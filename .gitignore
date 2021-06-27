@@ -1,0 +1,3 @@
+# Project exclude paths
+/Compiler/target/
+/Runtime/target/

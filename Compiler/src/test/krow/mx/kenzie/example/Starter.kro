@@ -1,0 +1,24 @@
+export <>
+class mx/kenzie/example/Starter extends mx/kenzie/example/Super {
+
+    export <>
+    static myMethod() void {
+        final String string = "hello";
+        System.out.println(string);
+    }
+
+}
+
+/*
+package mx.kenzie.example;
+
+public class Starter extends Super {
+
+    public static void myMethod() {
+        final String string = "hello";
+        System.out.println(string);
+    }
+
+}
+
+*/

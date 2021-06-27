@@ -1,0 +1,77 @@
+
+import <
+    mx/kenzie/MyJavaClass, MyJavaClass::new(I,I),
+    S(name:String,age:I)
+>
+export <>
+class com/example/Test extends com/example/Super {
+
+    export <> const String NAME = "hello";
+    static MyJavaClass thingy = {
+        int x = 100, y = 99;
+        return new MyJavaClass(x, y);
+    };
+
+    struct something = { int x; int y; }
+
+    static {
+
+    }
+
+    constructor() {
+        this.something.x = 20;
+        this.something.y = 21;
+
+        MyJavaClass fake = new MyJavaClass; // allocates instance, doesn't run <init>
+        fake(1, 2); // runs the constructor
+        MyJavaClass real = new MyJavaClass(1, 2); // allocates instance, runs constructor
+
+    }
+
+    import <java/util/UUID>
+    export <> // exports this::myMethod(java/lang/String,I,java/util/UUID)S(name:String,age:I,id:java/util/UUID),
+    struct myMethod(String name, int age, UUID id) {
+        return struct(name, age); // implicit struct { String name; int age; }
+    }
+
+    export <>
+    bridge <this::myMethod(String,I,UUID)S(name:String,age:I,id:java/util/UUID)>
+    struct myMethod(Object name, int age, Object id);
+
+
+    export <> // exports Test::createNew
+    static
+    Test createNew() {
+        return new Test;
+    }
+
+    void myMethod() {
+
+        Thing thing = new Thing();
+        Thing thing = new Thing;
+
+        int i = 10;
+        final long l = {
+            if (i > 5) return 20;
+            else return 30;
+        }
+    }
+
+    import <org/bukkit/Player, Player::getHealth, Player::getName>
+    export <S(health:D,name:String)>
+    struct getData(Player player) {
+        return {
+            double health = player.getHealth();
+            String name = player.getName();
+        }
+    }
+
+    void use() {
+
+        final struct data = getData(player);
+        if (data.health > 20) //...
+        if (data.name.equals("henry")) // ...
+
+    }
+
+}
