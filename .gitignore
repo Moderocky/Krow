@@ -1,3 +1,6 @@
 # Project exclude paths
 /Compiler/target/
 /Runtime/target/
+*.class
+.idea/
+.DS_Store
