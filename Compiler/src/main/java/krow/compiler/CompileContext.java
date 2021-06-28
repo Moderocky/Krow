@@ -32,6 +32,7 @@ public class CompileContext {
     public List<WriteInstruction> statement = new ArrayList<>();
     public List<PreMethodCall> preparing = new ArrayList<>();
     public CompileExpectation expectation = CompileExpectation.NONE;
+    public WriteInstruction skip; // stacked when DEAD_END reached (eol)
     public PreVariable store;
     public boolean inverted;
     public List<Object> exports = new ArrayList<>();

@@ -10,39 +10,31 @@ import krow.compiler.pre.PreClass;
 import mx.kenzie.foundation.Type;
 import mx.kenzie.foundation.WriteInstruction;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-public class StringLiteralHandler implements Handler, PostAssignment {
-    
-    private static final Pattern PATTERN = Pattern.compile("^\"[^\"\\\\\\r\\n]*(?:\\\\.[^\"\\\\\\r\\n]*)*\"");
+public class BooleanLiteralHandler implements Handler, PostAssignment {
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
         switch (context.expectation) {
-            case TYPE, DEAD_END, PRIMITIVE, DOWN, UP, METHOD, FIELD:
+            case TYPE, DEAD_END, DOWN, UP, METHOD, FIELD:
                 return false;
         }
-        return statement.startsWith("\"") && PATTERN.matcher(statement).find();
+        return statement.startsWith("true") || statement.startsWith("false");
     }
     
     @Override
     public HandleResult handle(String statement, PreClass data, CompileContext context, CompileState state) {
-        final Matcher matcher = PATTERN.matcher(statement);
-        matcher.find();
-        final String input = matcher.group();
-        final String value = input.substring(1, input.length() - 1);
-        context.child.statement.add(WriteInstruction.loadConstant(value));
+        final boolean value = statement.startsWith("true");
+        context.child.statement.add(value ? WriteInstruction.push1() : WriteInstruction.push0());
         context.expectation = CompileExpectation.NONE;
         attemptAssignment(context, state);
         if (state == CompileState.IN_CALL) {
-            context.child.preparing.get(0).addParameter(new Type(String.class));
+            context.child.preparing.get(0).addParameter(new Type(boolean.class));
         }
-        return new HandleResult(null, statement.substring(input.length()).trim(), state);
+        return new HandleResult(null, statement.substring(value ? 4 : 5).trim(), state);
     }
     
     @Override
     public String debugName() {
-        return "LDC_STRING";
+        return "BIPUSH_Z";
     }
 }

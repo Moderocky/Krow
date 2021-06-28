@@ -70,6 +70,8 @@ public class BasicCompiler implements Compiler<Krow> {
         ));
         HANDLERS.put(CompileState.IN_STATEMENT, List.of(
             new krow.compiler.handler.instatement.DeadEndHandler(),
+            new krow.compiler.handler.instatement.BooleanLiteralHandler(),
+            new krow.compiler.handler.instatement.CharLiteralHandler(),
             new krow.compiler.handler.instatement.StringLiteralHandler(),
             new krow.compiler.handler.inmethod.MethodCallStartHandler(), // goes in either
             new krow.compiler.handler.instatement.VarLoadHandler()
@@ -77,7 +79,10 @@ public class BasicCompiler implements Compiler<Krow> {
         HANDLERS.put(CompileState.IN_CALL, List.of(
             new krow.compiler.handler.incall.MethodCallEndHandler(),
             new krow.compiler.handler.incall.MethodSplitParameterHandler(),
+            new krow.compiler.handler.instatement.BooleanLiteralHandler(),
+            new krow.compiler.handler.instatement.CharLiteralHandler(),
             new krow.compiler.handler.instatement.StringLiteralHandler(),
+            new krow.compiler.handler.inmethod.MethodCallStartHandler(), // goes in either
             new krow.compiler.handler.incall.VarLoadHandler()
         ));
     }

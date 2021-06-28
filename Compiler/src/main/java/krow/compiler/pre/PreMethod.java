@@ -1,5 +1,6 @@
 package krow.compiler.pre;
 
+import krow.compiler.CompileContext;
 import mx.kenzie.foundation.Type;
 import mx.kenzie.foundation.WriteInstruction;
 
@@ -34,6 +35,18 @@ public class PreMethod {
         signature.name = name;
         signature.mode = Signature.Mode.METHOD;
         return signature;
+    }
+    
+    public WriteInstruction execute(final CompileContext context, boolean dynamic) {
+        PreMethod method = context.findMethod(owner, name, parameters);
+        if (method == null) method = context.findMethod(owner, name, parameters.size());
+        if (context.upcoming(Modifier.ABSTRACT)) {
+            return WriteInstruction.invokeInterface(method.owner, method.returnType, method.name, method.parameters.toArray(new Type[0]));
+        } else if (dynamic) {
+            return WriteInstruction.invokeVirtual(method.owner, method.returnType, method.name, method.parameters.toArray(new Type[0]));
+        } else {
+            return WriteInstruction.invokeStatic(method.owner, method.returnType, method.name, method.parameters.toArray(new Type[0]));
+        }
     }
     
     public void emergencyExit(final List<WriteInstruction> list) {

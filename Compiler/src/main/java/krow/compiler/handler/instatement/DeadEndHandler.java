@@ -21,11 +21,14 @@ public class DeadEndHandler implements Handler {
     public HandleResult handle(String statement, PreClass data, CompileContext context) {
         if (context.child.inverted)
             Collections.reverse(context.child.statement);
+        if (context.child.skip != null)
+            context.child.statement.add(context.child.skip);
         context.currentMethod.writeCode(context.child.statement.toArray(new WriteInstruction[0]));
         context.child.preparing.clear();
         context.child.statement.clear();
         context.child.expectation = CompileExpectation.NONE;
         context.child.store = null;
+        context.child.skip = null;
         context.expectation = CompileExpectation.NONE;
         return new HandleResult(null, statement.substring(1).trim(), CompileState.IN_METHOD);
     }

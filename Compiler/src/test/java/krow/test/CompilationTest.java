@@ -5,7 +5,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -117,12 +116,17 @@ public class CompilationTest {
                     out.println(value);
                 }
                 
+                static String internalMethod() {
+                    return "you are a bold one :)";
+                }
+                
                 export <>
                 static final void testMethod2(PrintStream out) {
                     String value;
                     value = "general kenobi";
+                    String end = Thingy.internalMethod();
                     out.println(value);
-                    out.println("you are a bold one :)");
+                    out.println(end);
                 }
                 
                 export <>

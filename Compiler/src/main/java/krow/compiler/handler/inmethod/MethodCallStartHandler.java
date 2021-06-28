@@ -2,6 +2,7 @@ package krow.compiler.handler.inmethod;
 
 import krow.compiler.*;
 import krow.compiler.handler.Handler;
+import krow.compiler.handler.PostAssignment;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.PreMethodCall;
 import krow.compiler.pre.PreVariable;
@@ -12,7 +13,7 @@ import mx.kenzie.foundation.WriteInstruction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MethodCallStartHandler implements Handler {
+public class MethodCallStartHandler implements Handler, PostAssignment {
     
     private static final Pattern PATTERN = Pattern.compile("^(?<target>" + Signature.TYPE_STRING + "|" + Signature.IDENTIFIER + ")\\s*\\.\\s*(?<name>" + Signature.IDENTIFIER + ")\\s*\\(");
     

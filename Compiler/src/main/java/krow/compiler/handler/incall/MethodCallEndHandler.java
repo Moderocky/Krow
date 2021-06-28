@@ -5,10 +5,11 @@ import krow.compiler.CompileExpectation;
 import krow.compiler.CompileState;
 import krow.compiler.HandleResult;
 import krow.compiler.handler.Handler;
+import krow.compiler.handler.PostAssignment;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.PreMethodCall;
 
-public class MethodCallEndHandler implements Handler {
+public class MethodCallEndHandler implements Handler, PostAssignment {
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
@@ -26,8 +27,10 @@ public class MethodCallEndHandler implements Handler {
         context.child.statement.add(call.execute(context));
         context.child.preparing.remove(0);
         context.expectation = CompileExpectation.NONE;
+        final boolean inCall = context.child.preparing.size() > 0;
+        attemptAssignment(context, inCall ? CompileState.IN_CALL : CompileState.IN_STATEMENT);
         return new HandleResult(null, statement.substring(1)
-            .trim(), context.child.preparing.size() > 0 ? CompileState.IN_CALL : CompileState.IN_STATEMENT);
+            .trim(), inCall ? CompileState.IN_CALL : CompileState.IN_STATEMENT);
     }
     
     @Override

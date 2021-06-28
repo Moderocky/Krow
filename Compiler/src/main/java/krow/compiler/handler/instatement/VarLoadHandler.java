@@ -5,6 +5,7 @@ import krow.compiler.CompileExpectation;
 import krow.compiler.CompileState;
 import krow.compiler.HandleResult;
 import krow.compiler.handler.Handler;
+import krow.compiler.handler.PostAssignment;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.PreVariable;
 import krow.compiler.pre.Signature;
@@ -14,7 +15,7 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class VarLoadHandler implements Handler {
+public class VarLoadHandler implements Handler, PostAssignment {
     
     private static final Pattern PATTERN = Pattern.compile("^(?<name>" + Signature.IDENTIFIER + ")");
     
@@ -41,12 +42,7 @@ public class VarLoadHandler implements Handler {
             context.child.statement.add(variable.load(context.child.variables.indexOf(variable)));
         }
         context.expectation = CompileExpectation.NONE;
-        final PreVariable assignment;
-        if ((assignment = context.child.store) != null) {
-            context.child.statement.add(assignment.store(context.child.variables.indexOf(assignment)));
-            context.expectation = CompileExpectation.DEAD_END;
-            context.child.store = null;
-        }
+        attemptAssignment(context, state);
         return new HandleResult(null, statement.substring(input.length()).trim(), state);
     }
     
