@@ -3,6 +3,7 @@ package krow.compiler.pre;
 import mx.kenzie.foundation.Type;
 import mx.kenzie.foundation.WriteInstruction;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +14,7 @@ public class PreMethod {
     public List<Type> parameters = new ArrayList<>();
     public List<PreVariable> variables = new ArrayList<>();
     public String name;
-    public boolean isAbstract, isFinal, isStatic;
+    public int modifiers;
     
     public PreMethod() {
     }
@@ -43,7 +44,6 @@ public class PreMethod {
             case "short":
             case "byte":
                 list.add(WriteInstruction.push0());
-                list.add(WriteInstruction.convert(int.class, float.class));
                 list.add(WriteInstruction.returnSmall());
                 break;
             case "long":
@@ -68,4 +68,29 @@ public class PreMethod {
         }
     }
     
+    public WriteInstruction invoke() {
+        return this.invoke(false);
+    }
+    
+    public WriteInstruction invoke(boolean isInterface) {
+        if (Modifier.isStatic(modifiers)) {
+            return WriteInstruction.invokeStatic(owner, returnType, name, parameters.toArray(new Type[0]));
+        } else if (isInterface) {
+            return WriteInstruction.invokeInterface(owner, returnType, name, parameters.toArray(new Type[0]));
+        } else {
+            return WriteInstruction.invokeVirtual(owner, returnType, name, parameters.toArray(new Type[0]));
+        }
+    }
+    
+    @Override
+    public String toString() {
+        return "PreMethod{" +
+            "owner=" + owner +
+            ", returnType=" + returnType +
+            ", parameters=" + parameters +
+            ", variables=" + variables +
+            ", name='" + name + '\'' +
+            ", modifiers=" + modifiers +
+            '}';
+    }
 }

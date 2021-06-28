@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 public class DeclareAssignVarHandler implements Handler {
     
-    private static final Pattern PATTERN = Pattern.compile("^(?:final |var )?(?<type>" + Signature.TYPE_STRING + ")\\s+(?<name>" + Signature.IDENTIFIER + ")\\s*=");
+    private static final Pattern PATTERN = Pattern.compile("^(?:final )?(?<type>" + Signature.TYPE_STRING + ")\\s+(?<name>" + Signature.IDENTIFIER + ")\\s*=");
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
@@ -32,14 +32,15 @@ public class DeclareAssignVarHandler implements Handler {
         final String name = matcher.group("name");
         final Type type = Resolver.resolveType(target, context.availableTypes().toArray(new Type[0]));
         assert (context.getVariable(name) == null);
-        context.child.variables.add(new PreVariable(name, type));
+        final PreVariable assignment;
+        context.child.variables.add(assignment = new PreVariable(name, type));
         context.expectation = CompileExpectation.OBJECT;
-        int throwback = (input.startsWith("final ") ? 6 : input.startsWith("var ") ? 4 : 0) + target.length();
-        return new HandleResult(null, statement.substring(throwback).trim(), CompileState.IN_STATEMENT);
+        context.child.store = assignment;
+        return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.IN_STATEMENT);
     }
     
     @Override
     public String debugName() {
-        return "DECLARE_VARIABLE";
+        return "DECLARE_VARIABLE_AND_STORE";
     }
 }

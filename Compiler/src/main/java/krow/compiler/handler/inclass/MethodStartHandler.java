@@ -11,11 +11,12 @@ import krow.compiler.pre.PreVariable;
 import krow.compiler.pre.Signature;
 import mx.kenzie.foundation.Type;
 
+import java.lang.reflect.Modifier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MethodStartHandler implements Handler {
-    private static final Pattern PATTERN = Pattern.compile("^(?:(?:abstract|final)\\s+)?(?<type>" + Signature.TYPE_STRING + ")\\s+(?<name>" + Signature.IDENTIFIER + ")\\s*\\(");
+    private static final Pattern PATTERN = Pattern.compile("^(?<type>" + Signature.TYPE_STRING + ")\\s+(?<name>" + Signature.IDENTIFIER + ")\\s*\\(");
     
     @Override
     public boolean accepts(String statement) {
@@ -26,19 +27,16 @@ public class MethodStartHandler implements Handler {
     public HandleResult handle(String statement, PreClass data, CompileContext context) {
         final Matcher matcher = PATTERN.matcher(statement);
         matcher.find();
-        final boolean isFinal = statement.startsWith("final"), isAbstract = statement.startsWith("abstract");
         final String type = matcher.group("type");
         final String name = matcher.group("name");
         final PreMethod method = new PreMethod();
         method.owner = data.path;
         method.name = name;
         method.returnType = Resolver.resolveType(type, context.availableTypes().toArray(new Type[0]));
-        method.isAbstract = isAbstract;
-        method.isFinal = isFinal;
-        method.isStatic = context.child.isStatic;
+        method.modifiers |= context.upcoming();
         context.method = method;
         context.availableMethods.add(method);
-        if (!context.child.isStatic) {
+        if (!context.upcoming(Modifier.STATIC)) {
             context.child.variables.add(new PreVariable("this", data.path));
         }
         return new HandleResult(null, statement.substring(statement.indexOf('(') + 1)

@@ -1,9 +1,6 @@
 package krow.compiler;
 
-import krow.compiler.pre.PreField;
-import krow.compiler.pre.PreMethod;
-import krow.compiler.pre.PreMethodCall;
-import krow.compiler.pre.PreVariable;
+import krow.compiler.pre.*;
 import mx.kenzie.foundation.*;
 
 import java.util.ArrayList;
@@ -19,8 +16,18 @@ public class CompileContext {
     public List<PreMethod> availableMethods = new ArrayList<>();
     public List<PreField> availableFields = new ArrayList<>();
     
-    // child
-    public boolean isStatic;
+    {
+        availableTypes.add(new Type(String.class));
+        availableTypes.add(new Type(Object.class));
+        availableTypes.add(new Type(Integer.class));
+        availableTypes.add(new Type(Class.class));
+    }
+    
+    //region Child
+    //region Keywords Upcoming
+    public int modifiersUpcoming;
+    public PreMethod bridgeTarget;
+    //endregion
     public List<PreVariable> variables = new ArrayList<>();
     public List<WriteInstruction> statement = new ArrayList<>();
     public List<PreMethodCall> preparing = new ArrayList<>();
@@ -30,17 +37,48 @@ public class CompileContext {
     public List<Object> exports = new ArrayList<>();
     public boolean exported;
     public boolean hasBody;
+    //endregion
     
     public ClassBuilder builder;
     public FieldBuilder currentField;
     public MethodBuilder currentMethod;
     public PreMethod method;
     
+    public boolean upcoming(int modifiers) {
+        final int test;
+        if (child != null) test = child.modifiersUpcoming; // preference for child modifiers
+        else test = modifiersUpcoming;
+        return (test & modifiers) != 0;
+    }
+    
+    public void addUpcoming(int modifiers) { // want to make sure they go on child so we can trough after dead end
+        if (child != null) child.modifiersUpcoming |= modifiers;
+        else modifiersUpcoming |= modifiers;
+    }
+    
+    public int upcoming() {
+        final int test;
+        if (child != null) test = child.modifiersUpcoming;
+        else test = modifiersUpcoming;
+        return test;
+    }
+    
     public int getSlot(final String variable) {
         for (int i = 0; i < variables.size(); i++) {
             if (variables.get(i).name().equals(variable)) return i;
         }
         return -1;
+    }
+    
+    public PreMethod findMethod(final Signature signature) {
+        final List<PreMethod> methods = new ArrayList<>(availableMethods);
+        if (child != null) methods.addAll(child.availableMethods);
+        final PreMethod test = new PreMethod(signature);
+        for (final PreMethod method : methods) {
+            if (method.name.equals(test.name) && method.owner.equals(test.owner) && method.parameters.equals(test.parameters))
+                return method;
+        }
+        return null;
     }
     
     public PreMethod findMethod(final Type owner, final String name) {

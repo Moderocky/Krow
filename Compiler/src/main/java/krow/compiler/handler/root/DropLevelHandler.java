@@ -21,7 +21,12 @@ public class DropLevelHandler implements Handler {
         context.child = new CompileContext();
         context.builder = new ClassBuilder(new Type(data.path.dotPath()))
             .addInterfaces(data.interfaces.toArray(new Type[0]))
-            .setSuperclass(data.extend);
+            .setSuperclass(data.extend)
+            .addModifiers(context.upcoming());
+        context.modifiersUpcoming = 0;
+        context.availableTypes.add(data.path);
+        context.availableTypes.add(data.extend);
+        context.availableTypes.addAll(data.interfaces);
         return new HandleResult(null, statement.substring(1).trim(), CompileState.IN_CLASS);
     }
     

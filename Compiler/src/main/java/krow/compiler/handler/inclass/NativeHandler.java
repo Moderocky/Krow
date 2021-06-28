@@ -8,21 +8,21 @@ import krow.compiler.pre.PreClass;
 
 import java.lang.reflect.Modifier;
 
-public class StaticHandler implements Handler {
+public class NativeHandler implements Handler {
     
     @Override
     public boolean accepts(String statement) {
-        return statement.startsWith("static");
+        return statement.startsWith("native");
     }
     
     @Override
-    public HandleResult handle(String statement, PreClass data, CompileContext context, CompileState state) {
-        context.addUpcoming(Modifier.STATIC);
-        return new HandleResult(null, statement.substring(6).trim(), state);
+    public HandleResult handle(String statement, PreClass data, CompileContext context) {
+        context.addUpcoming(Modifier.NATIVE);
+        return new HandleResult(null, statement.substring(6).trim(), CompileState.IN_CLASS);
     }
     
     @Override
     public String debugName() {
-        return "UPCOMING_STATIC";
+        return "UPCOMING_NATIVE";
     }
 }

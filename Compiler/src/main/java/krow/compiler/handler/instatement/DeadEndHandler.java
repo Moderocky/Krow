@@ -26,6 +26,7 @@ public class DeadEndHandler implements Handler {
         context.child.statement.clear();
         context.child.expectation = CompileExpectation.NONE;
         context.child.store = null;
+        context.expectation = CompileExpectation.NONE;
         return new HandleResult(null, statement.substring(1).trim(), CompileState.IN_METHOD);
     }
     

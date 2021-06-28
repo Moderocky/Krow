@@ -1,6 +1,8 @@
 package krow.compiler;
 
 import krow.compiler.handler.Handler;
+import krow.compiler.handler.inclass.AbstractHandler;
+import krow.compiler.handler.inclass.FinalHandler;
 import krow.compiler.handler.inmethodheader.MethodEndParameterHandler;
 import krow.compiler.handler.inmethodheader.MethodParameterHandler;
 import krow.compiler.handler.inmethodheader.MethodSplitParameterHandler;
@@ -31,6 +33,8 @@ public class BasicCompiler implements Compiler<Krow> {
     
     static {
         HANDLERS.put(CompileState.ROOT, List.of(
+            new AbstractHandler(),
+            new FinalHandler(),
             new ImportHandler(),
             new ExportHandler(),
             new ClassHandler(),
@@ -42,6 +46,10 @@ public class BasicCompiler implements Compiler<Krow> {
             new krow.compiler.handler.inclass.DeadEndHandler(),
             new krow.compiler.handler.inclass.DropLevelHandler(),
             new krow.compiler.handler.inclass.StaticHandler(),
+            new krow.compiler.handler.inclass.AbstractHandler(),
+            new krow.compiler.handler.inclass.FinalHandler(),
+            new krow.compiler.handler.inclass.BridgeHandler(),
+            new krow.compiler.handler.inclass.SynchronizedHandler(),
             new krow.compiler.handler.inclass.ImportHandler(),
             new krow.compiler.handler.inclass.ExportHandler(),
             new krow.compiler.handler.inclass.MethodStartHandler()
@@ -81,12 +89,10 @@ public class BasicCompiler implements Compiler<Krow> {
         throw new RuntimeException("No handler matches: '" + statement + "' in " + state.name());
     }
     
-    protected void compile(final String statement, final CompileState state, final PreClass data, final CompileContext context) {
+    protected HandleResult compile(final String statement, final CompileState state, final PreClass data, final CompileContext context) {
         final Handler handler = this.getHandler(statement, state, context);
         if ("1".equals(System.getProperty("TEST_STATE"))) System.out.println(handler.debugName());
-        final HandleResult result = handler.handle0(statement, data, context, state);
-        if (result != null)
-            this.compile(result.remainder(), result.future(), data, context);
+        return handler.handle0(statement, data, context, state);
     }
     
     public ClassBuilder compile0(final String file) {
@@ -95,7 +101,10 @@ public class BasicCompiler implements Compiler<Krow> {
         final String input = file
             .replaceAll(LINE_COMMENT.pattern(), "")
             .replaceAll(BLOCK_COMMENT.pattern(), "").trim();
-        this.compile(input.trim(), CompileState.ROOT, pre, context);
+        HandleResult result = new HandleResult(null, input.trim(), CompileState.ROOT);
+        do {
+            result = this.compile(result.remainder(), result.future(), pre, context);
+        } while (result != null);
         final ClassBuilder builder = context.builder;
         if (context.exported) builder.addModifiers(ACC_PUBLIC);
         return builder;

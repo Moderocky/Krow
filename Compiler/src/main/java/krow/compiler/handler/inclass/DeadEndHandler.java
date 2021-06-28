@@ -1,6 +1,7 @@
 package krow.compiler.handler.inclass;
 
 import krow.compiler.CompileContext;
+import krow.compiler.CompileExpectation;
 import krow.compiler.CompileState;
 import krow.compiler.HandleResult;
 import krow.compiler.handler.Handler;
@@ -20,6 +21,7 @@ public class DeadEndHandler implements Handler {
         context.currentField = null;
         context.currentMethod = null;
         context.method = null;
+        context.expectation = CompileExpectation.NONE;
         return new HandleResult(null, statement.substring(1).trim(), CompileState.IN_CLASS);
     }
     

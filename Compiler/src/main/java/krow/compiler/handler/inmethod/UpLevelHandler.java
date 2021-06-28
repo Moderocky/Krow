@@ -27,7 +27,7 @@ public class UpLevelHandler implements Handler {
         context.currentField = null;
         context.currentMethod = null;
         context.method = null;
-        context.isStatic = false;
+        context.modifiersUpcoming = 0;
         context.expectation = CompileExpectation.NONE;
         return new HandleResult(null, statement.substring(1).trim(), CompileState.IN_CLASS);
     }

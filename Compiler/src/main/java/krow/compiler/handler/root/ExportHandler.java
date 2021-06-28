@@ -13,7 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ExportHandler implements Handler {
-    private static final Pattern PATTERN = Pattern.compile("^export\\s*?<(.*?)>");
+    private static final Pattern PATTERN = Pattern.compile("^export\\s*?<([^<>]*?)>");
     
     @Override
     public boolean accepts(String statement) {

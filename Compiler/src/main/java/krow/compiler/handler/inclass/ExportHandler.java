@@ -1,6 +1,7 @@
 package krow.compiler.handler.inclass;
 
 import krow.compiler.CompileContext;
+import krow.compiler.CompileExpectation;
 import krow.compiler.CompileState;
 import krow.compiler.HandleResult;
 import krow.compiler.handler.Handler;
@@ -13,7 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ExportHandler implements Handler {
-    private static final Pattern PATTERN = Pattern.compile("^export\\s*?<(.*?)>");
+    private static final Pattern PATTERN = Pattern.compile("^export\\s*?<([^<>]*?)>");
     
     @Override
     public boolean accepts(String statement) {
@@ -32,6 +33,7 @@ public class ExportHandler implements Handler {
                 new Signature(string.trim(), context.availableTypes().toArray(new Type[0])).export(context.child);
             }
         }
+        context.expectation = CompileExpectation.NONE;
         return new HandleResult(null, statement.substring(statement.indexOf('>') + 1).trim(), CompileState.IN_CLASS);
     }
     
