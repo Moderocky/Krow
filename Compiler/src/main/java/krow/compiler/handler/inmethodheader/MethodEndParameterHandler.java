@@ -28,7 +28,6 @@ public class MethodEndParameterHandler implements Handler {
         assert method.name != null;
         assert method.returnType != null;
         method.modifiers |= context.upcoming();
-        System.out.println(method.name + " : " + method.modifiers); // todo
         final MethodBuilder builder = context.builder
             .addMethod(method.name)
             .setModifiers(method.modifiers);
@@ -41,7 +40,6 @@ public class MethodEndParameterHandler implements Handler {
             final PreMethod target = context.child.bridgeTarget;
             int slot = 0;
             assert target.owner.equals(method.owner); // same class
-            System.out.println(target.name + " ? " + target.modifiers); // todo
             if (!Modifier.isStatic(target.modifiers)) {
                 assert !Modifier.isStatic(method.modifiers);
                 builder.writeCode(WriteInstruction.loadThis());
