@@ -6,20 +6,21 @@ import krow.compiler.CompileState;
 import krow.compiler.HandleResult;
 import krow.compiler.handler.Handler;
 import krow.compiler.pre.PreClass;
-import krow.compiler.pre.PreVariable;
-import krow.compiler.pre.Signature;
+import krow.compiler.pre.PreMethodCall;
+import mx.kenzie.foundation.WriteInstruction;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class AssignVarHandler implements Handler {
+public class ConstructorCallStartHandler implements Handler {
     
-    private static final Pattern PATTERN = Pattern.compile("^(?<name>" + Signature.IDENTIFIER + ")\\s*=");
+    private static final Pattern PATTERN = Pattern.compile("^(this|super)\\s*\\(");
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
+        if (!statement.startsWith("this") && !statement.startsWith("super")) return false;
         switch (context.expectation) {
-            case TYPE, DEAD_END, LITERAL, VARIABLE, SMALL, OBJECT:
+            case TYPE, DEAD_END, LITERAL, VARIABLE, SMALL:
                 return false;
         }
         return PATTERN.matcher(statement).find();
@@ -30,17 +31,20 @@ public class AssignVarHandler implements Handler {
         final Matcher matcher = PATTERN.matcher(statement);
         matcher.find();
         final String input = matcher.group();
-        final String name = matcher.group("name");
-        context.duplicate = true;
+        final boolean here = statement.startsWith("this");
+        final PreMethodCall call;
+        context.child.preparing.add(0, call = new PreMethodCall());
+        context.child.point = null;
+        call.dynamic = true;
+        call.owner = here ? data.path : data.extend;
+        call.name = "<init>";
+        context.child.statement.add(WriteInstruction.loadThis());
         context.expectation = CompileExpectation.OBJECT;
-        final PreVariable assignment = context.getVariable(name);
-        assert (assignment != null);
-        context.child.skip = assignment.store(context.getSlot(assignment));
-        return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.IN_STATEMENT);
+        return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.IN_CALL);
     }
     
     @Override
     public String debugName() {
-        return "PREPARE_STORE_VARIABLE";
+        return "BEGIN_INIT_CALL";
     }
 }

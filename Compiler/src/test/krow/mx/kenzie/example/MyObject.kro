@@ -1,0 +1,25 @@
+import <java/io/PrintStream> export <>
+class mx/kenzie/example/MyObject {
+
+    export <>
+    void <init>(String name) {
+        System.out.println(name);
+        super();
+    }
+
+    import <MyObject::myMethod(String)V>
+    export <>
+    static void test() {
+        MyObject var1 = new MyObject;
+        MyObject var2 = new MyObject("there");
+        var1("hello");
+        var1#myMethod("thing");
+    }
+
+    // private method, not exported
+    void myMethod(String name) {
+        System.out.println(name);
+    }
+
+}
+

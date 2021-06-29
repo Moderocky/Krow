@@ -1,13 +1,16 @@
 package krow.test;
 
 import krow.compiler.BasicCompiler;
+import krow.compiler.Krow;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 
 public class CompilationTest {
     
@@ -124,9 +127,13 @@ public class CompilationTest {
                 static final void testMethod2(PrintStream out) {
                     String value;
                     value = "general kenobi";
-                    String end = Thingy.internalMethod();
+                    String end = Thingy
+                        .internalMethod();
                     out.println(value);
-                    out.println(end);
+                    out
+                        .println(
+                            end
+                        );
                 }
                 
                 export <>
@@ -159,12 +166,125 @@ public class CompilationTest {
                 export <>
                 bridge <Bridge::testMethod1(PrintStream,String)V>
                 static void bridgeMethod(PrintStream out, Object value);
+                
             }
             """;
         final Class<?> basic = new BasicCompiler().compileAndLoad(source);
         assert basic != null;
         basic.getMethod("testMethod1", PrintStream.class, String.class).invoke(null, System.out, "a");
         basic.getMethod("bridgeMethod", PrintStream.class, Object.class).invoke(null, System.out, "b");
+    }
+    
+    @Test
+    public void constructor() throws Throwable {
+        final String source = """
+            import <java/lang/String, java/lang/System, java/io/PrintStream, System.out:PrintStream, PrintStream::println(String)V>
+            export <>
+            class mx/kenzie/Const {
+            
+                export <>
+                void <init>(String name) {
+                    super();
+                    System.out.println(name);
+                }
+                
+                export <>
+                void testMethod1(PrintStream out, String value) {
+                    out.println(value);
+                }
+                
+            }
+            """;
+        final Class<?> basic = new BasicCompiler().compileAndLoad(source);
+        assert basic != null;
+        final Object object = basic.getConstructor(String.class).newInstance("hello");
+        assert object != null;
+        basic.getMethod("testMethod1", PrintStream.class, String.class).invoke(object, System.out, "there");
+    }
+    
+    @Test
+    public void arrays() throws Throwable {
+        final String source = """
+            import <java/io/PrintStream, java/util/Arrays>
+            export <>
+            class mx/kenzie/Arr {
+            
+                import <Arrays::toString(Object[])String>
+                export <>
+                static void main(String[] value) {
+                    System.out.println(Arrays.toString(value));
+                }
+                
+            }
+            """;
+        final Class<?> basic = new BasicCompiler().compileAndLoad(source);
+        assert basic != null;
+        basic.getMethod("main", String[].class).invoke(null, (Object) new String[]{"hello", "there"});
+    }
+    
+    @Test
+    public void allocation() throws Throwable {
+        final String source = """
+            import <java/io/PrintStream> export <>
+            class mx/kenzie/Alloc {
+            
+                void <init>(String name) {
+                    System.out.println(name);
+                    super();
+                }
+            
+                export <>
+                static void test() {
+                    Alloc var1 = new Alloc;
+                    var1("hello");
+                    Alloc var2 = new Alloc("there");
+                }
+                
+            }
+            """;
+        final Class<?> basic = new BasicCompiler().compileAndLoad(source);
+        assert basic != null;
+        basic.getMethod("test").invoke(null);
+    }
+    
+    @Test
+    public void dynamic() throws Throwable {
+        final String source = """
+            import <java/io/PrintStream> export <>
+            class mx/kenzie/example/Dynamic {
+                
+                void <init>(String name) {
+                    System.out.println(name);
+                    super();
+                }
+                
+                import <Dynamic::myMethod(String)V, krow/test/AssumptionTest, AssumptionTest::privateMethod()Z>
+                export <>
+                static void test() {
+                    Dynamic var1 = new Dynamic;
+                    Dynamic var2 = new Dynamic("there");
+                    var1("hello");
+                    var1#myMethod("thing");
+                    
+                    boolean boo = AssumptionTest#privateMethod();
+                    System.out.println(boo);
+                }
+                
+                void myMethod(String name) {
+                    System.out.println(name);
+                }
+                
+            }
+            
+            """;
+        final Class<?> basic = new BasicCompiler().compileAndLoad(source);
+        assert basic != null;
+        basic.getMethod("test").invoke(null);
+    }
+    
+    @Test
+    public void full() {
+        Krow.main("TestTarget.ark", "src/test/krow", "mx.kenzie.example.Main");
     }
     
 }

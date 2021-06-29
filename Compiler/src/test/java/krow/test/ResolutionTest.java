@@ -3,8 +3,17 @@ package krow.test;
 import krow.compiler.Resolver;
 import krow.compiler.pre.PreStructure;
 import krow.compiler.pre.Signature;
+import mx.kenzie.foundation.ClassBuilder;
 import mx.kenzie.foundation.Type;
+import mx.kenzie.foundation.WriteInstruction;
+import mx.kenzie.foundation.opcodes.JavaVersion;
 import org.junit.Test;
+import org.objectweb.asm.Handle;
+
+import java.io.FileOutputStream;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 
 public class ResolutionTest {
     
@@ -64,6 +73,5 @@ public class ResolutionTest {
         assert org.objectweb.asm.Type.getInternalName(String.class).equals(new Type(String.class).internalName());
         assert int.class.descriptorString().equals(new Type(int.class).descriptorString());
     }
-    
     
 }

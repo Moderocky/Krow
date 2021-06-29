@@ -12,10 +12,10 @@ public class Signature {
     public static final String TYPE_STRING = IDENTIFIER + "(/" + IDENTIFIER + ")*(?:\\[])?";
     public static final String STRUCTURE_STRING = "S\\(" + IDENTIFIER + ":" + TYPE_STRING + "(," + IDENTIFIER + ":" + TYPE_STRING + ")*" + "\\)";
     public static final String CL_TYPE_STRING = "(" + TYPE_STRING + "|" + STRUCTURE_STRING + ")";
-    private static final Pattern TYPE_PATTERN = Pattern.compile(TYPE_STRING);
-    private static final Pattern FIELD_PATTERN = Pattern.compile(TYPE_STRING + "\\." + IDENTIFIER + ":" + TYPE_STRING);
-    private static final Pattern STRUCTURE_PATTERN = Pattern.compile(STRUCTURE_STRING);
-    private static final Pattern METHOD_PATTERN = Pattern.compile(TYPE_STRING + "::" + IDENTIFIER + "\\(" + "(" + CL_TYPE_STRING + ",?)*" + "\\)" + CL_TYPE_STRING);
+    public static final Pattern TYPE_PATTERN = Pattern.compile(TYPE_STRING);
+    public static final Pattern FIELD_PATTERN = Pattern.compile(TYPE_STRING + "\\." + IDENTIFIER + ":" + TYPE_STRING);
+    public static final Pattern STRUCTURE_PATTERN = Pattern.compile(STRUCTURE_STRING);
+    public static final Pattern METHOD_PATTERN = Pattern.compile(TYPE_STRING + "::" + IDENTIFIER + "\\(" + "(" + CL_TYPE_STRING + ",?)*" + "\\)" + CL_TYPE_STRING);
     
     protected String value;
     protected Mode mode;
@@ -45,10 +45,14 @@ public class Signature {
                 owner = Resolver.resolveType(value.substring(0, value.indexOf(':')), available);
                 name = value.substring(value.indexOf("::") + 2, value.indexOf('('));
                 bound = Resolver.resolveType(value.substring(value.indexOf(')') + 1), available);
-                final String[] parts = value.substring(value.indexOf('(') + 1, value.indexOf(')')).split(",");
-                inside = new Type[parts.length];
-                for (int i = 0; i < parts.length; i++) {
-                    inside[i] = Resolver.resolveType(parts[i], available);
+                final String sub = value.substring(value.indexOf('(') + 1, value.indexOf(')')).trim();
+                if (sub.isBlank()) inside = new Type[0];
+                else {
+                    final String[] parts = sub.split(",");
+                    inside = new Type[parts.length];
+                    for (int i = 0; i < parts.length; i++) {
+                        inside[i] = Resolver.resolveType(parts[i], available);
+                    }
                 }
             }
             case STRUCTURE -> {
@@ -90,7 +94,14 @@ public class Signature {
         switch (mode) {
             case METHOD -> context.availableMethods.add(new PreMethod(this));
             case FIELD -> context.availableFields.add(new PreField(this));
-            case TYPE, STRUCTURE -> context.availableTypes.add(this.owner);
+            case TYPE, STRUCTURE -> {
+                context.availableTypes.add(this.owner);
+                try {
+                    final Class<?> cls = Class.forName(this.owner.dotPath());
+                    context.importJava(cls);
+                } catch (ClassNotFoundException ignore) {
+                }
+            }
         }
     }
     

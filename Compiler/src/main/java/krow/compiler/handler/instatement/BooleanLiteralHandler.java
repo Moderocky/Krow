@@ -5,12 +5,11 @@ import krow.compiler.CompileExpectation;
 import krow.compiler.CompileState;
 import krow.compiler.HandleResult;
 import krow.compiler.handler.Handler;
-import krow.compiler.handler.PostAssignment;
 import krow.compiler.pre.PreClass;
 import mx.kenzie.foundation.Type;
 import mx.kenzie.foundation.WriteInstruction;
 
-public class BooleanLiteralHandler implements Handler, PostAssignment {
+public class BooleanLiteralHandler implements Handler {
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
@@ -26,10 +25,7 @@ public class BooleanLiteralHandler implements Handler, PostAssignment {
         final boolean value = statement.startsWith("true");
         context.child.statement.add(value ? WriteInstruction.push1() : WriteInstruction.push0());
         context.expectation = CompileExpectation.NONE;
-        attemptAssignment(context, state);
-        if (state == CompileState.IN_CALL) {
-            context.child.preparing.get(0).addParameter(new Type(boolean.class));
-        }
+        context.child.point = new Type(boolean.class);
         return new HandleResult(null, statement.substring(value ? 4 : 5).trim(), state);
     }
     

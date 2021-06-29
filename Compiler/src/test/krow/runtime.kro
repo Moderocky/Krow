@@ -1,0 +1,43 @@
+
+import<java/lang/invoke/MethodHandles, java/lang/invoke/MethodHandles$Lookup, java/lang/invoke/CallSite, java/lang/invoke/ConstantCallSite, java/lang/invoke/MethodType, java/lang/invoke/MethodHandle>
+export<>
+final class krow/lang/Runtime {
+
+    import <MethodType::dropParameterTypes(I,I)MethodType, MethodHandles$Lookup::findVirtual(Class,String,MethodType)MethodHandle>
+    export <>
+    static CallSite bootstrapDynamic(MethodHandles$Lookup caller, String name, MethodType type, Class owner) {
+        MethodHandle handle;
+        MethodType end = type.dropParameterTypes(false, true);
+        handle = caller.findVirtual(owner, name, type);
+        ConstantCallSite site = new ConstantCallSite(handle);
+        return site;
+    }
+
+    import <MethodHandles$Lookup::findStatic(Class,String,MethodType)MethodHandle>
+    export <>
+    static CallSite bootstrap(MethodHandles$Lookup caller, String name, MethodType type, Class owner) {
+        MethodHandle handle = caller.findStatic(owner, name, type);
+        ConstantCallSite site = new ConstantCallSite(handle);
+        return site;
+    }
+
+    import <MethodHandles$Lookup::findStatic(Class,String,MethodType)MethodHandle>
+    export <>
+    static CallSite bootstrapPrivate(MethodHandles$Lookup caller, String name, MethodType type, Class owner) {
+        final MethodHandle handle;
+        handle = MethodHandles.privateLookupIn(owner, caller).findStatic(owner, name, type);
+        ConstantCallSite site = new ConstantCallSite(handle);
+        return site;
+    }
+
+    import <MethodType::dropParameterTypes(I,I)MethodType, MethodHandles$Lookup::findVirtual(Class,String,MethodType)MethodHandle>
+    export <>
+    static CallSite bootstrapPrivateDynamic(MethodHandles$Lookup caller, String name, MethodType type, Class owner) {
+        final MethodHandle handle;
+        final MethodType end = type.dropParameterTypes(false, true);
+        handle = MethodHandles.privateLookupIn(owner, caller).findVirtual(owner, name, end);
+        ConstantCallSite site = new ConstantCallSite(handle);
+        return site;
+    }
+
+}

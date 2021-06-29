@@ -18,15 +18,44 @@ Clearly, there are many situations where these benefits outweigh their drawbacks
 
 ## Keywords
 
+### Metadata Keywords
+
+Metadata keywords provide information to the compiler for the upcoming element.
+While they exist only at source level, they can have side effects in the compiled result.
+
 |Word|Value|Target|Description|
 |----|-----------|------|-----------|
 |`import`|Reference `<>` metadata.|Class declaration, field declaration, method declaration.|Asserts the given references exist in the target area, allows use of their shortened names.|
 |`export`|Reference `<>` metadata.|Class declaration, field declaration, method declaration.|Exports the given element for use outside the class. Exports any included elements to users of this element.|
-|`static`|None.|Field declaration, method declaration.|Marks the upcoming class member as static.|
-|`abstract`|None.|Class declaration, method declaration.|Marks the upcoming method as implemented elsewhere.|
-|`final`|None.|Field declaration, class declaration, method declaration.|Marks the upcoming element as final.|
-|`bridge`|Reference `<>` metadata.|Method declaration.|Sets the bridge target of the upcoming method.|
+|`bridge`|Reference `<>` metadata for a method.|Method declaration.|Sets the bridge target of the upcoming method.|
 
+### Modifier Keywords
+
+Modifier keywords modify the upcoming element. They are effective in the compiled result.
+Note: Krow does not directly offer visibility modifiers.
+
+|Word|Target|Description|
+|----|-----------|------|
+|`static`|Field declaration, method declaration.|Marks the upcoming class member as static.|
+|`abstract`|Class declaration, method declaration.|Marks the upcoming method as implemented elsewhere.|
+|`final`|Field declaration, class declaration, method declaration.|Marks the upcoming element as final.|
+|`native`|Method declaration.|Marks the upcoming element as implemented elsewhere.|
+
+### Type Keywords
+
+Type keywords are used to designate primitive (or built-in) in fields, methods, variables and returns.
+
+|Word|Length|Machine Words|Descriptor|
+|----|------|-------------|----------|
+|`void`|1|1|V|
+|`boolean`|1|1|Z|
+|`char`|2|1|C|
+|`short`|2|1|S|
+|`int`|4|1|I|
+|`long`|8|2|J|
+|`float`|4|1|F|
+|`double`|8|2|D|
+|`struct`|8 (16+ in real memory)|2|S(...) // See [struct](#Structs) section.|
 
 ## Core Features
 
@@ -87,11 +116,30 @@ void use(Player player) {
 }
 ```
 
+## Particles
 
-### The Metadata Particle
+Krow uses particles to indicate new functionality without making the language more verbose or confusing than it needs to be.
+Particles reduce the need for new keywords, are easier to spot and highlight and make parsing more efficient.
+
+|Symbol|Name|Description|
+|------|----|-----------|
+|`<>`|[Meta Section](#the-metadata-particle-)|Reference metadata section (for imports, exports, bridges).|
+|`?`|[Optional](#the-optional-particle-)|Null inference and control.|
+|`@`|[Target](#the-target-particle-)|Reserved.|
+|`#`|[Tag](#the-tag-particle-)|Reserved.|
+
+### The Metadata Particle `<>`
 
 Todo.
 
-## #The Optional Particle
+### The Optional Particle `?`
 
 Todo.
+
+### The Target Particle `@`
+
+Reserved.
+
+### The Tag Particle `#`
+
+Reserved.

@@ -5,24 +5,25 @@ import krow.compiler.CompileExpectation;
 import krow.compiler.CompileState;
 import krow.compiler.HandleResult;
 import krow.compiler.handler.Handler;
-import krow.compiler.handler.PostAssignment;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.PreVariable;
 import krow.compiler.pre.Signature;
 import mx.kenzie.foundation.WriteInstruction;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class VarLoadHandler implements Handler, PostAssignment {
+public class VarLoadHandler implements Handler {
     
     private static final Pattern PATTERN = Pattern.compile("^(?<name>" + Signature.IDENTIFIER + ")");
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
         switch (context.expectation) {
-            case TYPE, DEAD_END, LITERAL, METHOD, FIELD:
+            case TYPE, DEAD_END, LITERAL, METHOD, FIELD, DOWN, UP:
                 return false;
         }
         return PATTERN.matcher(statement).find();
@@ -36,14 +37,27 @@ public class VarLoadHandler implements Handler, PostAssignment {
         final String name = matcher.group("name");
         if (Objects.equals(name, "this")) {
             context.child.statement.add(WriteInstruction.loadThis());
+            context.child.point = data.path;
+        } else if (Objects.equals(name, "super")) {
+            context.child.statement.add(WriteInstruction.loadThis());
+            context.child.point = data.extend;
         } else {
-            final PreVariable variable = context.child.getVariable(name);
-            assert variable != null;
-            context.child.statement.add(variable.load(context.child.variables.indexOf(variable)));
+            final PreVariable variable = context.getVariable(name);
+            if (variable == null) {
+                if ("1".equals(System.getProperty("TEST_STATE"))) {
+                    final List<String> strings = new ArrayList<>();
+                    for (final PreVariable var : context.child.variables) {
+                        strings.add(var.name());
+                    }
+                    throw new RuntimeException("Unavailable variable: '" + name + "'\nAvailable: " + strings);
+                } else throw new RuntimeException("Unavailable variable: '" + name + "'");
+            }
+            context.child.statement.add(variable.load(context.getSlot(variable)));
+            context.child.point = variable.type();
         }
         context.expectation = CompileExpectation.NONE;
-        attemptAssignment(context, state);
-        return new HandleResult(null, statement.substring(input.length()).trim(), state);
+        return new HandleResult(null, statement.substring(input.length())
+            .trim(), state == CompileState.IN_METHOD ? CompileState.IN_STATEMENT : state);
     }
     
     @Override

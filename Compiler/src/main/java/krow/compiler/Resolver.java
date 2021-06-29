@@ -12,6 +12,17 @@ import java.util.Objects;
 public class Resolver {
     
     public static Type resolveType(final String name, final Type... types) {
+        if (name.contains("[")) {
+            Type end = resolveType(name.substring(0, name.indexOf("[")), types);
+            if (end == null) return null;
+            String input = name;
+            int x;
+            while ((x = input.indexOf("[")) > -1) {
+                input = input.substring(x + 1); // count array dimensions
+                end = end.arrayType(); // stack array dimensions
+            }
+            return end;
+        }
         if (name.contains("/"))
             return Type.of(name);
         switch (name) {
@@ -24,7 +35,7 @@ public class Resolver {
             case "I":
             case "int":
                 return new Type(int.class);
-            case "L":
+            case "J":
             case "long":
                 return new Type(long.class);
             case "F":
@@ -49,7 +60,8 @@ public class Resolver {
             if (!type.internalName().endsWith(name)) continue;
             if (type.getSimpleName().equals(name)) return type;
         }
-        throw new RuntimeException("Unable to resolve type: '" + name + "'");
+        return null;
+        // throw new RuntimeException("Unable to resolve type: '" + name + "'");
     }
     
     public static Type resolveStructureType(final String[] names, final String[] extracted, final Type... types) {

@@ -6,6 +6,8 @@ import krow.compiler.handler.inclass.FinalHandler;
 import krow.compiler.handler.inmethodheader.MethodEndParameterHandler;
 import krow.compiler.handler.inmethodheader.MethodParameterHandler;
 import krow.compiler.handler.inmethodheader.MethodSplitParameterHandler;
+import krow.compiler.handler.instatement.*;
+import krow.compiler.handler.root.DeadEndHandler;
 import krow.compiler.handler.root.*;
 import krow.compiler.pre.PreClass;
 import mx.kenzie.foundation.ClassBuilder;
@@ -38,6 +40,7 @@ public class BasicCompiler implements Compiler<Krow> {
             new ImportHandler(),
             new ExportHandler(),
             new ClassHandler(),
+            new ExtendsHandler(),
             new DropLevelHandler(),
             new DeadEndHandler()
         ));
@@ -52,6 +55,7 @@ public class BasicCompiler implements Compiler<Krow> {
             new krow.compiler.handler.inclass.SynchronizedHandler(),
             new krow.compiler.handler.inclass.ImportHandler(),
             new krow.compiler.handler.inclass.ExportHandler(),
+            new krow.compiler.handler.inclass.ConstructorStartHandler(),
             new krow.compiler.handler.inclass.MethodStartHandler()
         ));
         HANDLERS.put(CompileState.IN_METHOD_HEADER, List.of(
@@ -63,17 +67,31 @@ public class BasicCompiler implements Compiler<Krow> {
             new krow.compiler.handler.inmethod.UpLevelHandler(),
             new krow.compiler.handler.inmethod.DeadEndHandler(),
             new krow.compiler.handler.inmethod.ReturnHandler(),
+            new krow.compiler.handler.inmethod.ConstructorCallStartHandler(),
             new krow.compiler.handler.inmethod.AssignVarHandler(),
             new krow.compiler.handler.inmethod.DeclareAssignVarHandler(),
             new krow.compiler.handler.inmethod.DeclareVarHandler(),
-            new krow.compiler.handler.inmethod.MethodCallStartHandler()
+            new krow.compiler.handler.instatement.NewInstanceHandler(),
+            new krow.compiler.handler.inmethod.TypeHandler(),
+            new krow.compiler.handler.inmethod.InitCallStartHandler(),
+//            new krow.compiler.handler.instatement.HandleHandler(),
+            new krow.compiler.handler.instatement.VarLoadHandler()
         ));
         HANDLERS.put(CompileState.IN_STATEMENT, List.of(
             new krow.compiler.handler.instatement.DeadEndHandler(),
             new krow.compiler.handler.instatement.BooleanLiteralHandler(),
             new krow.compiler.handler.instatement.CharLiteralHandler(),
             new krow.compiler.handler.instatement.StringLiteralHandler(),
-            new krow.compiler.handler.inmethod.MethodCallStartHandler(), // goes in either
+            new krow.compiler.handler.instatement.AllocateInstanceHandler(),
+            new CastHandler(),
+            new DynamicCallStartHandler(), // goes in either
+            new MethodCallStartHandler(), // goes in either
+            new krow.compiler.handler.instatement.NewInstanceHandler(),
+            new FieldAssignHandler(),
+            new FieldAccessHandler(), // goes in either
+            new krow.compiler.handler.inmethod.TypeHandler(),
+            new krow.compiler.handler.inmethod.InitCallStartHandler(),
+//            new krow.compiler.handler.instatement.HandleHandler(),
             new krow.compiler.handler.instatement.VarLoadHandler()
         ));
         HANDLERS.put(CompileState.IN_CALL, List.of(
@@ -82,7 +100,14 @@ public class BasicCompiler implements Compiler<Krow> {
             new krow.compiler.handler.instatement.BooleanLiteralHandler(),
             new krow.compiler.handler.instatement.CharLiteralHandler(),
             new krow.compiler.handler.instatement.StringLiteralHandler(),
-            new krow.compiler.handler.inmethod.MethodCallStartHandler(), // goes in either
+            new CastHandler(),
+            new DynamicCallStartHandler(), // goes in either
+            new MethodCallStartHandler(), // goes in either
+            new krow.compiler.handler.instatement.NewInstanceHandler(),
+            new FieldAccessHandler(),
+            new krow.compiler.handler.inmethod.TypeHandler(),
+            new krow.compiler.handler.inmethod.InitCallStartHandler(),
+//            new krow.compiler.handler.instatement.HandleHandler(),
             new krow.compiler.handler.incall.VarLoadHandler()
         ));
     }
@@ -176,7 +201,67 @@ public class BasicCompiler implements Compiler<Krow> {
     }
     
     @Override
-    public void compileResource(File file, InputStream... sources) {
+    public void compileResource(String main, File file, File... files) {
+        final List<PostCompileClass> classes = new ArrayList<>();
+        final List<File> extra = new ArrayList<>();
+        final InputStream[] sources = new InputStream[files.length];
+        try (
+            final ZipOutputStream out = new ZipOutputStream(new FileOutputStream(file))) {
+            for (int i = 0; i < sources.length; i++) {
+                try {
+                    if (files[i].getName().endsWith(".DS_Store")) continue;
+                    if (files[i].getName().endsWith(".kro"))
+                        sources[i] = new FileInputStream(files[i]);
+                    else extra.add(files[i]);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+            for (final InputStream source : sources) {
+                if (source == null) continue;
+                classes.addAll(List.of(compile(source)));
+            }
+            for (final PostCompileClass result : classes) {
+                ZipEntry entry = new ZipEntry(result.internalName() + ".class");
+                out.putNextEntry(entry);
+                byte[] data = result.code();
+                out.write(data, 0, data.length);
+                out.closeEntry();
+            }
+            for (final File ext : extra) {
+                ZipEntry entry = new ZipEntry(ext.getName());
+                out.putNextEntry(entry);
+                byte[] data = new FileInputStream(ext).readAllBytes();
+                out.write(data, 0, data.length);
+                out.closeEntry();
+            }
+            manifest:
+            {
+                ZipEntry entry = new ZipEntry("META-INF/MANIFEST.MF");
+                out.putNextEntry(entry);
+                final String version = this.getClass().getPackage().getImplementationVersion();
+                byte[] data = ("Manifest-Version: 1.0\n" +
+                    (main != null ? "Main-Class: " + main + "\n" : "") +
+                    "Archiver-Version: Zip\n" +
+                    "Created-By: Krow Compiler " + version + "\n" +
+                    "Built-By: Krow Compiler\n").getBytes(StandardCharsets.UTF_8);
+                out.write(data, 0, data.length);
+                out.closeEntry();
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            for (final InputStream source : sources) {
+                try {
+                    source.close();
+                } catch (Throwable ignored) {
+                }
+            }
+        }
+    }
+    
+    @Override
+    public void compileResource(String main, File file, InputStream... sources) {
         final List<PostCompileClass> classes = new ArrayList<>();
         for (final InputStream source : sources) {
             classes.addAll(List.of(compile(source)));
@@ -196,10 +281,10 @@ public class BasicCompiler implements Compiler<Krow> {
                 out.putNextEntry(entry);
                 final String version = this.getClass().getPackage().getImplementationVersion();
                 byte[] data = ("Manifest-Version: 1.0\n" +
+                    (main != null ? "Main-Class: " + main + "\n" : "") +
                     "Archiver-Version: Zip\n" +
                     "Created-By: Krow Compiler " + version + "\n" +
-                    "Built-By: Krow Compiler\n" +
-                    "Build-Jdk: 11.0.8").getBytes(StandardCharsets.UTF_8);
+                    "Built-By: Krow Compiler\n").getBytes(StandardCharsets.UTF_8);
                 out.write(data, 0, data.length);
                 out.closeEntry();
             }

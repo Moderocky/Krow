@@ -3,8 +3,11 @@ package krow.compiler;
 import krow.compiler.pre.*;
 import mx.kenzie.foundation.*;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class CompileContext {
     
@@ -17,10 +20,29 @@ public class CompileContext {
     public List<PreField> availableFields = new ArrayList<>();
     
     {
-        availableTypes.add(new Type(String.class));
-        availableTypes.add(new Type(Object.class));
-        availableTypes.add(new Type(Integer.class));
-        availableTypes.add(new Type(Class.class));
+        importJava(java.lang.String.class);
+        importJava(java.lang.Object.class);
+        importJava(java.lang.Integer.class);
+        importJava(java.lang.Class.class);
+        importJava(java.lang.System.class);
+        importJava(java.lang.Integer.class);
+        importJava(java.lang.Character.class);
+        importJava(java.lang.Boolean.class);
+        importJava(java.lang.Byte.class);
+        importJava(java.lang.Short.class);
+        importJava(java.lang.Long.class);
+        importJava(java.lang.Integer.class);
+        importJava(java.lang.Float.class);
+        importJava(java.lang.Double.class);
+        importJava(java.lang.Void.class);
+        importJava(java.lang.StringBuilder.class);
+        importJava(java.lang.RuntimeException.class);
+        importJava(java.lang.Runtime.class);
+        importJava(java.lang.Runnable.class);
+        importJava(java.lang.Error.class);
+        importJava(java.lang.Throwable.class);
+        importJava(java.lang.Exception.class);
+        importJava(java.lang.Number.class);
     }
     
     //region Child
@@ -34,6 +56,9 @@ public class CompileContext {
     public CompileExpectation expectation = CompileExpectation.NONE;
     public WriteInstruction skip; // stacked when DEAD_END reached (eol)
     public PreVariable store;
+    public Type point;
+    public boolean duplicate;
+    public boolean staticState;
     public boolean inverted;
     public List<Object> exports = new ArrayList<>();
     public boolean exported;
@@ -44,6 +69,17 @@ public class CompileContext {
     public FieldBuilder currentField;
     public MethodBuilder currentMethod;
     public PreMethod method;
+    
+    public void importJava(final Class<?> cls) {
+        final Type type = new Type(cls);
+        availableTypes.add(type);
+        for (final Method method : cls.getMethods()) {
+            availableMethods.add(new PreMethod(method));
+        }
+        for (final Field field : cls.getFields()) {
+            availableFields.add(new PreField(field));
+        }
+    }
     
     public boolean upcoming(int modifiers) {
         final int test;
@@ -64,7 +100,13 @@ public class CompileContext {
         return test;
     }
     
+    public int getSlot(final PreVariable variable) {
+        if (child != null) return child.variables.indexOf(variable);
+        return variables.indexOf(variable);
+    }
+    
     public int getSlot(final String variable) {
+        if (child != null) return child.getSlot(variable);
         for (int i = 0; i < variables.size(); i++) {
             if (variables.get(i).name().equals(variable)) return i;
         }
@@ -72,8 +114,7 @@ public class CompileContext {
     }
     
     public PreMethod findMethod(final Signature signature) {
-        final List<PreMethod> methods = new ArrayList<>(availableMethods);
-        if (child != null) methods.addAll(child.availableMethods);
+        final List<PreMethod> methods = availableMethods();
         final PreMethod test = new PreMethod(signature);
         for (final PreMethod method : methods) {
             if (method.name.equals(test.name) && method.owner.equals(test.owner) && method.parameters.equals(test.parameters))
@@ -82,9 +123,16 @@ public class CompileContext {
         return null;
     }
     
+    public PreField findField(final Type owner, final String name) {
+        final List<PreField> fields = availableFields();
+        for (final PreField field : fields) {
+            if (field.name.equals(name) && field.owner.equals(owner)) return field;
+        }
+        return null;
+    }
+    
     public PreMethod findMethod(final Type owner, final String name) {
-        final List<PreMethod> methods = new ArrayList<>(availableMethods);
-        if (child != null) methods.addAll(child.availableMethods);
+        final List<PreMethod> methods = availableMethods();
         for (final PreMethod method : methods) {
             if (method.name.equals(name) && method.owner.equals(owner)) return method;
         }
@@ -92,41 +140,82 @@ public class CompileContext {
     }
     
     public PreMethod findMethod(final Type owner, final String name, int params) {
-        final List<PreMethod> methods = new ArrayList<>(availableMethods);
-        if (child != null) methods.addAll(child.availableMethods);
+        final List<PreMethod> methods = availableMethods();
+        final String seenName;
+        if (Objects.equals(name, "<init>")) seenName = "new";
+        else seenName = name;
         for (final PreMethod method : methods) {
-            if (method.name.equals(name) && method.owner.equals(owner) && method.parameters.size() == params)
+            if (method.name.equals(seenName) && method.owner.equals(owner) && method.parameters.size() == params)
                 return method;
         }
         return null;
     }
     
     public PreMethod findMethod(final Type owner, final String name, final List<Type> parameters) {
-        final List<PreMethod> methods = new ArrayList<>(availableMethods);
-        if (child != null) methods.addAll(child.availableMethods);
+        final List<PreMethod> methods = availableMethods();
+        final String seenName;
+        if (Objects.equals(name, "<init>")) seenName = "new";
+        else seenName = name;
         for (final PreMethod method : methods) {
-            if (method.name.equals(name) && method.owner.equals(owner) && parameters.equals(method.parameters))
+            if (method.name.equals(seenName) && method.owner.equals(owner) && parameters.equals(method.parameters))
                 return method;
         }
+        if (name.equals("<init>")) return getImplicitConstructor(owner, parameters);
         return null;
+    }
+    
+    public PreMethod getImplicitConstructor(final Type owner, final List<Type> parameters) {
+        final PreMethod method = new PreMethod();
+        method.name = "<init>";
+        method.returnType = new Type(void.class);
+        method.owner = owner;
+        method.parameters.addAll(parameters);
+        return method;
+    }
+    
+    public boolean hasVariable(final String name) {
+        List<PreVariable> variables = child == null ? this.variables : this.child.variables;
+        for (PreVariable preVariable : variables) {
+            if (preVariable.name().equals(name)) return true;
+        }
+        return false;
     }
     
     public PreVariable getVariable(final String variable) {
         List<PreVariable> variables = child == null ? this.variables : this.child.variables;
-        for (int i = 0; i < variables.size(); i++) {
+        for (PreVariable preVariable : variables) {
             final PreVariable var;
-            if ((var = variables.get(i)).name().equals(variable)) return var;
+            if ((var = preVariable).name().equals(variable)) return var;
         }
         return null;
+    }
+    
+    public Type resolveType(final String name) {
+        return Resolver.resolveType(name, availableTypes().toArray(new Type[0]));
     }
     
     public boolean isRoot() {
         return child != null;
     }
     
+    public List<PreField> availableFields() {
+        final List<PreField> fields = new ArrayList<>();
+        if (child != null) fields.addAll(child.availableFields());
+        fields.addAll(availableFields);
+        return fields;
+    }
+    
+    public List<PreMethod> availableMethods() {
+        final List<PreMethod> methods = new ArrayList<>();
+        if (child != null) methods.addAll(child.availableMethods());
+        methods.addAll(availableMethods);
+        return methods;
+    }
+    
     public List<Type> availableTypes() {
-        final List<Type> types = new ArrayList<>(availableTypes);
+        final List<Type> types = new ArrayList<>();
         if (child != null) types.addAll(child.availableTypes());
+        types.addAll(availableTypes);
         return types;
     }
     

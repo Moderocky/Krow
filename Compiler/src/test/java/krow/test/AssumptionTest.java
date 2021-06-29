@@ -9,4 +9,8 @@ public class AssumptionTest {
     public void test() {
     }
     
+    private static boolean privateMethod() {
+        return true;
+    }
+    
 }

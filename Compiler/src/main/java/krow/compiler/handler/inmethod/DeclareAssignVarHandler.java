@@ -1,6 +1,9 @@
 package krow.compiler.handler.inmethod;
 
-import krow.compiler.*;
+import krow.compiler.CompileContext;
+import krow.compiler.CompileState;
+import krow.compiler.HandleResult;
+import krow.compiler.Resolver;
 import krow.compiler.handler.Handler;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.PreVariable;
@@ -33,9 +36,9 @@ public class DeclareAssignVarHandler implements Handler {
         final Type type = Resolver.resolveType(target, context.availableTypes().toArray(new Type[0]));
         assert (context.getVariable(name) == null);
         final PreVariable assignment;
+        context.duplicate = true;
         context.child.variables.add(assignment = new PreVariable(name, type));
-        context.expectation = CompileExpectation.OBJECT;
-        context.child.store = assignment;
+        context.child.skip = assignment.store(context.getSlot(assignment));
         return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.IN_STATEMENT);
     }
     

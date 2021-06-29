@@ -11,6 +11,8 @@ import krow.compiler.pre.Signature;
 import mx.kenzie.foundation.Type;
 import mx.kenzie.foundation.WriteInstruction;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,14 +40,21 @@ public class VarLoadHandler implements Handler {
         final String name = matcher.group("name");
         if (Objects.equals(name, "this")) {
             context.child.statement.add(WriteInstruction.loadThis());
-            type = data.path;
+            context.child.point = data.path;
         } else {
             final PreVariable variable = context.child.getVariable(name);
-            assert variable != null;
-            type = variable.type();
+            if (variable == null) {
+                if ("1".equals(System.getProperty("TEST_STATE"))) {
+                    final List<String> strings = new ArrayList<>();
+                    for (final PreVariable var : context.child.variables) {
+                        strings.add(var.name());
+                    }
+                    throw new RuntimeException("Unavailable variable: '" + name + "'\nAvailable: " + strings);
+                } else throw new RuntimeException("Unavailable variable: '" + name + "'");
+            }
             context.child.statement.add(variable.load(context.child.variables.indexOf(variable)));
+            context.child.point = variable.type();
         }
-        context.child.preparing.get(0).addParameter(type);
         context.expectation = CompileExpectation.NONE;
         return new HandleResult(null, statement.substring(input.length()).trim(), state);
     }

@@ -5,12 +5,11 @@ import krow.compiler.CompileExpectation;
 import krow.compiler.CompileState;
 import krow.compiler.HandleResult;
 import krow.compiler.handler.Handler;
-import krow.compiler.handler.PostAssignment;
 import krow.compiler.pre.PreClass;
 import mx.kenzie.foundation.Type;
 import mx.kenzie.foundation.WriteInstruction;
 
-public class CharLiteralHandler implements Handler, PostAssignment {
+public class CharLiteralHandler implements Handler {
 
 //    private static final Pattern PATTERN = Pattern.compile("^'(?:[^'\\\\\\r\\n]|\\\\['tbnrf\\\\])'");
     
@@ -55,10 +54,7 @@ public class CharLiteralHandler implements Handler, PostAssignment {
         }
         context.child.statement.add(WriteInstruction.loadConstant(value));
         context.expectation = CompileExpectation.NONE;
-        attemptAssignment(context, state);
-        if (state == CompileState.IN_CALL) {
-            context.child.preparing.get(0).addParameter(new Type(String.class));
-        }
+        context.child.point = new Type(char.class);
         return new HandleResult(null, statement.substring(length).trim(), state);
     }
     

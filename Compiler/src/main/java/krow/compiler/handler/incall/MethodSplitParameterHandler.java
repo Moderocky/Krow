@@ -15,6 +15,7 @@ public class MethodSplitParameterHandler implements Handler {
     
     @Override
     public HandleResult handle(String statement, PreClass data, CompileContext context) {
+        context.child.preparing.get(0).addParameter(context.child.point);
         return new HandleResult(null, statement.substring(1).trim(), CompileState.IN_CALL);
     }
     

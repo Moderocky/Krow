@@ -10,6 +10,7 @@ public enum CompileExpectation {
     OBJECT,
     SMALL,
     TYPE,
+    MEMBER,
     METHOD,
     FIELD,
     META,

@@ -6,39 +6,44 @@ import krow.compiler.CompileState;
 import krow.compiler.HandleResult;
 import krow.compiler.handler.Handler;
 import krow.compiler.pre.PreClass;
+import krow.compiler.pre.PreMethod;
+import krow.compiler.pre.Signature;
 import mx.kenzie.foundation.Type;
 import mx.kenzie.foundation.WriteInstruction;
 
+import java.lang.invoke.CallSite;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class StringLiteralHandler implements Handler {
+public class HandleHandler implements Handler {
     
-    private static final Pattern PATTERN = Pattern.compile("^\"[^\"\\\\\\r\\n]*(?:\\\\.[^\"\\\\\\r\\n]*)*\"");
+    private static final Pattern PATTERN = Signature.METHOD_PATTERN;
+    
+    Matcher matcher;
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
         switch (context.expectation) {
-            case TYPE, DEAD_END, PRIMITIVE, DOWN, UP, METHOD, FIELD:
+            case TYPE, DEAD_END, LITERAL, METHOD, FIELD, DOWN, UP:
                 return false;
         }
-        return statement.startsWith("\"") && PATTERN.matcher(statement).find();
+        return (matcher = PATTERN.matcher(statement)).find();
     }
     
     @Override
     public HandleResult handle(String statement, PreClass data, CompileContext context, CompileState state) {
-        final Matcher matcher = PATTERN.matcher(statement);
-        matcher.find();
         final String input = matcher.group();
-        final String value = input.substring(1, input.length() - 1);
-        context.child.statement.add(WriteInstruction.loadConstant(value));
-        context.child.point = new Type(String.class);
+        final Signature signature = new Signature(input);
+        final PreMethod method = new PreMethod(signature);
+        context.child.point = new Type(CallSite.class);
+        context.child.statement.add(WriteInstruction.loadConstant(method.handle()));
         context.expectation = CompileExpectation.NONE;
-        return new HandleResult(null, statement.substring(input.length()).trim(), state);
+        return new HandleResult(null, statement.substring(input.length())
+            .trim(), state == CompileState.IN_METHOD ? CompileState.IN_STATEMENT : state);
     }
     
     @Override
     public String debugName() {
-        return "LDC_STRING";
+        return "LDC_HANDLE";
     }
 }
