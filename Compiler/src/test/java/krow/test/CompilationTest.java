@@ -528,6 +528,79 @@ public class CompilationTest {
     }
     
     @Test
+    public void speed() throws Throwable {
+        final String source = """
+            implement <java/lang/Runnable>
+            export <>
+            class mx/kenzie/A1 {
+                export <>
+                void <init>() {
+                    super();
+                }
+                export <>
+                void run() {
+                    boolean a = false;
+                    int i = 0;
+                    label top;
+                    if (i == 100000) goto exit;
+                    i = i + 1;
+                    a = !a;
+                    goto top;
+                    label exit;
+                }
+            }
+            """;
+        final Class<?> a1 = new ReKrow().compileAndLoad(source);
+        assert a1 != null;
+        final String source2 = """
+            implement <java/lang/Runnable>
+            export <>
+            class mx/kenzie/A2 {
+                export <>
+                void <init>() {
+                    super();
+                }
+                export <>
+                void run() {
+                    boolean a = false;
+                    int i = 0;
+                    label top;
+                    if (i == 100000) goto exit;
+                    i = i + 1;
+                    if (a == true) goto q;
+                    a = true;
+                    goto p;
+                    label q;
+                    a = false;
+                    label p;
+                    goto top;
+                    label exit;
+                }
+            }
+            """;
+        final Class<?> a2 = new ReKrow().compileAndLoad(source2);
+        assert a2 != null;
+        Runnable a = (Runnable) a1.newInstance();
+        Runnable b = (Runnable) a2.newInstance();
+        a.run();
+        b.run();
+        {
+            a.run();
+            long x = System.nanoTime();
+            a.run();
+            long y = System.nanoTime();
+            System.out.println("a: " + (y - x));
+        }
+        {
+            b.run();
+            long x = System.nanoTime();
+            b.run();
+            long y = System.nanoTime();
+            System.out.println("b: " + (y - x));
+        }
+    }
+    
+    @Test
     public void full() {
         Krow.main("TestTarget.ark", "src/test/krow", "mx.kenzie.example.Main");
     }

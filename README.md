@@ -27,6 +27,21 @@ The Krow language spec and the original ReKrow compiler were designed and writte
 > 
 > Coincidentally, K comes after J in the alphabet.
 
+## Language Efficiency
+
+Whether or not Krow is 'faster' or 'better' than another JVM language is difficult to answer.
+
+The result code that ReKrow produces is minimalist: a class written in Krow will be much smaller than a class written in Java. This is because ReKrow includes no source metadata (line numbers, variable names) which take up a large amount of space in `javac`'s class result.
+
+Code compiled by Krow could be more efficient than Java code. Some results are natively more efficient than what `javac` produces, particularly when it comes to logic instructions.
+> *Note:* I don't know why this is the case. Krow is about 30% faster at inverting booleans, for example.
+
+On the other hand, `javac` will spot and remove loops and variable assignments it deems pointless, whereas ReKrow will not. This is very minor - JIT will catch it all in the end.
+
+Outside these small edge cases, the efficiency of Krow code will depend entirely on the programmer: ReKrow does exactly what you tell it to, mistakes and all. :)
+
+> *Note:* I would imagine a very proficient programmer could write much more efficient code in Krow but, equally, a mere mortal like myself would probably benefit from `javac`'s hand-holding a lot of the time. :)
+
 
 ## The ReKrow Compiler
 
@@ -39,12 +54,22 @@ It also has very little verification, allowing a lot of instructions to be compi
 In practice, this means you can:
 - Create default classes with abstract methods.
 - Extend an abstract class without implementing all of its methods.
-- Write unreachable code after the return statement.
+- Write unreachable code after the return statement or between jumps.
 - Much, much more.
 
 ReKrow is a 'flyover' compiler. This means it reads the input source in one line: the compiler does not know about something until it reaches it. While this does make forward referencing more problematic, it also makes the compiler less complex and more efficient: elements are dealt with as they are reached, then discarded. The compiler requires no recursion or sub-parsing.
 
 ReKrow uses [ASM](https://asm.ow2.io/) for assembling its output bytecode. ASM is a very old and established tool, so much so that the Java JDK uses it internally.
+
+## The Krow Runtime
+
+Krow has a runtime environment. This is very small (limited to a couple of classes) and designed to be as unobtrusive as possible. Basic Krow can be used without the runtime, but some of the more advanced features (structs, dynamic invocation, targets) require it.
+
+Fortunately, Krow's runtime is tiny - with only a few stubs - and very unobtrusive (looking at you, Kotlin!) so it should never be a size problem.
+
+The runtime contains the four bootstraps needed for dynamic methods and the `Structure` stub class that all structs extend under the hood. It also contains the endpoints for the built-in targets.
+
+> *Fun fact:* the first version of the Krow runtime was written before number literals were added to the language spec. This meant I had to use booleans and bit-shift them to obtain number values.
 
 ## Keywords
 
@@ -59,6 +84,7 @@ See the [metadata particle](#the-metadata-particle-) for more information.
 |`import`|Reference `<>` metadata.|Class declaration, field declaration, method declaration.|Asserts the given references exist in the target area, allows use of their shortened names.|
 |`export`|Reference `<>` metadata.|Class declaration, field declaration, method declaration.|Exports the given element for use outside the class. Exports any included elements to users of this element.|
 |`bridge`|Reference `<>` metadata for a method.|Method declaration.|Sets the bridge target of the upcoming method.|
+|`implement`|Type `<>` metadata for a class.|Class declaration.|Adds interfaces to the upcoming class.|
 |`const`|Identifier and literal value.|Class body, method body.|Stores a compile-time constant.|
 
 ### Modifier Keywords
@@ -226,8 +252,7 @@ struct myMethod(String name, int age, UUID id) {
 
 *Example:* Using structs for multiple return.
 ```java 
-import <org/bukkit/Player, Player::getHealth, Player::getName>
-export <this::getData(Player)S(health:D,name:String)>
+import <org/bukkit/Player, Player::getHealth()D, Player::getName()String>
 struct getData(Player player) {
     return {
         double health = player.getHealth();

@@ -1,6 +1,13 @@
 package krow.test;
 
+import mx.kenzie.foundation.ClassBuilder;
+import mx.kenzie.foundation.Type;
 import org.junit.Test;
+
+import static java.lang.reflect.Modifier.FINAL;
+import static java.lang.reflect.Modifier.PUBLIC;
+import static mx.kenzie.foundation.WriteInstruction.*;
+import static mx.kenzie.foundation.WriteInstruction.returnEmpty;
 
 public class AssumptionTest {
     
