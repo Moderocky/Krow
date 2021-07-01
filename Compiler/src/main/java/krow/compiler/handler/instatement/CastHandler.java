@@ -23,7 +23,11 @@ public class CastHandler implements Handler {
         final Type type = signature.length() > 0 ? new Signature(signature, context.availableTypes()
             .toArray(new Type[0])).getOwner() : new Type(Object.class);
         if (type == null) throw new RuntimeException("Unavailable type: '" + signature + "'");
-        context.child.statement.add(WriteInstruction.cast(type));
+        if (type.isPrimitive()) {
+            final Type previous = context.child.point;
+            assert previous != null;
+            context.child.statement(WriteInstruction.convert(previous, type));
+        } else context.child.statement(WriteInstruction.cast(type));
         context.child.point = type;
         return new HandleResult(null, statement.substring(length + 1).trim(), state);
     }

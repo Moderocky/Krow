@@ -1,0 +1,8 @@
+export <>
+class krow/lang/Structure {
+    export <>
+    void <init> () {
+        super();
+        return;
+    }
+}

@@ -3,17 +3,8 @@ package krow.test;
 import krow.compiler.Resolver;
 import krow.compiler.pre.PreStructure;
 import krow.compiler.pre.Signature;
-import mx.kenzie.foundation.ClassBuilder;
 import mx.kenzie.foundation.Type;
-import mx.kenzie.foundation.WriteInstruction;
-import mx.kenzie.foundation.opcodes.JavaVersion;
 import org.junit.Test;
-import org.objectweb.asm.Handle;
-
-import java.io.FileOutputStream;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 
 public class ResolutionTest {
     
@@ -33,7 +24,7 @@ public class ResolutionTest {
         structure.fields.put("name", new Type(String.class));
         structure.fields.put("age", new Type(int.class));
         structure.fields.put("stage", new Type(Object.class));
-        assert "krow.lang.Structure$L1265577300W113227431S3304034081537553085"
+        assert "krow.lang.Structure$L1265572110W113227431S2852571371512584461"
             .equals(Resolver.resolveStructurePath(structure));
     }
     
@@ -55,15 +46,18 @@ public class ResolutionTest {
         }
         {
             final PreStructure structure = Resolver.resolveStructure("S(name:String,age:I,structure:S(name:String))", new Type(String.class));
-            assert structure.toString().equals("S(name:java/lang/String,age:int,structure:krow/lang/Structure$L901475364W3373738S1611797601888125282)");
+            assert structure.toString()
+                .equals("S(name:java/lang/String,age:int,structure:krow/lang/Structure$L901475364W3373738S1611797601888125282)");
         }
         {
             final PreStructure structure = Resolver.resolveStructure("S(name:String,age:I,structure:S(name:String,structure:S(name:String)))", new Type(String.class));
-            assert structure.toString().equals("S(name:java/lang/String,age:int,structure:krow/lang/Structure$L2119034903W147892253S3780060826278253525)");
+            assert structure.toString()
+                .equals("S(name:java/lang/String,age:int,structure:krow/lang/Structure$L2119034903W147892253S3780060826278253525)");
         }
         {
             final PreStructure structure = Resolver.resolveStructure("S(name0:String,age:I,sub1:S(name1:String,sub2:S(name2:String)),end:V)", new Type(String.class));
-            assert structure.toString().equals("S(sub1:krow/lang/Structure$L2119035053W108126487S8434963381073429791,end:void,name0:java/lang/String,age:int)");
+            assert structure.toString()
+                .equals("S(name0:java/lang/String,age:int,sub1:krow/lang/Structure$L2119034903W108126487S3913422602618471041,end:void)");
         }
     }
     

@@ -1,4 +1,4 @@
-package krow.compiler.handler.instatement;
+package krow.compiler.handler.literal;
 
 import krow.compiler.CompileContext;
 import krow.compiler.CompileExpectation;
@@ -6,24 +6,25 @@ import krow.compiler.CompileState;
 import krow.compiler.HandleResult;
 import krow.compiler.handler.Handler;
 import krow.compiler.pre.PreClass;
-import krow.compiler.pre.Signature;
 import mx.kenzie.foundation.Type;
 import mx.kenzie.foundation.WriteInstruction;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class AllocateInstanceHandler implements Handler {
+public class SmallLiteralHandler implements Handler {
     
-    private static final Pattern PATTERN = Pattern.compile("^new\\s+(?<type>" + Signature.TYPE_STRING + ")\\s*(?=;)");
+    private static final Pattern PATTERN = Pattern.compile("^\\d+(?![\\d.#LFD])");
+    private static final int LOW = 48, HIGH = 57;
     
     Matcher matcher;
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
-        if (!statement.startsWith("new")) return false;
+        final char c = statement.charAt(0);
+        if (c < LOW || c > HIGH) return false;
         switch (context.expectation) {
-            case TYPE, DEAD_END, LITERAL, VARIABLE, SMALL:
+            case TYPE, DEAD_END, VARIABLE, DOWN, UP, METHOD, FIELD:
                 return false;
         }
         return (matcher = PATTERN.matcher(statement)).find();
@@ -32,21 +33,19 @@ public class AllocateInstanceHandler implements Handler {
     @Override
     public HandleResult handle(String statement, PreClass data, CompileContext context, CompileState state) {
         final String input = matcher.group();
-        final String target = matcher.group("type");
-        final Type type = context.resolveType(target);
-        assert type != null;
-        context.child.statement(WriteInstruction.allocate(type));
-        if (context.duplicate) {
-            context.child.statement(WriteInstruction.duplicate());
-            context.duplicate = false;
+        final int value = Integer.parseInt(input);
+        context.child.statement(WriteInstruction.loadConstant(value));
+        context.expectation = CompileExpectation.NONE;
+        context.child.point = new Type(int.class);
+        if (state == CompileState.IN_CONST) {
+            context.saveConstant.value = value;
+            context.expectation = CompileExpectation.DEAD_END;
         }
-        context.child.point = type;
-        context.expectation = CompileExpectation.DEAD_END;
         return new HandleResult(null, statement.substring(input.length()).trim(), state);
     }
     
     @Override
     public String debugName() {
-        return "ALLOCATE_TOP";
+        return "LDC_INT";
     }
 }

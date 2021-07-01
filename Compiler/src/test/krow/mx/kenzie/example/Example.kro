@@ -1,0 +1,47 @@
+import <java/io/PrintStream> export <>
+class mx/kenzie/example/Example {
+
+    void <init>(String name) {
+        System.out.println(name);
+        super();
+    }
+
+    static void defaults() {
+        String a = null;
+        String result = a ? "default";
+        System.out.println(result);
+    }
+
+    static void jumpy() {
+        int a = 10;
+        int b = 5;
+        goto box;
+        int c = 6;
+        System.out.println(a);
+        System.out.println(c);
+        label box;
+        System.out.println(b);
+    }
+
+    static void conditions() {
+        int a = 6;
+        int b = 5;
+        if (a == b) goto end;
+        System.out.println(a);
+        System.out.println(b);
+        label end;
+        System.out.println("end");
+    }
+
+    export <>
+    static void test() {
+        Example example = new Example;
+        System.out.println("Code in between.");
+        example("hello");
+        Example.jumpy();
+        Example.defaults();
+        Example.conditions();
+    }
+
+}
+

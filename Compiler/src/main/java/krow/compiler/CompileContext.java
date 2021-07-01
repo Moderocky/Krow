@@ -5,9 +5,7 @@ import mx.kenzie.foundation.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class CompileContext {
     
@@ -47,28 +45,111 @@ public class CompileContext {
     
     //region Child
     //region Keywords Upcoming
+    public Map<String, Object> constants = new HashMap<>();
     public int modifiersUpcoming;
     public PreMethod bridgeTarget;
     //endregion
     public List<PreVariable> variables = new ArrayList<>();
-    public List<WriteInstruction> statement = new ArrayList<>();
+    private final List<WriteInstruction> statement = new ArrayList<>();
     public List<PreMethodCall> preparing = new ArrayList<>();
+    public List<PreStructure> structures = new ArrayList<>();
     public CompileExpectation expectation = CompileExpectation.NONE;
     public WriteInstruction skip; // stacked when DEAD_END reached (eol)
+    public WriteInstruction doAfter; // done after swap
     public PreVariable store;
     public Type point;
+    public Type lookingFor;
+    private boolean swap;
     public boolean duplicate;
     public boolean staticState;
     public boolean inverted;
     public List<Object> exports = new ArrayList<>();
     public boolean exported;
     public boolean hasBody;
+    public boolean inReturnPhase;
+    public boolean awaitAdjustedType;
+    public PreVariable forAdjustment;
+    public PreConstant saveConstant;
+    public CompileState exitTo;
+    public List<CompileState> nested = new ArrayList<>();
+    private final List<PreBracket> brackets = new ArrayList<>();
+    private final List<PreLabel> labels = new ArrayList<>();
     //endregion
+    
     
     public ClassBuilder builder;
     public FieldBuilder currentField;
     public MethodBuilder currentMethod;
     public PreMethod method;
+    
+    public List<PreLabel> labels() {
+        return child != null ? child.labels() : labels;
+    }
+    
+    public PreLabel label(final String name) {
+        if (child != null) return child.label(name);
+        for (final PreLabel label : labels()) {
+            if (label.name.equals(name)) return label;
+        }
+        final PreLabel label = new PreLabel();
+        label.name = name;
+        labels.add(label);
+        return label;
+    }
+    
+    public List<PreBracket> brackets() {
+        return child != null ? child.brackets() : brackets;
+    }
+    
+    public boolean swap() {
+        if (brackets().isEmpty())
+            return child != null ? child.swap() : swap;
+        else return brackets().get(0).swap;
+    }
+    
+    public void swap(final boolean value) {
+        if (brackets().isEmpty()) {
+            if (child != null) child.swap(value);
+            else swap = value;
+        } else {
+            brackets().get(0).swap = value;
+        }
+    }
+    
+    public WriteInstruction doAfter() {
+        final CompileContext context;
+        final WriteInstruction after;
+        context = child == null ? this : child;
+        after = context.doAfter;
+        context.doAfter = null;
+        return after;
+    }
+    
+    public List<WriteInstruction> statement() {
+        if (brackets.isEmpty())
+            return child == null ? statement : child.statement;
+        else return brackets.get(0).instructions;
+    }
+    
+    public void statement(final WriteInstruction instruction) {
+        final List<WriteInstruction> list = statement();
+        if (swap()) {
+            list.add(list.size() - 1, instruction);
+            swap(false);
+        } else list.add(instruction);
+        final WriteInstruction after = doAfter();
+        if (after != null) list.add(after);
+    }
+    
+    public void statementRaw(final WriteInstruction instruction) {
+        final List<WriteInstruction> list = child == null ? statement : child.statement;
+        if (swap()) {
+            list.add(list.size() - 1, instruction);
+            swap(false);
+        } else list.add(instruction);
+        final WriteInstruction after = doAfter();
+        if (after != null) list.add(after);
+    }
     
     public void importJava(final Class<?> cls) {
         final Type type = new Type(cls);
@@ -217,6 +298,25 @@ public class CompileContext {
         if (child != null) types.addAll(child.availableTypes());
         types.addAll(availableTypes);
         return types;
+    }
+    
+    public Object getConstant(final String name) {
+        if (constants.containsKey(name)) return constants.get(name);
+        if (child != null) return child.getConstant(name);
+        return null;
+    }
+    
+    public boolean hasConstant(final String name) {
+        if (child != null)
+            return constants.containsKey(name) || child.hasConstant(name);
+        return constants.containsKey(name);
+    }
+    
+    public Map<String, Object> getConstants() {
+        final Map<String, Object> map = new HashMap<>();
+        if (child != null) map.putAll(child.constants);
+        map.putAll(constants);
+        return map;
     }
     
 }

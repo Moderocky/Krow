@@ -42,7 +42,7 @@ public class InitCallStartHandler implements Handler {
         call.dynamic = true;
         call.owner = variable.type();
         call.name = "<init>";
-        context.child.statement.add(variable.load(context.getSlot(variable)));
+        context.child.statement(variable.load(context.getSlot(variable)));
         context.expectation = CompileExpectation.OBJECT;
         return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.IN_CALL);
     }

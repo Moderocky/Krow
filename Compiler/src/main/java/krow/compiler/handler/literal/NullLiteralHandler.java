@@ -1,4 +1,4 @@
-package krow.compiler.handler.instatement;
+package krow.compiler.handler.literal;
 
 import krow.compiler.CompileContext;
 import krow.compiler.CompileExpectation;
@@ -9,7 +9,7 @@ import krow.compiler.pre.PreClass;
 import mx.kenzie.foundation.Type;
 import mx.kenzie.foundation.WriteInstruction;
 
-public class BooleanLiteralHandler implements Handler {
+public class NullLiteralHandler implements Handler {
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
@@ -17,20 +17,19 @@ public class BooleanLiteralHandler implements Handler {
             case TYPE, DEAD_END, DOWN, UP, METHOD, FIELD:
                 return false;
         }
-        return statement.startsWith("true") || statement.startsWith("false");
+        return statement.startsWith("null");
     }
     
     @Override
     public HandleResult handle(String statement, PreClass data, CompileContext context, CompileState state) {
-        final boolean value = statement.startsWith("true");
-        context.child.statement.add(value ? WriteInstruction.push1() : WriteInstruction.push0());
+        context.child.statement(WriteInstruction.pushNull());
         context.expectation = CompileExpectation.NONE;
-        context.child.point = new Type(boolean.class);
-        return new HandleResult(null, statement.substring(value ? 4 : 5).trim(), state);
+        context.child.point = new Type(void.class);
+        return new HandleResult(null, statement.substring(4).trim(), state);
     }
     
     @Override
     public String debugName() {
-        return "BIPUSH_Z";
+        return "ACONST_NULL";
     }
 }

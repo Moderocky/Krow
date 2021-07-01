@@ -18,8 +18,8 @@ public class UpLevelHandler implements Handler {
     @Override
     public HandleResult handle(String statement, PreClass data, CompileContext context) {
         if (context.method != null && context.currentMethod != null) {
-            context.method.emergencyExit(context.child.statement);
-            context.currentMethod.writeCode(context.child.statement.toArray(new WriteInstruction[0]));
+            context.method.emergencyExit(context.child.statement());
+            context.currentMethod.writeCode(context.child.statement().toArray(new WriteInstruction[0]));
         }
         context.child = new CompileContext();
         context.variables.clear();

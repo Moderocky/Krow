@@ -7,6 +7,11 @@ import krow.compiler.handler.inmethodheader.MethodEndParameterHandler;
 import krow.compiler.handler.inmethodheader.MethodParameterHandler;
 import krow.compiler.handler.inmethodheader.MethodSplitParameterHandler;
 import krow.compiler.handler.instatement.*;
+import krow.compiler.handler.instatement.maths.*;
+import krow.compiler.handler.instructheader.NamedVarLoadHandler;
+import krow.compiler.handler.instructheader.StructCallEndHandler;
+import krow.compiler.handler.instructheader.StructSplitParameterHandler;
+import krow.compiler.handler.literal.*;
 import krow.compiler.handler.root.DeadEndHandler;
 import krow.compiler.handler.root.*;
 import krow.compiler.pre.PreClass;
@@ -53,6 +58,7 @@ public class BasicCompiler implements Compiler<Krow> {
             new krow.compiler.handler.inclass.FinalHandler(),
             new krow.compiler.handler.inclass.BridgeHandler(),
             new krow.compiler.handler.inclass.SynchronizedHandler(),
+            new krow.compiler.handler.inmethod.ConstHandler(),
             new krow.compiler.handler.inclass.ImportHandler(),
             new krow.compiler.handler.inclass.ExportHandler(),
             new krow.compiler.handler.inclass.ConstructorStartHandler(),
@@ -63,10 +69,31 @@ public class BasicCompiler implements Compiler<Krow> {
             new MethodSplitParameterHandler(),
             new MethodParameterHandler()
         ));
+        HANDLERS.put(CompileState.IN_STRUCT_HEADER, List.of(
+            new StructCallEndHandler(),
+            new StructSplitParameterHandler(),
+            new NamedVarLoadHandler()
+        ));
+        HANDLERS.put(CompileState.IN_CONST, List.of(
+            new krow.compiler.handler.inconst.DeadEndHandler(),
+            new NullLiteralHandler(),
+            new BooleanLiteralHandler(),
+            new CharLiteralHandler(),
+            new StringLiteralHandler(),
+            new SmallLiteralHandler(),
+            new LongLiteralHandler(),
+            new DoubleLiteralHandler(),
+            new FloatLiteralHandler(),
+            new BootstrapHandler()
+        ));
         HANDLERS.put(CompileState.IN_METHOD, List.of(
             new krow.compiler.handler.inmethod.UpLevelHandler(),
             new krow.compiler.handler.inmethod.DeadEndHandler(),
             new krow.compiler.handler.inmethod.ReturnHandler(),
+            new krow.compiler.handler.inmethod.ConstHandler(),
+            new krow.compiler.handler.inmethod.LabelHandler(),
+            new krow.compiler.handler.inmethod.GotoHandler(),
+            new krow.compiler.handler.inmethod.IfHandler(),
             new krow.compiler.handler.inmethod.ConstructorCallStartHandler(),
             new krow.compiler.handler.inmethod.AssignVarHandler(),
             new krow.compiler.handler.inmethod.DeclareAssignVarHandler(),
@@ -79,9 +106,23 @@ public class BasicCompiler implements Compiler<Krow> {
         ));
         HANDLERS.put(CompileState.IN_STATEMENT, List.of(
             new krow.compiler.handler.instatement.DeadEndHandler(),
-            new krow.compiler.handler.instatement.BooleanLiteralHandler(),
-            new krow.compiler.handler.instatement.CharLiteralHandler(),
-            new krow.compiler.handler.instatement.StringLiteralHandler(),
+            new OpenBracketHandler(),
+            new CloseBracketHandler(),
+            new AddHandler(),
+            new SubtractHandler(),
+            new MultiplyHandler(),
+            new DivideHandler(),
+            new DefaultHandler(),
+            new EqualsHandler(),
+            new NullLiteralHandler(),
+            new BooleanLiteralHandler(),
+            new CharLiteralHandler(),
+            new StringLiteralHandler(),
+            new SmallLiteralHandler(),
+            new LongLiteralHandler(),
+            new DoubleLiteralHandler(),
+            new FloatLiteralHandler(),
+            new StructImplicitHandler(),
             new krow.compiler.handler.instatement.AllocateInstanceHandler(),
             new CastHandler(),
             new DynamicCallStartHandler(), // goes in either
@@ -97,9 +138,16 @@ public class BasicCompiler implements Compiler<Krow> {
         HANDLERS.put(CompileState.IN_CALL, List.of(
             new krow.compiler.handler.incall.MethodCallEndHandler(),
             new krow.compiler.handler.incall.MethodSplitParameterHandler(),
-            new krow.compiler.handler.instatement.BooleanLiteralHandler(),
-            new krow.compiler.handler.instatement.CharLiteralHandler(),
-            new krow.compiler.handler.instatement.StringLiteralHandler(),
+            new OpenBracketHandler(),
+            new NullLiteralHandler(),
+            new BooleanLiteralHandler(),
+            new CharLiteralHandler(),
+            new StringLiteralHandler(),
+            new SmallLiteralHandler(),
+            new LongLiteralHandler(),
+            new DoubleLiteralHandler(),
+            new FloatLiteralHandler(),
+            new StructImplicitHandler(),
             new CastHandler(),
             new DynamicCallStartHandler(), // goes in either
             new MethodCallStartHandler(), // goes in either
@@ -145,7 +193,8 @@ public class BasicCompiler implements Compiler<Krow> {
     }
     
     public Class<?> compileAndLoad(final String file) {
-        return this.compile0(file).compileAndLoad();
+        final ClassBuilder builder = this.compile0(file);
+        return builder.compileAndLoad();
     }
     
     @Override

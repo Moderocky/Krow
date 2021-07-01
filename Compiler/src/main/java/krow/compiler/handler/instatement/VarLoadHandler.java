@@ -8,6 +8,7 @@ import krow.compiler.handler.Handler;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.PreVariable;
 import krow.compiler.pre.Signature;
+import mx.kenzie.foundation.Type;
 import mx.kenzie.foundation.WriteInstruction;
 
 import java.util.ArrayList;
@@ -20,27 +21,31 @@ public class VarLoadHandler implements Handler {
     
     private static final Pattern PATTERN = Pattern.compile("^(?<name>" + Signature.IDENTIFIER + ")");
     
+    Matcher matcher;
+    
     @Override
     public boolean accepts(String statement, CompileContext context) {
         switch (context.expectation) {
             case TYPE, DEAD_END, LITERAL, METHOD, FIELD, DOWN, UP:
                 return false;
         }
-        return PATTERN.matcher(statement).find();
+        return (matcher = PATTERN.matcher(statement)).find();
     }
     
     @Override
     public HandleResult handle(String statement, PreClass data, CompileContext context, CompileState state) {
-        final Matcher matcher = PATTERN.matcher(statement);
-        matcher.find();
         final String input = matcher.group();
         final String name = matcher.group("name");
         if (Objects.equals(name, "this")) {
-            context.child.statement.add(WriteInstruction.loadThis());
+            context.child.statement(WriteInstruction.loadThis());
             context.child.point = data.path;
         } else if (Objects.equals(name, "super")) {
-            context.child.statement.add(WriteInstruction.loadThis());
+            context.child.statement(WriteInstruction.loadThis());
             context.child.point = data.extend;
+        } else if (context.hasConstant(name)) {
+            final Object value = context.getConstant(name);
+            context.child.statement(WriteInstruction.loadConstant(value));
+            context.child.point = new Type(value.getClass());
         } else {
             final PreVariable variable = context.getVariable(name);
             if (variable == null) {
@@ -52,7 +57,7 @@ public class VarLoadHandler implements Handler {
                     throw new RuntimeException("Unavailable variable: '" + name + "'\nAvailable: " + strings);
                 } else throw new RuntimeException("Unavailable variable: '" + name + "'");
             }
-            context.child.statement.add(variable.load(context.getSlot(variable)));
+            context.child.statement(variable.load(context.getSlot(variable)));
             context.child.point = variable.type();
         }
         context.expectation = CompileExpectation.NONE;

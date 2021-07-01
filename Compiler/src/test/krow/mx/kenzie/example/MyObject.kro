@@ -7,18 +7,34 @@ class mx/kenzie/example/MyObject {
         super();
     }
 
-    import <MyObject::myMethod(String)V>
+    import <MyObject::myMethod(String)V, MyObject::dataTest()V>
     export <>
     static void test() {
         MyObject var1 = new MyObject;
         MyObject var2 = new MyObject("there");
         var1("hello");
         var1#myMethod("thing");
+        System.out.println("");
+        var1.dataTest();
     }
 
     // private method, not exported
     void myMethod(String name) {
         System.out.println(name);
+    }
+
+    struct getData() {
+        const name = "Jeremy";
+        const surname = "Baker";
+        int age = 25;
+        return struct(name, surname, age);
+    }
+
+    void dataTest() {
+        struct data = this.getData();
+        System.out.println(data.name);
+        System.out.println(data.surname);
+        System.out.println(data.age);
     }
 
 }

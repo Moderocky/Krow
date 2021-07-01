@@ -1,4 +1,4 @@
-package krow.compiler.handler.instatement;
+package krow.compiler.handler.literal;
 
 import krow.compiler.CompileContext;
 import krow.compiler.CompileExpectation;
@@ -52,9 +52,13 @@ public class CharLiteralHandler implements Handler {
             value = statement.charAt(1);
             length = 3;
         }
-        context.child.statement.add(WriteInstruction.loadConstant(value));
+        context.child.statement(WriteInstruction.loadConstant(value));
         context.expectation = CompileExpectation.NONE;
         context.child.point = new Type(char.class);
+        if (state == CompileState.IN_CONST) {
+            context.saveConstant.value = value;
+            context.expectation = CompileExpectation.DEAD_END;
+        }
         return new HandleResult(null, statement.substring(length).trim(), state);
     }
     

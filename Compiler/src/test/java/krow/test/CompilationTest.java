@@ -10,7 +10,6 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
 
 public class CompilationTest {
     
@@ -112,7 +111,7 @@ public class CompilationTest {
             >
             export <>
             final class mx/kenzie/Thingy {
-            
+                
                 export <>
                 static final void testMethod1(PrintStream out) {
                     String value = "hello there";
@@ -157,7 +156,7 @@ public class CompilationTest {
             >
             export <>
             class mx/kenzie/Bridge {
-            
+                
                 export <>
                 static final void testMethod1(PrintStream out, String value) {
                     out.println(value);
@@ -181,7 +180,7 @@ public class CompilationTest {
             import <java/lang/String, java/lang/System, java/io/PrintStream, System.out:PrintStream, PrintStream::println(String)V>
             export <>
             class mx/kenzie/Const {
-            
+                
                 export <>
                 void <init>(String name) {
                     super();
@@ -208,7 +207,7 @@ public class CompilationTest {
             import <java/io/PrintStream, java/util/Arrays>
             export <>
             class mx/kenzie/Arr {
-            
+                
                 import <Arrays::toString(Object[])String>
                 export <>
                 static void main(String[] value) {
@@ -227,12 +226,12 @@ public class CompilationTest {
         final String source = """
             import <java/io/PrintStream> export <>
             class mx/kenzie/Alloc {
-            
+                
                 void <init>(String name) {
                     System.out.println(name);
                     super();
                 }
-            
+                
                 export <>
                 static void test() {
                     Alloc var1 = new Alloc;
@@ -283,8 +282,214 @@ public class CompilationTest {
     }
     
     @Test
+    public void smalls() throws Throwable {
+        final String source = """
+            import <java/io/PrintStream> export <>
+            class mx/kenzie/Small {
+                
+                static void myMethod(int i) {
+                    System.out.println(i);
+                }
+                
+                export <>
+                static void test() {
+                    int i = 20;
+                    Small.myMethod(i);
+                }
+                
+            }
+            
+            """;
+        final Class<?> basic = new BasicCompiler().compileAndLoad(source);
+        assert basic != null;
+        basic.getMethod("test").invoke(null);
+    }
+    
+    @Test
+    public void consts() throws Throwable {
+        final String source = """
+            import <java/io/PrintStream> export <>
+            class mx/kenzie/Constants {
+                
+                const a = "hello";
+                
+                export <>
+                static void test() {
+                    const b = "there";
+                    System.out.println(a);
+                    System.out.println(b);
+                }
+                
+            }
+            
+            """;
+        final Class<?> basic = new BasicCompiler().compileAndLoad(source);
+        assert basic != null;
+        basic.getMethod("test").invoke(null);
+    }
+    
+    @Test
+    public void structs() throws Throwable {
+        final String source = """
+            import <java/io/PrintStream> export <>
+            class mx/kenzie/Blob6 {
+                
+                const name = "hello";
+                
+                static struct myMethod() {
+                    int age = 66;
+                    return struct(name, age);
+                }
+                
+                export <>
+                static void test() {
+                    struct data = Blob6.myMethod();
+                    System.out.println(data.name);
+                    System.out.println(data.age);
+                }
+                
+            }
+            
+            """;
+        final Class<?> basic = new BasicCompiler().compileAndLoad(source);
+        assert basic != null;
+        basic.getMethod("test").invoke(null);
+    }
+    
+    @Test
+    public void maths() throws Throwable {
+        final String source = """
+            import <java/io/PrintStream> export <>
+            class mx/kenzie/Maths {
+                
+                export <>
+                static void test() {
+                    int a = 1 + 1;
+                    int b = (1 + 3);
+                    int c = 2 + (3 * 4);
+                    double d = 2D - (3D / 4D);
+                    System.out.println(a);
+                    System.out.println(b);
+                    System.out.println(c);
+                    System.out.println(d);
+                    System.out.println(((2 + 3 )* 4));
+                }
+                
+            }
+            
+            """;
+        final Class<?> basic = new BasicCompiler().compileAndLoad(source);
+        assert basic != null;
+        basic.getMethod("test").invoke(null);
+    }
+    
+    @Test
+    public void jump() throws Throwable {
+        final String source = """
+            import <java/io/PrintStream> export <>
+            class mx/kenzie/Jump {
+                
+                export <>
+                static void test() {
+                    int a = 1 + 1;
+                    int b = (1 + 3);
+                    int c = 2 + (3 * 4);
+                    goto test;
+                    double d = 2D - (3D / 4D);
+                    System.out.println(d);
+                    System.out.println(a);
+                    System.out.println(b);
+                    label test;
+                    System.out.println(c);
+                    System.out.println(((2 + 3 )* 4));
+                }
+                
+            }
+            
+            """;
+        final Class<?> basic = new BasicCompiler().compileAndLoad(source);
+        assert basic != null;
+        basic.getMethod("test").invoke(null);
+    }
+    
+    @Test
+    public void def() throws Throwable {
+        final String source = """
+            import <java/io/PrintStream> export <>
+            class mx/kenzie/Default {
+                
+                export <>
+                static void test() {
+                    String var1 = null;
+                    String var2 = "hello";
+                    String result = (var1 ? var2);
+                    System.out.println(result);
+                }
+                
+            }
+            
+            """;
+        final Class<?> basic = new BasicCompiler().compileAndLoad(source);
+        assert basic != null;
+        basic.getMethod("test").invoke(null);
+    }
+    
+    @Test
+    public void eq() throws Throwable {
+        final String source = """
+            import <java/io/PrintStream> export <>
+            class mx/kenzie/Equals {
+                
+                export <>
+                static void test() {
+                    String var1 = null;
+                    String var2 = "hello";
+                    boolean result = var1 == var2;
+                    boolean blob = var1 != var2;
+                    System.out.println(result);
+                    System.out.println(blob);
+                    System.out.println((1 == 1));
+                    System.out.println((1 != 2));
+                }
+                
+            }
+            
+            """;
+        final Class<?> basic = new BasicCompiler().compileAndLoad(source);
+        assert basic != null;
+        basic.getMethod("test").invoke(null);
+    }
+    
+    @Test
+    public void iff() throws Throwable {
+        final String source = """
+            import <java/io/PrintStream> export <>
+            class mx/kenzie/Iff {
+                
+                export <>
+                static void test() {
+                    String var1 = null;
+                    String var2 = "hello";
+                    if (var1 != var2) System.out.println(var2);
+                    if (var1 == var2) System.out.println("blob");
+                    System.out.println("there");
+                }
+                
+            }
+            
+            """;
+        final Class<?> basic = new BasicCompiler().compileAndLoad(source);
+        assert basic != null;
+        basic.getMethod("test").invoke(null);
+    }
+    
+    @Test
     public void full() {
         Krow.main("TestTarget.ark", "src/test/krow", "mx.kenzie.example.Main");
+    }
+    
+    private void debug(final String source) throws Throwable {
+        new FileOutputStream("debug.class").write(new BasicCompiler().compile(source));
     }
     
 }

@@ -24,7 +24,7 @@ public class MethodCallEndHandler implements Handler {
         final PreMethodCall call = context.child.preparing.get(0);
         assert call != null;
         if (context.child.point != null) call.addParameter(context.child.point);
-        context.child.statement.add(call.execute(context));
+        context.child.statement(call.execute(context));
         context.child.staticState = false;
         context.child.preparing.remove(0);
         context.expectation = CompileExpectation.NONE;

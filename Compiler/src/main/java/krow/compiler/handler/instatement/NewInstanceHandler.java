@@ -36,9 +36,9 @@ public class NewInstanceHandler implements Handler {
         final String target = matcher.group("type");
         final Type type = context.resolveType(target);
         assert type != null;
-        context.child.statement.add(WriteInstruction.allocate(type));
+        context.child.statement(WriteInstruction.allocate(type));
         if (context.duplicate) {
-            context.child.statement.add(WriteInstruction.duplicate());
+            context.child.statement(WriteInstruction.duplicate());
             context.duplicate = false;
         }
         context.child.point = type;

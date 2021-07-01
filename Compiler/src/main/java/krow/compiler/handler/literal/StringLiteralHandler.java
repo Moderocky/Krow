@@ -1,4 +1,4 @@
-package krow.compiler.handler.instatement;
+package krow.compiler.handler.literal;
 
 import krow.compiler.CompileContext;
 import krow.compiler.CompileExpectation;
@@ -31,9 +31,13 @@ public class StringLiteralHandler implements Handler {
         matcher.find();
         final String input = matcher.group();
         final String value = input.substring(1, input.length() - 1);
-        context.child.statement.add(WriteInstruction.loadConstant(value));
+        context.child.statement(WriteInstruction.loadConstant(value));
         context.child.point = new Type(String.class);
         context.expectation = CompileExpectation.NONE;
+        if (state == CompileState.IN_CONST) {
+            context.saveConstant.value = value;
+            context.expectation = CompileExpectation.DEAD_END;
+        }
         return new HandleResult(null, statement.substring(input.length()).trim(), state);
     }
     

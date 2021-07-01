@@ -1,6 +1,7 @@
 package krow.compiler;
 
 import krow.compiler.pre.PreStructure;
+import krow.lang.Structure;
 import mx.kenzie.foundation.Type;
 
 import java.nio.ByteBuffer;
@@ -54,7 +55,7 @@ public class Resolver {
             case "void":
                 return new Type(void.class);
             case "struct":
-                return new Type(Object.class);
+                return new Type(Structure.class);
         }
         for (final Type type : types) {
             if (!type.internalName().endsWith(name)) continue;

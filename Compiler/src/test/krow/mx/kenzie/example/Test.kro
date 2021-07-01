@@ -3,7 +3,7 @@ import <java/io/PrintStream, java/util/Arrays>
 export <>
 class mx/kenzie/example/Main {
 
-    import <Arrays::toString(Object[])String, mx/kenzie/example/MyObject, MyObject::test()V, MyObject::myMethod(String)V>
+    import <Arrays::toString(Object[])String, mx/kenzie/example/Example, Example::test()V, mx/kenzie/example/MyObject, MyObject::test()V, MyObject::myMethod(String)V>
     export <>
     static void main(String[] value) {
         Object x = "hello";
@@ -17,6 +17,9 @@ class mx/kenzie/example/Main {
 
         // calls private method :)
         object#myMethod("bean");
+
+        System.out.println("");
+        Example.test();
     }
 
 }

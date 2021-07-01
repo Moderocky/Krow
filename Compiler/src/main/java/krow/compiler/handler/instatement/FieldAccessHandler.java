@@ -36,7 +36,7 @@ public class FieldAccessHandler implements Handler {
         final PreFieldCall call = new PreFieldCall();
         call.owner = context.child.point;
         call.name = name;
-        context.child.statement.add(call.get(context));
+        context.child.statement(call.get(context));
         context.child.point = call.getType(context);
         context.child.staticState = false;
         context.expectation = CompileExpectation.NONE;

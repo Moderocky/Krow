@@ -38,7 +38,7 @@ public class ConstructorCallStartHandler implements Handler {
         call.dynamic = true;
         call.owner = here ? data.path : data.extend;
         call.name = "<init>";
-        context.child.statement.add(WriteInstruction.loadThis());
+        context.child.statement(WriteInstruction.loadThis());
         context.expectation = CompileExpectation.OBJECT;
         return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.IN_CALL);
     }

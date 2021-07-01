@@ -22,6 +22,10 @@ public class ReturnHandler implements Handler {
         assert context.method != null;
         final Type type = context.method.returnType;
         assert type != null;
+        context.lookingFor = type;
+        if (type.getSimpleName().equals("Structure"))
+            context.child.awaitAdjustedType = true;
+        context.child.inReturnPhase = true;
         if (type.matches(void.class)) {
             context.child.skip = (returnEmpty());
             context.expectation = CompileExpectation.DEAD_END;
