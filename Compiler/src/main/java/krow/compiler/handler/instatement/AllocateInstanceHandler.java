@@ -35,12 +35,12 @@ public class AllocateInstanceHandler implements Handler {
         final String target = matcher.group("type");
         final Type type = context.resolveType(target);
         assert type != null;
+        context.child.point = type;
         context.child.statement(WriteInstruction.allocate(type));
         if (context.duplicate) {
             context.child.statement(WriteInstruction.duplicate());
             context.duplicate = false;
         }
-        context.child.point = type;
         context.expectation = CompileExpectation.DEAD_END;
         return new HandleResult(null, statement.substring(input.length()).trim(), state);
     }

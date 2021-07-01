@@ -23,7 +23,7 @@ public class DivideHandler implements Handler {
     public HandleResult handle(String statement, PreClass data, CompileContext context, CompileState state) {
         final WriteInstruction instruction;
         switch (context.child.point.dotPath()) {
-            case "int", "short", "char", "boolean" -> instruction = WriteInstruction.divideSmall();
+            case "int", "short", "byte", "char", "boolean" -> instruction = WriteInstruction.divideSmall();
             case "long" -> instruction = WriteInstruction.divideLong();
             case "double" -> instruction = WriteInstruction.divideDouble();
             case "float" -> instruction = WriteInstruction.divideFloat();

@@ -35,9 +35,9 @@ public class FloatLiteralHandler implements Handler {
         final String input = matcher.group();
         final String number = input.endsWith("F") ? input.substring(0, input.length() - 1) : input;
         final float value = Float.parseFloat(number);
+        context.child.point = new Type(float.class);
         context.child.statement(WriteInstruction.loadConstant(value));
         context.expectation = CompileExpectation.NONE;
-        context.child.point = new Type(float.class);
         if (state == CompileState.IN_CONST) {
             context.saveConstant.value = value;
             context.expectation = CompileExpectation.DEAD_END;

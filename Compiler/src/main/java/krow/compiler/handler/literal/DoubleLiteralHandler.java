@@ -35,9 +35,9 @@ public class DoubleLiteralHandler implements Handler {
         final String input = matcher.group();
         final String number = input.substring(0, input.length() - 1);
         final double value = Double.parseDouble(number);
+        context.child.point = new Type(double.class);
         context.child.statement(WriteInstruction.loadConstant(value));
         context.expectation = CompileExpectation.NONE;
-        context.child.point = new Type(double.class);
         if (state == CompileState.IN_CONST) {
             context.saveConstant.value = value;
             context.expectation = CompileExpectation.DEAD_END;

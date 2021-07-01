@@ -31,7 +31,7 @@ import java.util.zip.ZipOutputStream;
 
 import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
 
-public class BasicCompiler implements Compiler<Krow> {
+public class ReKrow implements Compiler<Krow> {
     
     Pattern LINE_COMMENT = Pattern.compile("//.+(?=(\\R|$))");
     Pattern BLOCK_COMMENT = Pattern.compile("/\\*[\\s\\S]*?\\*/");
@@ -89,6 +89,7 @@ public class BasicCompiler implements Compiler<Krow> {
         HANDLERS.put(CompileState.IN_METHOD, List.of(
             new krow.compiler.handler.inmethod.UpLevelHandler(),
             new krow.compiler.handler.inmethod.DeadEndHandler(),
+            new krow.compiler.handler.inmethod.AssertHandler(),
             new krow.compiler.handler.inmethod.ReturnHandler(),
             new krow.compiler.handler.inmethod.ConstHandler(),
             new krow.compiler.handler.inmethod.LabelHandler(),
@@ -114,6 +115,16 @@ public class BasicCompiler implements Compiler<Krow> {
             new DivideHandler(),
             new DefaultHandler(),
             new EqualsHandler(),
+            new InvertHandler(),
+            new IsNullHandler(),
+            new NegateHandler(),
+            new AndHandler(),
+            new OrHandler(),
+            new CastHandler(),
+            new UShiftHandler(),
+            new ShiftHandler(),
+            new GTLTEQHandler(),
+            new GTLTHandler(),
             new NullLiteralHandler(),
             new BooleanLiteralHandler(),
             new CharLiteralHandler(),
@@ -124,7 +135,6 @@ public class BasicCompiler implements Compiler<Krow> {
             new FloatLiteralHandler(),
             new StructImplicitHandler(),
             new krow.compiler.handler.instatement.AllocateInstanceHandler(),
-            new CastHandler(),
             new DynamicCallStartHandler(), // goes in either
             new MethodCallStartHandler(), // goes in either
             new krow.compiler.handler.instatement.NewInstanceHandler(),
@@ -147,6 +157,9 @@ public class BasicCompiler implements Compiler<Krow> {
             new LongLiteralHandler(),
             new DoubleLiteralHandler(),
             new FloatLiteralHandler(),
+            new InvertHandler(),
+            new IsNullHandler(),
+            new NegateHandler(),
             new StructImplicitHandler(),
             new CastHandler(),
             new DynamicCallStartHandler(), // goes in either

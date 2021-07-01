@@ -22,9 +22,9 @@ public class NullLiteralHandler implements Handler {
     
     @Override
     public HandleResult handle(String statement, PreClass data, CompileContext context, CompileState state) {
+        context.child.point = new Type(void.class);
         context.child.statement(WriteInstruction.pushNull());
         context.expectation = CompileExpectation.NONE;
-        context.child.point = new Type(void.class);
         return new HandleResult(null, statement.substring(4).trim(), state);
     }
     

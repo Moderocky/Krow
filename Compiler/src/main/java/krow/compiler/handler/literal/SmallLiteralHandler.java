@@ -34,9 +34,9 @@ public class SmallLiteralHandler implements Handler {
     public HandleResult handle(String statement, PreClass data, CompileContext context, CompileState state) {
         final String input = matcher.group();
         final int value = Integer.parseInt(input);
+        context.child.point = new Type(int.class);
         context.child.statement(WriteInstruction.loadConstant(value));
         context.expectation = CompileExpectation.NONE;
-        context.child.point = new Type(int.class);
         if (state == CompileState.IN_CONST) {
             context.saveConstant.value = value;
             context.expectation = CompileExpectation.DEAD_END;

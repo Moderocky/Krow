@@ -1,6 +1,6 @@
 package krow.test;
 
-import krow.compiler.BasicCompiler;
+import krow.compiler.ReKrow;
 import krow.compiler.Krow;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -25,7 +25,7 @@ public class CompilationTest {
     
     @Test
     public void basic() {
-        final Class<?> basic = new BasicCompiler().compileAndLoad("""
+        final Class<?> basic = new ReKrow().compileAndLoad("""
             import <java/lang/String>
             // export <>
             class mx/kenzie/Example {
@@ -40,7 +40,7 @@ public class CompilationTest {
     
     @Test
     public void abstractMethod() throws Throwable {
-        final Class<?> basic = new BasicCompiler().compileAndLoad("""
+        final Class<?> basic = new ReKrow().compileAndLoad("""
             import <java/lang/String>
             // export <>
             class mx/kenzie/Example2 {
@@ -61,7 +61,7 @@ public class CompilationTest {
     
     @Test
     public void bodyMethod() throws Throwable {
-        final Class<?> basic = new BasicCompiler().compileAndLoad("""
+        final Class<?> basic = new ReKrow().compileAndLoad("""
             import <java/lang/String>
             // export <>
             class mx/kenzie/Example3 {
@@ -93,7 +93,7 @@ public class CompilationTest {
                 }
             }
             """;
-        final Class<?> basic = new BasicCompiler().compileAndLoad(source);
+        final Class<?> basic = new ReKrow().compileAndLoad(source);
         assert basic != null;
         assert basic.getName().equals("mx.kenzie.Fancy");
         final Method method = basic.getDeclaredMethod("testMethod", PrintStream.class, String.class);
@@ -140,7 +140,7 @@ public class CompilationTest {
                 static void bridgeMethod(Object object);
             }
             """;
-        final Class<?> basic = new BasicCompiler().compileAndLoad(source);
+        final Class<?> basic = new ReKrow().compileAndLoad(source);
         assert basic != null;
         basic.getMethod("testMethod1", PrintStream.class).invoke(null, System.out);
         basic.getMethod("testMethod2", PrintStream.class).invoke(null, System.out);
@@ -168,7 +168,7 @@ public class CompilationTest {
                 
             }
             """;
-        final Class<?> basic = new BasicCompiler().compileAndLoad(source);
+        final Class<?> basic = new ReKrow().compileAndLoad(source);
         assert basic != null;
         basic.getMethod("testMethod1", PrintStream.class, String.class).invoke(null, System.out, "a");
         basic.getMethod("bridgeMethod", PrintStream.class, Object.class).invoke(null, System.out, "b");
@@ -194,7 +194,7 @@ public class CompilationTest {
                 
             }
             """;
-        final Class<?> basic = new BasicCompiler().compileAndLoad(source);
+        final Class<?> basic = new ReKrow().compileAndLoad(source);
         assert basic != null;
         final Object object = basic.getConstructor(String.class).newInstance("hello");
         assert object != null;
@@ -216,7 +216,7 @@ public class CompilationTest {
                 
             }
             """;
-        final Class<?> basic = new BasicCompiler().compileAndLoad(source);
+        final Class<?> basic = new ReKrow().compileAndLoad(source);
         assert basic != null;
         basic.getMethod("main", String[].class).invoke(null, (Object) new String[]{"hello", "there"});
     }
@@ -241,7 +241,7 @@ public class CompilationTest {
                 
             }
             """;
-        final Class<?> basic = new BasicCompiler().compileAndLoad(source);
+        final Class<?> basic = new ReKrow().compileAndLoad(source);
         assert basic != null;
         basic.getMethod("test").invoke(null);
     }
@@ -276,7 +276,7 @@ public class CompilationTest {
             }
             
             """;
-        final Class<?> basic = new BasicCompiler().compileAndLoad(source);
+        final Class<?> basic = new ReKrow().compileAndLoad(source);
         assert basic != null;
         basic.getMethod("test").invoke(null);
     }
@@ -300,7 +300,7 @@ public class CompilationTest {
             }
             
             """;
-        final Class<?> basic = new BasicCompiler().compileAndLoad(source);
+        final Class<?> basic = new ReKrow().compileAndLoad(source);
         assert basic != null;
         basic.getMethod("test").invoke(null);
     }
@@ -323,7 +323,7 @@ public class CompilationTest {
             }
             
             """;
-        final Class<?> basic = new BasicCompiler().compileAndLoad(source);
+        final Class<?> basic = new ReKrow().compileAndLoad(source);
         assert basic != null;
         basic.getMethod("test").invoke(null);
     }
@@ -351,7 +351,7 @@ public class CompilationTest {
             }
             
             """;
-        final Class<?> basic = new BasicCompiler().compileAndLoad(source);
+        final Class<?> basic = new ReKrow().compileAndLoad(source);
         assert basic != null;
         basic.getMethod("test").invoke(null);
     }
@@ -378,7 +378,7 @@ public class CompilationTest {
             }
             
             """;
-        final Class<?> basic = new BasicCompiler().compileAndLoad(source);
+        final Class<?> basic = new ReKrow().compileAndLoad(source);
         assert basic != null;
         basic.getMethod("test").invoke(null);
     }
@@ -407,7 +407,7 @@ public class CompilationTest {
             }
             
             """;
-        final Class<?> basic = new BasicCompiler().compileAndLoad(source);
+        final Class<?> basic = new ReKrow().compileAndLoad(source);
         assert basic != null;
         basic.getMethod("test").invoke(null);
     }
@@ -429,7 +429,7 @@ public class CompilationTest {
             }
             
             """;
-        final Class<?> basic = new BasicCompiler().compileAndLoad(source);
+        final Class<?> basic = new ReKrow().compileAndLoad(source);
         assert basic != null;
         basic.getMethod("test").invoke(null);
     }
@@ -450,12 +450,24 @@ public class CompilationTest {
                     System.out.println(blob);
                     System.out.println((1 == 1));
                     System.out.println((1 != 2));
+                    boolean a = 1 < 2;
+                    boolean b = 2 < 2;
+                    boolean c = 2 <= 2;
+                    boolean d = 3 > 2;
+                    boolean e = 2 > 2;
+                    boolean f = 2 >= 2;
+                    System.out.println(a);
+                    System.out.println(b);
+                    System.out.println(c);
+                    System.out.println(d);
+                    System.out.println(e);
+                    System.out.println(f);
                 }
                 
             }
             
             """;
-        final Class<?> basic = new BasicCompiler().compileAndLoad(source);
+        final Class<?> basic = new ReKrow().compileAndLoad(source);
         assert basic != null;
         basic.getMethod("test").invoke(null);
     }
@@ -478,7 +490,39 @@ public class CompilationTest {
             }
             
             """;
-        final Class<?> basic = new BasicCompiler().compileAndLoad(source);
+        final Class<?> basic = new ReKrow().compileAndLoad(source);
+        assert basic != null;
+        basic.getMethod("test").invoke(null);
+    }
+    
+    @Test
+    public void logic() throws Throwable {
+        final String source = """
+            import <java/io/PrintStream> export <>
+            class mx/kenzie/Logic {
+                
+                export <>
+                static void test() {
+                    boolean a = false;
+                    boolean b = !a;
+                    boolean c = !b;
+                    assert b;
+                    assert !c;
+                    assert 1 == 1;
+                    assert (-101 == ~100);
+                    assert true;
+                    assert !a;
+                    assert true & true;
+                    assert true | false;
+                    assert ~false;
+                    assert !false;
+                    
+                }
+                
+            }
+            
+            """;
+        final Class<?> basic = new ReKrow().compileAndLoad(source);
         assert basic != null;
         basic.getMethod("test").invoke(null);
     }
@@ -489,7 +533,7 @@ public class CompilationTest {
     }
     
     private void debug(final String source) throws Throwable {
-        new FileOutputStream("debug.class").write(new BasicCompiler().compile(source));
+        new FileOutputStream("debug.class").write(new ReKrow().compile(source));
     }
     
 }

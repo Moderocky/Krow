@@ -6,6 +6,7 @@ import mx.kenzie.foundation.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.Function;
 
 public class CompileContext {
     
@@ -56,6 +57,7 @@ public class CompileContext {
     public CompileExpectation expectation = CompileExpectation.NONE;
     public WriteInstruction skip; // stacked when DEAD_END reached (eol)
     public WriteInstruction doAfter; // done after swap
+    public Function<Type, WriteInstruction> doExpecting; // done after swap
     public PreVariable store;
     public Type point;
     public Type lookingFor;
@@ -116,6 +118,15 @@ public class CompileContext {
         }
     }
     
+    public Function<Type, WriteInstruction> doExpecting() {
+        final CompileContext context;
+        final Function<Type, WriteInstruction> after;
+        context = child == null ? this : child;
+        after = context.doExpecting;
+        context.doExpecting = null;
+        return after;
+    }
+    
     public WriteInstruction doAfter() {
         final CompileContext context;
         final WriteInstruction after;
@@ -138,7 +149,9 @@ public class CompileContext {
             swap(false);
         } else list.add(instruction);
         final WriteInstruction after = doAfter();
+        final Function<Type, WriteInstruction> expecting = doExpecting();
         if (after != null) list.add(after);
+        if (expecting != null) list.add(expecting.apply(point));
     }
     
     public void statementRaw(final WriteInstruction instruction) {
@@ -148,7 +161,9 @@ public class CompileContext {
             swap(false);
         } else list.add(instruction);
         final WriteInstruction after = doAfter();
+        final Function<Type, WriteInstruction> expecting = doExpecting();
         if (after != null) list.add(after);
+        if (expecting != null) list.add(expecting.apply(point));
     }
     
     public void importJava(final Class<?> cls) {

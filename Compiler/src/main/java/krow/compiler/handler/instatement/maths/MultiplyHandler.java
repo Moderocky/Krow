@@ -23,7 +23,7 @@ public class MultiplyHandler implements Handler {
     public HandleResult handle(String statement, PreClass data, CompileContext context, CompileState state) {
         final WriteInstruction instruction;
         switch (context.child.point.dotPath()) {
-            case "int", "short", "char", "boolean" -> instruction = WriteInstruction.multiplySmall();
+            case "int", "short", "byte", "char", "boolean" -> instruction = WriteInstruction.multiplySmall();
             case "long" -> instruction = WriteInstruction.multiplyLong();
             case "double" -> instruction = WriteInstruction.multiplyDouble();
             case "float" -> instruction = WriteInstruction.multiplyFloat();

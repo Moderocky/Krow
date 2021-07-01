@@ -34,9 +34,9 @@ public class LongLiteralHandler implements Handler {
     public HandleResult handle(String statement, PreClass data, CompileContext context, CompileState state) {
         final String input = matcher.group();
         final long value = Long.parseLong(input.substring(0, input.length() - 1));
+        context.child.point = new Type(long.class);
         context.child.statement(WriteInstruction.loadConstant(value));
         context.expectation = CompileExpectation.NONE;
-        context.child.point = new Type(long.class);
         if (state == CompileState.IN_CONST) {
             context.saveConstant.value = value;
             context.expectation = CompileExpectation.DEAD_END;

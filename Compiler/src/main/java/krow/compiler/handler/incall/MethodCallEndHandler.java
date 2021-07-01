@@ -24,11 +24,12 @@ public class MethodCallEndHandler implements Handler {
         final PreMethodCall call = context.child.preparing.get(0);
         assert call != null;
         if (context.child.point != null) call.addParameter(context.child.point);
+        call.ensureReturnType(context);
+        context.child.point = call.returnType;
         context.child.statement(call.execute(context));
         context.child.staticState = false;
         context.child.preparing.remove(0);
         context.expectation = CompileExpectation.NONE;
-        context.child.point = call.returnType;
         final boolean inCall = context.child.preparing.size() > 0;
         return new HandleResult(null, statement.substring(1)
             .trim(), inCall ? CompileState.IN_CALL : CompileState.IN_STATEMENT);

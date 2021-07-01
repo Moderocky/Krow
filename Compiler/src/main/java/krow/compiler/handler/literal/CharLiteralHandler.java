@@ -52,9 +52,9 @@ public class CharLiteralHandler implements Handler {
             value = statement.charAt(1);
             length = 3;
         }
+        context.child.point = new Type(char.class);
         context.child.statement(WriteInstruction.loadConstant(value));
         context.expectation = CompileExpectation.NONE;
-        context.child.point = new Type(char.class);
         if (state == CompileState.IN_CONST) {
             context.saveConstant.value = value;
             context.expectation = CompileExpectation.DEAD_END;

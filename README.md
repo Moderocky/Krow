@@ -16,7 +16,35 @@ Java's long-standing and established nature is both a strength and a flaw: Java 
 
 Clearly, there are many situations where these benefits outweigh their drawbacks. Many programmers benefit from Java's simplicity, newer programmers benefit from Java's safety and everybody benefits from Java's reliability. However, some users may find themselves longing for source-level access to JVM internals or to patch the many gaps and inconsistencies in Java.
 
-The Krow compiler has very limited verification, allowing a lot of instructions to be compiled that Java's compiler would consider illegal. Some of these will still be caught by the runtime verifier when the class is loaded, if they would actually prevent the code from running. 
+The Krow language spec and the original ReKrow compiler were designed and written within six days. I rested on the seventh. ;) More than anything, they were created for proof of concept: a JVM language entirely interoperable with Java, yet able to do things far outside the Java language spec. A JVM language that provides more than sugar.
+
+> *Nomenclature:*
+> 
+> Krow spells 'work' backwards, but this is coincidental. The name comes from it being in row 'K' of my project table. 
+> However, the back-to-front name has been embraced for other elements: rekrow (worker) .ark (Krow ARchive)
+> 
+> The pronunciation doesn't matter, I'm partial to 'kay-row', but 'crow' is equally fine. The tag-line is a reference to crows being carrion birds.
+> 
+> Coincidentally, K comes after J in the alphabet.
+
+
+## The ReKrow Compiler
+
+The basic Krow compiler is called 'ReKrow'. 
+
+ReKrow is very rudimentary. It is designed to be as close to 'what-you-see-is-what-you-get' as possible, with no re-ordering or rearranging of entries.
+
+It also has very little verification, allowing a lot of instructions to be compiled that Java's compiler would consider illegal. Some of these will still be caught by the runtime verifier when the class is loaded, if they would actually prevent the code from running.
+
+In practice, this means you can:
+- Create default classes with abstract methods.
+- Extend an abstract class without implementing all of its methods.
+- Write unreachable code after the return statement.
+- Much, much more.
+
+ReKrow is a 'flyover' compiler. This means it reads the input source in one line: the compiler does not know about something until it reaches it. While this does make forward referencing more problematic, it also makes the compiler less complex and more efficient: elements are dealt with as they are reached, then discarded. The compiler requires no recursion or sub-parsing.
+
+ReKrow uses [ASM](https://asm.ow2.io/) for assembling its output bytecode. ASM is a very old and established tool, so much so that the Java JDK uses it internally.
 
 ## Keywords
 
@@ -31,6 +59,7 @@ See the [metadata particle](#the-metadata-particle-) for more information.
 |`import`|Reference `<>` metadata.|Class declaration, field declaration, method declaration.|Asserts the given references exist in the target area, allows use of their shortened names.|
 |`export`|Reference `<>` metadata.|Class declaration, field declaration, method declaration.|Exports the given element for use outside the class. Exports any included elements to users of this element.|
 |`bridge`|Reference `<>` metadata for a method.|Method declaration.|Sets the bridge target of the upcoming method.|
+|`const`|Identifier and literal value.|Class body, method body.|Stores a compile-time constant.|
 
 ### Modifier Keywords
 
@@ -44,9 +73,21 @@ Note: Krow does not directly offer visibility modifiers.
 |`final`|Field declaration, class declaration, method declaration.|Marks the upcoming element as final.|
 |`native`|Method declaration.|Marks the upcoming element as implemented elsewhere.|
 
+### Instruction Keywords
+
+Instruction keywords are used in code bodies. They perform a function, and may only be used at the start of a statement. 
+
+|Word|Accepts|Description|
+|----|-----------|------|
+|`label`|`identifier`|Marks a point which can be jumped to.|
+|`goto`|`identifier`|Jumps to the given label.|
+|`if`|`(boolean)`|Runs the subsequent statement if the condition is true. Note: the statement is from root-level.|
+|`return`|`value?`|Returns the given value from the method, or returns empty.|
+|`assert`|`boolean`|Asserts that the given value is true.|
+
 ### Type Keywords
 
-Type keywords are used to designate primitive (or built-in) in fields, methods, variables and returns.
+Type keywords are used to designate primitive (or built-in constants) in fields, methods, variables and returns.
 
 |Word|Length|Machine Words|Descriptor|
 |----|------|-------------|----------|
@@ -72,6 +113,89 @@ Krow introduces source-level literals for methods, fields, classes and structs.
 |Field|`static Type name`|`Owner.name:Type`|A field reference. Used for importing, exporting and reflective access.|
 |Method|`public void myMethod(Type param, int i)`|`Owner::myMethod(Type,I)V`|A method reference. Used for importing, exporting and reflective access.|
 |Struct|Java doesn't have structs :(|`S(name:Type,name:Type)`|A structure reference, used for automatic type inference.|
+
+### Jump Instructions
+
+Krow allows for routine jumps in methods by use of the `goto` and `label` keywords.
+
+These are very raw and potentially dangerous instructions - it is very easy to create infinite loops or inaccessible code that the JVM simply cannot process because the jump instructions cannot be processed. As such, non-trivial use of `goto` is not recommended.
+
+Warnings aside, the instruction is very simple.
+Labels are denoted by a `label name;` statement.
+That label can be jumped to by a `goto name;` statement.
+
+For beginners, it is recommended to keep these instructions in pairs (rather than having multiple jumps to a single point) as it lowers the risk of jump asymmetry.
+
+> N.B: Jump asymmetry occurs when the stack/variable map could have two different states at a label.
+> The Krow compiler is able to prevent this in most situations.
+
+Jump instructions can be used to create more complex conditional sections:
+```java 
+int a = 6;
+int b = 5;
+if (a == b) goto end;
+System.out.println(a);
+System.out.println(b);
+label end;
+System.out.println("end");
+```
+
+It is very easy to create inaccessible areas of code.
+This is not an issue in itself - unlike Java, Krow is perfectly able to handle unreachable statements - but programmers should be careful with doing this accidentally.
+
+Unreachable code: (Valid but pointless.)
+```java 
+int a = 10;
+int b = 5;
+goto box;
+int c = 6;
+System.out.println(a);
+System.out.println(c);
+label box;
+System.out.println(b);
+```
+
+This can be used to manually assemble Java's `while` and `for` loops.
+Example:
+```java 
+int a = 0;
+label top;
+if (a == 12) goto exit;
+a = a + 1;
+goto top;
+label exit;
+System.out.println(a);
+```
+
+Manual jump instructions can be used to create much more efficient and direct loops - a skilled programmer can always create a more effective version than a machine compiler.
+However, the reverse is also true: misuse of jump instructions will likely be less efficient than a simple loop. Use them wisely.
+
+### Constants
+
+Like other languages, Krow offers constants using the `const` keyword.
+However, this is a compile-time keyword. The constant is *not* available at runtime as a field or variable. It is simply a programming tool to make use of the `LDC` instruction instead of assigning unnecessary variables for constant values.
+
+Constants must either be primitive or of a compile-time constant type, such as a string, class or handle.
+
+This feature is a better replacement for Java's final assigned variables and fields.
+The variable `final String name = "Bob";` would have its value copied to all uses within the method using `LDC`, but the variable will still occupy a slot in memory which it doesn't need to - the variable itself is never accessed. Krow avoids this waste with `const` by using the value as-is and never assigning a variable for it.
+The same principle applies to final primitive variables which are assigned at declaration.
+
+
+Constants can be declared at the class or the method level, and are available within their scope like regular variables.
+```java 
+class Example {
+    const name = "Henry";
+    
+    void myMethod() {
+        const surname = "Carter";
+        // name is available here
+        // surname is available here
+    }
+}
+```
+
+Constants may also be used in the implicit struct constructor.
 
 ### Structs
 
@@ -146,16 +270,17 @@ Krow does not include visibility modifiers at the language level.
 This is a deliberate choice - partly because it is very simple to ignore access modifiers in Krow using the built-in [dynamic particle](#the-dynamic-particle-). This would make a `private` modifier a little pointless.
 Instead, Krow opts for an `export` metadata system.
 
+This is currently unfinished.
 
 ## Particles
 
 Krow uses particles to indicate new functionality without making the language more verbose or confusing than it needs to be.
-Particles reduce the need for new keywords, are easier to spot and highlight and make parsing more efficient.
+Particles reduce the need for new keywords that would clutter the language, are easier to spot and highlight and make parsing more efficient.
 
 |Symbol|Name|Description|
 |------|----|-----------|
 |`<>`|[Meta Section](#the-metadata-particle-)|Reference metadata section (for imports, exports, bridges).|
-|`#`|[Dynamic](#the-dynamic-particle-)|Reserved.|
+|`#`|[Dynamic](#the-dynamic-particle-)|Invoking inaccessible methods.|
 |`?`|[Optional](#the-optional-particle-)|Null inference and control.|
 |`@`|[Target](#the-target-particle-)|Reserved.|
 
@@ -255,7 +380,7 @@ The optional has four main uses:
 
 #### Semantic Null Marker
 Example: Potential null return value.
-```kro
+```java 
 String? getName() {
     return this.name;
 }
@@ -272,7 +397,7 @@ Krow's compiler uses `?value` for the `ISNULL` instruction.
 Similarly, `!?value` is effectively the `NOTNULL` instruction, since `!` negates the boolean.
 
 Example:
-```
+```java 
 Object a = null;
 Object b = "hello";
 
@@ -283,9 +408,25 @@ if (?b) // always reached
 if (!?b) // never reached
 ```
 
+#### Default Value
+
+The typical Java ternary `(str != null ? str : "default")` requires the evaluation of the checked element twice. While this is not a problem for small variables, you could not do this with a method without calling the method result twice.
+This is also mirrored in Java's compile result, which will load the `str` variable twice.
+
+Krow adds an alternative for this case: the default value `var1 ? var2`.
+This `?` default operator is an implicit null check, and functions very similarly to the above ternary, but without loading the variable twice.
+
+This is not just syntax sugar - there is a minor performance improvement over a ternary, but the difference is minimal.
+
+Example:
+```java 
+String name = player.getName();
+return name ? "Unknown";
+```
+
 #### Early Exit
 Example: The target on which this method is called is potentially null.
-```kro
+```java 
 String string = null;
 String sub = string?.substring(3);
 assert !?sub;
@@ -295,7 +436,7 @@ assert !?sub;
 Krow's optional particle will make the compiler verify the target is set before calling the method. If the target is null, the instruction will be skipped.
 Note: this should be used CAUTIOUSLY as it can have some unintended side-effects, which cannot always be verified by the Krow compiler!
 
-```kro
+```java 
 // x and y are objects
 Object value = 
 obj? // obj is not null

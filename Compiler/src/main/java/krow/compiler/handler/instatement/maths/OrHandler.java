@@ -8,7 +8,7 @@ import krow.compiler.handler.Handler;
 import krow.compiler.pre.PreClass;
 import mx.kenzie.foundation.WriteInstruction;
 
-public class SubtractHandler implements Handler {
+public class OrHandler implements Handler {
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
@@ -16,18 +16,16 @@ public class SubtractHandler implements Handler {
             case DEAD_END, SMALL, OBJECT, PRIMITIVE, DOWN, UP:
                 return false;
         }
-        return statement.startsWith("-") && context.child.point != null;
+        return statement.startsWith("|") && context.child.point != null;
     }
     
     @Override
     public HandleResult handle(String statement, PreClass data, CompileContext context, CompileState state) {
         final WriteInstruction instruction;
         switch (context.child.point.dotPath()) {
-            case "int", "short", "byte", "char", "boolean" -> instruction = WriteInstruction.subtractSmall();
-            case "long" -> instruction = WriteInstruction.subtractLong();
-            case "double" -> instruction = WriteInstruction.subtractDouble();
-            case "float" -> instruction = WriteInstruction.subtractFloat();
-            default -> throw new RuntimeException("Subtraction of non-primitive type.");
+            case "int", "short", "byte", "char", "boolean" -> instruction = WriteInstruction.orSmall();
+            case "long" -> instruction = WriteInstruction.orLong();
+            default -> throw new RuntimeException("Operating on non-binary type.");
         }
         context.child.statement(instruction);
         context.expectation = CompileExpectation.PRIMITIVE;
@@ -38,6 +36,6 @@ public class SubtractHandler implements Handler {
     
     @Override
     public String debugName() {
-        return "SUBTRACT";
+        return "BIT_OR";
     }
 }

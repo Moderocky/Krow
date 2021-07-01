@@ -31,7 +31,7 @@ public final class Krow implements LanguageDefinition {
             if (!root.exists()) throw new IllegalArgumentException("Root file does not exist.");
             final List<File> files = getFiles(new ArrayList<>(), root.toPath());
 //            files.removeIf(file -> !file.getName().endsWith(".kro"));
-            new BasicCompiler().compileResource(main, target, files.toArray(new File[0]));
+            new ReKrow().compileResource(main, target, files.toArray(new File[0]));
         } else {
             System.out.println("Correct arguments: output target & source root");
         }

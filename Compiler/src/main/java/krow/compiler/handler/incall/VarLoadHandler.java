@@ -39,12 +39,12 @@ public class VarLoadHandler implements Handler {
         final Type type;
         final String name = matcher.group("name");
         if (Objects.equals(name, "this")) {
-            context.child.statement(WriteInstruction.loadThis());
             context.child.point = data.path;
+            context.child.statement(WriteInstruction.loadThis());
         } else if (context.hasConstant(name)) {
             final Object value = context.getConstant(name);
-            context.child.statement(WriteInstruction.loadConstant(value));
             context.child.point = new Type(value.getClass());
+            context.child.statement(WriteInstruction.loadConstant(value));
         } else {
             final PreVariable variable = context.child.getVariable(name);
             if (variable == null) {
@@ -56,8 +56,8 @@ public class VarLoadHandler implements Handler {
                     throw new RuntimeException("Unavailable variable: '" + name + "'\nAvailable: " + strings);
                 } else throw new RuntimeException("Unavailable variable: '" + name + "'");
             }
-            context.child.statement(variable.load(context.child.variables.indexOf(variable)));
             context.child.point = variable.type();
+            context.child.statement(variable.load(context.child.variables.indexOf(variable)));
         }
         context.expectation = CompileExpectation.NONE;
         return new HandleResult(null, statement.substring(input.length()).trim(), state);

@@ -23,9 +23,9 @@ public class BooleanLiteralHandler implements Handler {
     @Override
     public HandleResult handle(String statement, PreClass data, CompileContext context, CompileState state) {
         final boolean value = statement.startsWith("true");
+        context.child.point = new Type(boolean.class);
         context.child.statement(value ? WriteInstruction.push1() : WriteInstruction.push0());
         context.expectation = CompileExpectation.NONE;
-        context.child.point = new Type(boolean.class);
         if (state == CompileState.IN_CONST) {
             context.saveConstant.value = value;
             context.expectation = CompileExpectation.DEAD_END;

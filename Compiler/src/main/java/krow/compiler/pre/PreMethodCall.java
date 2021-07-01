@@ -20,6 +20,12 @@ public class PreMethodCall {
         parameters.add(type);
     }
     
+    public void ensureReturnType(final CompileContext context) {
+        PreMethod method = context.findMethod(owner, name, parameters);
+        if (method == null) method = context.findMethod(owner, name, parameters.size());
+        returnType = method.returnType;
+    }
+    
     public WriteInstruction execute(final CompileContext context) {
         PreMethod method = context.findMethod(owner, name, parameters);
         if (method == null) method = context.findMethod(owner, name, parameters.size());

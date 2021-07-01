@@ -57,8 +57,8 @@ public class VarLoadHandler implements Handler {
                     throw new RuntimeException("Unavailable variable: '" + name + "'\nAvailable: " + strings);
                 } else throw new RuntimeException("Unavailable variable: '" + name + "'");
             }
-            context.child.statement(variable.load(context.getSlot(variable)));
             context.child.point = variable.type();
+            context.child.statement(variable.load(context.getSlot(variable)));
         }
         context.expectation = CompileExpectation.NONE;
         return new HandleResult(null, statement.substring(input.length())
