@@ -1,6 +1,7 @@
 package krow.compiler.pre;
 
 import krow.compiler.CompileContext;
+import krow.compiler.CompileState;
 import mx.kenzie.foundation.Type;
 import mx.kenzie.foundation.WriteInstruction;
 
@@ -15,6 +16,7 @@ public class PreMethodCall {
     public String name;
     public Type returnType;
     public List<Type> parameters = new ArrayList<>();
+    public CompileState state;
     
     public void addParameter(final Type type) {
         parameters.add(type);

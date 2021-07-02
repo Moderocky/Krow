@@ -1,6 +1,8 @@
 import <java/io/PrintStream> export <>
 class mx/kenzie/example/Example {
 
+    static boolean field;
+
     void <init>(String name) {
         System.out.println(name);
         super();

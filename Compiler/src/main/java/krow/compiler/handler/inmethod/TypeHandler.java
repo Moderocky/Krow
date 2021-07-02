@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 public class TypeHandler implements Handler {
     
-    private static final Pattern PATTERN = Pattern.compile("^(?<target>" + Signature.TYPE_STRING + ")(?:\\[])*\\s*(?=[.#])");
+    private static final Pattern PATTERN = Pattern.compile("^(?<target>" + Signature.TYPE_STRING + ")\\s*(?=[.#])");
     
     String target;
     Type type;
@@ -23,7 +23,7 @@ public class TypeHandler implements Handler {
     @Override
     public boolean accepts(String statement, CompileContext context) {
         switch (context.expectation) {
-            case PRIMITIVE, DOWN, UP, MEMBER, METHOD, FIELD, DEAD_END, LITERAL, VARIABLE, SMALL:
+            case DOWN, UP, DEAD_END, LITERAL, VARIABLE:
                 return false;
         }
         final Matcher matcher = PATTERN.matcher(statement);

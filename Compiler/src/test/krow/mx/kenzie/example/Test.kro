@@ -3,11 +3,19 @@ import <java/io/PrintStream, java/util/Arrays>
 export <>
 class mx/kenzie/example/Main {
 
-    import <Arrays::toString(Object[])String, mx/kenzie/example/Example, Example::test()V, mx/kenzie/example/MyObject, MyObject::test()V, MyObject::myMethod(String)V>
+    import <
+        Arrays::toString(Object[])String,
+        mx/kenzie/example/Example, Example::test()V, Example.field:Z,
+        mx/kenzie/example/MyObject, MyObject::test()V, MyObject::myMethod(String)V
+    >
     export <>
     static void main(String[] value) {
         Object x = "hello";
         String y = x<String>;
+        Object[] array = new Object[]("hello", "there");
+        assert array.length == 2;
+        assert array[0].equals("hello");
+        assert array[1].equals("there");
         System.out.println(y);
         System.out.println(Arrays.toString(value));
         MyObject.test();
@@ -20,6 +28,11 @@ class mx/kenzie/example/Main {
 
         System.out.println("");
         Example.test();
+
+        Example#field = false;
+        assert !Example#field;
+        Example#field = true;
+        assert Example#field;
     }
 
 }

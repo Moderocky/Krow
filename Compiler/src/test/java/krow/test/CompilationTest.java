@@ -212,6 +212,22 @@ public class CompilationTest {
                 export <>
                 static void main(String[] value) {
                     System.out.println(Arrays.toString(value));
+                    String a = value[0];
+                    String b = value[1];
+                    assert a.equals("hello");
+                    assert b.equals("there");
+                    value[1] = "world";
+                    assert value[1].equals("world");
+                    Object[][] array = new Object[2][3];
+                    array[0][1] = "hello";
+                    System.out.println(Arrays.toString(array[0]));
+                    System.out.println(array[0][1]);
+                    Object[] bean = new Object[]("hello", "there");
+                    System.out.println(bean.length);
+                    System.out.println(bean[0]);
+                    System.out.println(bean[1]);
+                    assert bean[0].equals("hello");
+                    assert bean[1].equals("there");
                 }
                 
             }
@@ -598,6 +614,78 @@ public class CompilationTest {
             long y = System.nanoTime();
             System.out.println("b: " + (y - x));
         }
+    }
+    
+    private static String testField = "hello"; // we're accessing this :D
+    
+    @Test
+    public void dynamicField() throws Throwable {
+        final String source = """
+            import <java/io/PrintStream> export <>
+            class mx/kenzie/example/Dynamic2 {
+                
+                import <krow/test/CompilationTest, CompilationTest.testField:String>
+                export <>
+                static void test() {
+                    String var = CompilationTest#testField; // private field ;)
+                    
+                    System.out.println(var);
+                    CompilationTest#testField = "there";
+                    
+                    System.out.println(CompilationTest#testField);
+                }
+                
+            }
+            
+            """;
+        final Class<?> basic = new ReKrow().compileAndLoad(source);
+        assert basic != null;
+        basic.getMethod("test").invoke(null);
+    }
+    
+    @Test
+    public void field() throws Throwable {
+        final String source = """
+            import <java/io/PrintStream> export <>
+            class mx/kenzie/example/Field {
+            
+                static String name;
+                
+                export <>
+                static void test() {
+                    Field.name = "Jeremy";
+                    assert Field.name.equals("Jeremy");
+                    Field.name = "Alice";
+                    assert Field#name.equals("Alice");
+                }
+                
+            }
+            
+            """;
+        final Class<?> basic = new ReKrow().compileAndLoad(source);
+        assert basic != null;
+        basic.getMethod("test").invoke(null);
+    }
+    
+    @Test
+    public void clinit() throws Throwable {
+        final String source = """
+            import <java/io/PrintStream> export <>
+            class mx/kenzie/example/ClInit {
+            
+                export <>
+                static void test() { }
+            
+                static void <clinit> () {
+                    System.out.println("ClInit works.");
+                }
+                
+            }
+            
+            """;
+        final Class<?> basic = new ReKrow().compileAndLoad(source);
+        assert basic != null;
+        basic.getMethod("test").invoke(null);
     }
     
     @Test

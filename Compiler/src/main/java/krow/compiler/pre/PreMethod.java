@@ -55,7 +55,7 @@ public class PreMethod {
     public WriteInstruction execute(final CompileContext context, boolean dynamic) {
         if (name.equals("<init>")) {
             return WriteInstruction.invokeSpecial(owner, parameters.toArray(new Type[0]));
-        } else if (context.upcoming(Modifier.ABSTRACT)) {
+        } else if (Modifier.isAbstract(modifiers)) {
             return WriteInstruction.invokeInterface(owner, returnType, name, parameters.toArray(new Type[0]));
         } else if (dynamic) {
             return WriteInstruction.invokeVirtual(owner, returnType, name, parameters.toArray(new Type[0]));

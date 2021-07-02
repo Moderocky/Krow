@@ -12,9 +12,11 @@ import krow.compiler.pre.Signature;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class FieldAssignHandler implements Handler {
+public class DynamicFieldAccessHandler implements Handler {
     
-    private static final Pattern PATTERN = Pattern.compile("^\\.\\s*(?<name>" + Signature.IDENTIFIER + ")\\s*=");
+    private static final Pattern PATTERN = Pattern.compile("^#\\s*(?<name>" + Signature.IDENTIFIER + ")\\s*(?![(=])");
+    
+    Matcher matcher;
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
@@ -23,28 +25,27 @@ public class FieldAssignHandler implements Handler {
                 return false;
         }
         if (context.child.point == null) return false;
-        return PATTERN.matcher(statement).find();
+        return (matcher = PATTERN.matcher(statement)).find();
     }
     
     @Override
-    public HandleResult handle(String statement, PreClass data, CompileContext context) {
-        final Matcher matcher = PATTERN.matcher(statement);
-        matcher.find();
+    public HandleResult handle(String statement, PreClass data, CompileContext context, CompileState state) {
         final String input = matcher.group();
         final String name = matcher.group("name");
         assert context.child.point != null;
         final PreFieldCall call = new PreFieldCall();
         call.owner = context.child.point;
         call.name = name;
-        context.child.skip = call.set(context);
-        context.child.point = null;
+        call.dynamic = true;
+        context.child.point = call.getType(context);
+        context.child.statement(call.get(context));
         context.child.staticState = false;
-        context.expectation = CompileExpectation.OBJECT;
-        return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.IN_STATEMENT);
+        context.expectation = CompileExpectation.NONE;
+        return new HandleResult(null, statement.substring(input.length()).trim(), state);
     }
     
     @Override
     public String debugName() {
-        return "PREPARE_ASSIGN_FIELD";
+        return "RETRIEVE_FIELD_DYNAMIC";
     }
 }

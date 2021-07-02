@@ -5,31 +5,35 @@ import krow.compiler.CompileExpectation;
 import krow.compiler.CompileState;
 import krow.compiler.HandleResult;
 import krow.compiler.handler.Handler;
-import krow.compiler.pre.PreBracket;
 import krow.compiler.pre.PreClass;
+import mx.kenzie.foundation.Type;
+import mx.kenzie.foundation.WriteInstruction;
 
-public class OpenBracketHandler implements Handler {
+public class ArrayLengthHandler implements Handler {
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
+        if (!statement.startsWith(".length")) return false;
         switch (context.expectation) {
-            case DEAD_END, DOWN, UP:
+            case TYPE, DEAD_END, METHOD, DOWN, UP, LITERAL, VARIABLE, SMALL:
                 return false;
         }
-        return statement.startsWith("(");
+        if (context.child.point == null) return false;
+        return (context.child.point.isArray());
     }
     
     @Override
     public HandleResult handle(String statement, PreClass data, CompileContext context, CompileState state) {
-        final PreBracket bracket;
-        context.brackets().add(0, bracket = new PreBracket());
+        assert context.child.point != null;
+        context.child.point = new Type(int.class);
+        context.child.statement(WriteInstruction.arrayLength());
+        context.child.staticState = false;
         context.expectation = CompileExpectation.NONE;
-        bracket.state = state;
-        return new HandleResult(null, statement.substring(1).trim(), CompileState.IN_STATEMENT);
+        return new HandleResult(null, statement.substring(7).trim(), state);
     }
     
     @Override
     public String debugName() {
-        return "OPEN_BRACKET";
+        return "ARRAY_LENGTH";
     }
 }

@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 
 public class DeclareVarHandler implements Handler {
     
-    private static final Pattern PATTERN = Pattern.compile("^(?:final )?(?<type>" + Signature.TYPE_STRING + ")\\s+(?<name>" + Signature.IDENTIFIER + ")");
+    private static final Pattern PATTERN = Pattern.compile("^(?<type>" + Signature.TYPE_STRING + ")\\s+(?<name>" + Signature.IDENTIFIER + ")");
     
     @Override
     public boolean accepts(String statement, CompileContext context) {

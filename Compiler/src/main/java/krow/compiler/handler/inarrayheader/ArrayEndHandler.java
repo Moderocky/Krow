@@ -1,4 +1,4 @@
-package krow.compiler.handler.incall;
+package krow.compiler.handler.inarrayheader;
 
 import krow.compiler.CompileContext;
 import krow.compiler.CompileExpectation;
@@ -7,29 +7,30 @@ import krow.compiler.HandleResult;
 import krow.compiler.handler.Handler;
 import krow.compiler.pre.PreArray;
 import krow.compiler.pre.PreClass;
-import krow.compiler.pre.PreMethodCall;
+import krow.compiler.pre.PreVariable;
 
-public class MethodCallEndHandler implements Handler {
+public class ArrayEndHandler implements Handler {
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
-        switch (context.expectation) {
-            case TYPE, DEAD_END, LITERAL, VARIABLE, SMALL:
-                return false;
-        }
         return statement.startsWith(")");
     }
     
     @Override
     public HandleResult handle(String statement, PreClass data, CompileContext context) {
-        final PreMethodCall call = context.child.preparing.remove(0);
-        assert call != null;
-        assert !(call instanceof PreArray);
-        if (context.child.point != null) call.addParameter(context.child.point);
-        call.ensureReturnType(context);
-        context.child.point = call.returnType;
-        if (call.returnType.matches(void.class)) context.child.point = null;
-        context.child.statement(call.execute(context));
+        final PreArray array = (PreArray) context.child.preparing.remove(0);
+        assert array != null;
+        if (context.child.point != null) {
+            context.child.swap(true);
+            int i = array.length;
+            context.child.statement((writer, method) -> {
+                method.visitInsn(89);
+                method.visitIntInsn(16, i);
+            });
+            context.child.statement(PreVariable.store(array.type, 0));
+            array.length++;
+        }
+        context.child.point = array.type;
         context.child.staticState = false;
         context.expectation = CompileExpectation.NONE;
         final CompileState state = context.child.nested.remove(0);
@@ -39,6 +40,6 @@ public class MethodCallEndHandler implements Handler {
     
     @Override
     public String debugName() {
-        return "END_CALL";
+        return "END_ARRAY_HEADER";
     }
 }

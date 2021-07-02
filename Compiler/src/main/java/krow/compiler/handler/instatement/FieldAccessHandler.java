@@ -37,6 +37,8 @@ public class FieldAccessHandler implements Handler {
         call.owner = context.child.point;
         call.name = name;
         context.child.point = call.getType(context);
+        if (context.child.point == null)
+            throw new RuntimeException("Unavailable field: '" + name + "'");
         context.child.statement(call.get(context));
         context.child.staticState = false;
         context.expectation = CompileExpectation.NONE;

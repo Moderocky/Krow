@@ -62,7 +62,9 @@ public class ReKrow implements Compiler<Krow> {
             new krow.compiler.handler.inmethod.ConstHandler(),
             new krow.compiler.handler.inclass.ImportHandler(),
             new krow.compiler.handler.inclass.ExportHandler(),
+            new krow.compiler.handler.inclass.ClinitStartHandler(),
             new krow.compiler.handler.inclass.ConstructorStartHandler(),
+            new krow.compiler.handler.inclass.FieldHandler(),
             new krow.compiler.handler.inclass.MethodStartHandler()
         ));
         HANDLERS.put(CompileState.IN_METHOD_HEADER, List.of(
@@ -121,6 +123,9 @@ public class ReKrow implements Compiler<Krow> {
             new NegateHandler(),
             new AndHandler(),
             new OrHandler(),
+            new krow.compiler.handler.instatement.AssignArrayHandler(),
+            new krow.compiler.handler.instatement.LoadArrayHandler(),
+            new ArrayLengthHandler(),
             new CastHandler(),
             new UShiftHandler(),
             new ShiftHandler(),
@@ -138,9 +143,13 @@ public class ReKrow implements Compiler<Krow> {
             new krow.compiler.handler.instatement.AllocateInstanceHandler(),
             new DynamicCallStartHandler(), // goes in either
             new MethodCallStartHandler(), // goes in either
+            new krow.compiler.handler.instatement.NewArrayHandler(),
+            new krow.compiler.handler.instatement.NewDimArrayHandler(),
             new krow.compiler.handler.instatement.NewInstanceHandler(),
             new FieldAssignHandler(),
             new FieldAccessHandler(), // goes in either
+            new DynamicFieldAssignHandler(),
+            new DynamicFieldAccessHandler(), // goes in either
             new krow.compiler.handler.inmethod.TypeHandler(),
             new krow.compiler.handler.inmethod.InitCallStartHandler(),
 //            new krow.compiler.handler.instatement.HandleHandler(),
@@ -161,12 +170,46 @@ public class ReKrow implements Compiler<Krow> {
             new InvertHandler(),
             new IsNullHandler(),
             new NegateHandler(),
+            new krow.compiler.handler.instatement.LoadArrayHandler(),
+            new ArrayLengthHandler(),
             new StructImplicitHandler(),
             new CastHandler(),
+            new NewArrayHandler(),
             new DynamicCallStartHandler(), // goes in either
             new MethodCallStartHandler(), // goes in either
             new krow.compiler.handler.instatement.NewInstanceHandler(),
             new FieldAccessHandler(),
+            new DynamicFieldAccessHandler(), // goes in either
+            new krow.compiler.handler.inmethod.TypeHandler(),
+            new krow.compiler.handler.inmethod.InitCallStartHandler(),
+//            new krow.compiler.handler.instatement.HandleHandler(),
+            new krow.compiler.handler.incall.VarLoadHandler()
+        ));
+        HANDLERS.put(CompileState.IN_ARRAY_HEADER, List.of(
+            new krow.compiler.handler.inarrayheader.ArrayEndHandler(),
+            new krow.compiler.handler.inarrayheader.ArraySplitParameterHandler(),
+            new OpenBracketHandler(),
+            new NullLiteralHandler(),
+            new BooleanLiteralHandler(),
+            new CharLiteralHandler(),
+            new StringLiteralHandler(),
+            new SmallLiteralHandler(),
+            new LongLiteralHandler(),
+            new DoubleLiteralHandler(),
+            new FloatLiteralHandler(),
+            new InvertHandler(),
+            new IsNullHandler(),
+            new NegateHandler(),
+            new krow.compiler.handler.instatement.LoadArrayHandler(),
+            new ArrayLengthHandler(),
+            new StructImplicitHandler(),
+            new CastHandler(),
+            new NewArrayHandler(),
+            new DynamicCallStartHandler(), // goes in either
+            new MethodCallStartHandler(), // goes in either
+            new krow.compiler.handler.instatement.NewInstanceHandler(),
+            new FieldAccessHandler(),
+            new DynamicFieldAccessHandler(), // goes in either
             new krow.compiler.handler.inmethod.TypeHandler(),
             new krow.compiler.handler.inmethod.InitCallStartHandler(),
 //            new krow.compiler.handler.instatement.HandleHandler(),

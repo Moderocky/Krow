@@ -8,6 +8,7 @@ public enum CompileState {
     IN_STATEMENT,
     IN_CALL,
     IN_STRUCT_HEADER,
+    IN_ARRAY_HEADER,
     IN_BLOCK,
     IN_CONST,
     IN_FIELD

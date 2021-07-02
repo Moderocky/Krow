@@ -1,19 +1,13 @@
 
-import<java/lang/invoke/MethodHandles, java/lang/invoke/MethodHandles$Lookup, java/lang/invoke/CallSite, java/lang/invoke/ConstantCallSite, java/lang/invoke/MethodType, java/lang/invoke/MethodHandle>
+import<
+    java/lang/invoke/MethodHandles, java/lang/invoke/MethodHandles$Lookup, java/lang/invoke/CallSite, java/lang/invoke/ConstantCallSite, java/lang/invoke/MethodType, java/lang/invoke/MethodHandle,
+    MethodType::dropParameterTypes(I,I)MethodType, MethodHandles$Lookup::findVirtual(Class,String,MethodType)MethodHandle,
+    MethodHandles$Lookup::findStatic(Class,String,MethodType)MethodHandle,
+    java/lang/invoke/VarHandle, java/lang/invoke/VarHandle$AccessMode
+>
 export<>
 final class krow/lang/Runtime {
 
-    import <MethodType::dropParameterTypes(I,I)MethodType, MethodHandles$Lookup::findVirtual(Class,String,MethodType)MethodHandle>
-    export <>
-    static CallSite bootstrapDynamic(MethodHandles$Lookup caller, String name, MethodType type, Class owner) {
-        MethodHandle handle;
-        MethodType end = type.dropParameterTypes(false, true);
-        handle = caller.findVirtual(owner, name, type);
-        ConstantCallSite site = new ConstantCallSite(handle);
-        return site;
-    }
-
-    import <MethodHandles$Lookup::findStatic(Class,String,MethodType)MethodHandle>
     export <>
     static CallSite bootstrap(MethodHandles$Lookup caller, String name, MethodType type, Class owner) {
         MethodHandle handle = caller.findStatic(owner, name, type);
@@ -21,21 +15,103 @@ final class krow/lang/Runtime {
         return site;
     }
 
-    import <MethodHandles$Lookup::findStatic(Class,String,MethodType)MethodHandle>
     export <>
     static CallSite bootstrapPrivate(MethodHandles$Lookup caller, String name, MethodType type, Class owner) {
-        final MethodHandle handle;
-        handle = MethodHandles.privateLookupIn(owner, caller).findStatic(owner, name, type);
+        MethodHandle handle = MethodHandles.privateLookupIn(owner, caller).findStatic(owner, name, type);
         ConstantCallSite site = new ConstantCallSite(handle);
         return site;
     }
 
-    import <MethodType::dropParameterTypes(I,I)MethodType, MethodHandles$Lookup::findVirtual(Class,String,MethodType)MethodHandle>
+    export <>
+    static CallSite bootstrapDynamic(MethodHandles$Lookup caller, String name, MethodType type, Class owner) {
+        MethodType end = type.dropParameterTypes(false, true);
+        MethodHandle handle = caller.findVirtual(owner, name, end);
+        ConstantCallSite site = new ConstantCallSite(handle);
+        return site;
+    }
+
     export <>
     static CallSite bootstrapPrivateDynamic(MethodHandles$Lookup caller, String name, MethodType type, Class owner) {
-        final MethodHandle handle;
-        final MethodType end = type.dropParameterTypes(false, true);
-        handle = MethodHandles.privateLookupIn(owner, caller).findVirtual(owner, name, end);
+        MethodType end = type.dropParameterTypes(false, true);
+        MethodHandle handle = MethodHandles.privateLookupIn(owner, caller).findVirtual(owner, name, end);
+        ConstantCallSite site = new ConstantCallSite(handle);
+        return site;
+    }
+
+    export <>
+    static CallSite bootstrapStaticFieldSetter(MethodHandles$Lookup caller, String name, MethodType type, Class owner) {
+        final MethodHandle handle = caller
+            .findStaticVarHandle(owner, name, (type.parameterType(0)<Class>))
+            .toMethodHandle(VarHandle$AccessMode.SET);
+        ConstantCallSite site = new ConstantCallSite(handle);
+        return site;
+    }
+
+    export <>
+    static CallSite bootstrapStaticFieldGetter(MethodHandles$Lookup caller, String name, MethodType type, Class owner) {
+        final MethodHandle handle = caller
+            .findStaticVarHandle(owner, name, (type.returnType()<Class>))
+            .toMethodHandle(VarHandle$AccessMode.GET);
+        ConstantCallSite site = new ConstantCallSite(handle);
+        return site;
+    }
+
+    export <>
+    static CallSite bootstrapPrivateStaticFieldSetter(MethodHandles$Lookup caller, String name, MethodType type, Class owner)
+        {
+        final MethodHandle handle = MethodHandles.privateLookupIn(owner, caller)
+            .findStaticVarHandle(owner, name, (type.parameterType(0)<Class>))
+            .toMethodHandle(VarHandle$AccessMode.SET);
+        ConstantCallSite site = new ConstantCallSite(handle);
+        return site;
+    }
+
+    export <>
+    static CallSite bootstrapPrivateStaticFieldGetter(MethodHandles$Lookup caller, String name, MethodType type, Class owner)
+        {
+        final MethodHandle handle = MethodHandles
+            .privateLookupIn(owner, caller)
+            .findStaticVarHandle(owner, name, (type.returnType()<Class>))
+            .toMethodHandle(VarHandle$AccessMode.GET);
+        ConstantCallSite site = new ConstantCallSite(handle);
+        return site;
+    }
+
+    export <>
+    static CallSite bootstrapFieldSetter(MethodHandles$Lookup caller, String name, MethodType type, Class owner) {
+        final MethodHandle handle = caller
+            .findStaticVarHandle(owner, name, type.parameterType(0)<Class>)
+            .toMethodHandle(VarHandle$AccessMode.SET);
+        ConstantCallSite site = new ConstantCallSite(handle);
+        return site;
+    }
+
+    export <>
+    static CallSite bootstrapFieldGetter(MethodHandles$Lookup caller, String name, MethodType type, Class owner) {
+        final MethodHandle handle = caller
+            .findStaticVarHandle(owner, name, type.returnType()<Class>)
+            .toMethodHandle(VarHandle$AccessMode.GET);
+        ConstantCallSite site = new ConstantCallSite(handle);
+        return site;
+    }
+
+    export <>
+    static CallSite bootstrapPrivateFieldSetter(MethodHandles$Lookup caller, String name, MethodType type, Class owner)
+        {
+        final MethodHandle handle = MethodHandles.privateLookupIn(owner, caller)
+            .findStaticVarHandle(owner, name, type.parameterType(0)<Class>)
+            .toMethodHandle(VarHandle$AccessMode.SET);
+        ConstantCallSite site = new ConstantCallSite(handle);
+        return site;
+    }
+
+    export <>
+    static CallSite bootstrapPrivateFieldGetter(MethodHandles$Lookup caller, String name, MethodType type, Class owner)
+        {
+        final MethodHandle handle = MethodHandles
+            .privateLookupIn(owner, caller)
+            .findStaticVarHandle(owner, name, type.returnType()<Class>)
+            .toMethodHandle(VarHandle$AccessMode.GET);
         ConstantCallSite site = new ConstantCallSite(handle);
         return site;
     }

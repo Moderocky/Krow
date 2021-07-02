@@ -14,6 +14,38 @@ import static org.objectweb.asm.Opcodes.*;
 
 public class Handles {
     
+    public static Handle getPBFG(boolean dynamic, boolean setter) {
+        try {
+            if (setter) {
+                if (dynamic)
+                    return Handles.getHandle(Runtime.class.getMethod("bootstrapPrivateFieldSetter", MethodHandles.Lookup.class, String.class, MethodType.class, Class.class));
+                return Handles.getHandle(Runtime.class.getMethod("bootstrapPrivateStaticFieldSetter", MethodHandles.Lookup.class, String.class, MethodType.class, Class.class));
+            } else {
+                if (dynamic)
+                    return Handles.getHandle(Runtime.class.getMethod("bootstrapPrivateFieldGetter", MethodHandles.Lookup.class, String.class, MethodType.class, Class.class));
+                return Handles.getHandle(Runtime.class.getMethod("bootstrapPrivateStaticFieldGetter", MethodHandles.Lookup.class, String.class, MethodType.class, Class.class));
+            }
+        } catch (Throwable ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+    
+    public static Handle getBFG(boolean dynamic, boolean setter) {
+        try {
+            if (setter) {
+                if (dynamic)
+                    return Handles.getHandle(Runtime.class.getMethod("bootstrapFieldSetter", MethodHandles.Lookup.class, String.class, MethodType.class, Class.class));
+                return Handles.getHandle(Runtime.class.getMethod("bootstrapStaticFieldSetter", MethodHandles.Lookup.class, String.class, MethodType.class, Class.class));
+            } else {
+                if (dynamic)
+                    return Handles.getHandle(Runtime.class.getMethod("bootstrapFieldGetter", MethodHandles.Lookup.class, String.class, MethodType.class, Class.class));
+                return Handles.getHandle(Runtime.class.getMethod("bootstrapStaticFieldGetter", MethodHandles.Lookup.class, String.class, MethodType.class, Class.class));
+            }
+        } catch (Throwable ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+    
     public static Handle getPrivateBootstrap(boolean dynamic) {
         try {
             if (dynamic)

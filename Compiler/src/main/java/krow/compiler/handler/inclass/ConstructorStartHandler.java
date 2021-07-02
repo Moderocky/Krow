@@ -30,9 +30,8 @@ public class ConstructorStartHandler implements Handler {
         method.modifiers |= context.upcoming();
         context.method = method;
         context.availableMethods.add(method);
-        if (!context.upcoming(Modifier.STATIC)) {
-            context.child.variables.add(new PreVariable("this", data.path));
-        }
+        if (context.upcoming(Modifier.STATIC)) throw new RuntimeException("Class <init> declared static.");
+        context.child.variables.add(new PreVariable("this", data.path));
         return new HandleResult(null, statement.substring(statement.indexOf('(') + 1)
             .trim(), CompileState.IN_METHOD_HEADER);
     }

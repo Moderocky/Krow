@@ -69,6 +69,7 @@ public class MethodEndParameterHandler implements Handler {
             || context.upcoming(HiddenModifier.BRIDGE)
         ) context.expectation = CompileExpectation.DEAD_END;
         context.currentMethod = builder;
+        context.clearUpcoming();
         return new HandleResult(null, statement.substring(1).trim(), CompileState.IN_CLASS);
     }
     

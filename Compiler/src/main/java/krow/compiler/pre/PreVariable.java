@@ -24,6 +24,29 @@ public class PreVariable {
         };
     }
     
+    public static WriteInstruction load(final Type type, final int slot) {
+        if (type.isArray()) {
+            if (type.isPrimitiveArray()) {
+                char c = type.descriptor().charAt(type.descriptor().length());
+                return switch (c) {
+                    case 'L' -> WriteInstruction.arrayLoad(long.class);
+                    case 'F' -> WriteInstruction.arrayLoad(float.class);
+                    case 'D' -> WriteInstruction.arrayLoad(double.class);
+                    default -> WriteInstruction.arrayLoad(int.class);
+                };
+            } else {
+                return WriteInstruction.arrayLoadObject();
+            }
+        }
+        return switch (type.dotPath()) {
+            case "char", "boolean", "byte", "int", "short", "void" -> WriteInstruction.loadSmall(slot);
+            case "long" -> WriteInstruction.loadLong(slot);
+            case "float" -> WriteInstruction.loadFloat(slot);
+            case "double" -> WriteInstruction.loadDouble(slot);
+            default -> WriteInstruction.loadObject(slot);
+        };
+    }
+    
     public WriteInstruction store(int slot) {
         return switch (type.dotPath()) {
             case "char", "boolean", "byte", "int", "short", "void" -> WriteInstruction.storeSmall(slot);
@@ -32,7 +55,29 @@ public class PreVariable {
             case "double" -> WriteInstruction.storeDouble(slot);
             default -> WriteInstruction.storeObject(slot);
         };
-        
+    }
+    
+    public static WriteInstruction store(final Type type, final int slot) {
+        if (type.isArray()) {
+            if (type.isPrimitiveArray()) {
+                char c = type.descriptor().charAt(type.descriptor().length());
+                return switch (c) {
+                    case 'L' -> WriteInstruction.arrayStore(long.class);
+                    case 'F' -> WriteInstruction.arrayStore(float.class);
+                    case 'D' -> WriteInstruction.arrayStore(double.class);
+                    default -> WriteInstruction.arrayStore(int.class);
+                };
+            } else {
+                return WriteInstruction.arrayStoreObject();
+            }
+        }
+        return switch (type.dotPath()) {
+            case "char", "boolean", "byte", "int", "short", "void" -> WriteInstruction.storeSmall(slot);
+            case "long" -> WriteInstruction.storeLong(slot);
+            case "float" -> WriteInstruction.storeFloat(slot);
+            case "double" -> WriteInstruction.storeDouble(slot);
+            default -> WriteInstruction.storeObject(slot);
+        };
     }
     
     public String name() {

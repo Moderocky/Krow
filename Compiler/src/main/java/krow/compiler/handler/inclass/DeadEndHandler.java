@@ -21,6 +21,7 @@ public class DeadEndHandler implements Handler {
         context.currentField = null;
         context.currentMethod = null;
         context.method = null;
+        context.clearUpcoming();
         context.expectation = CompileExpectation.NONE;
         return new HandleResult(null, statement.substring(1).trim(), CompileState.IN_CLASS);
     }

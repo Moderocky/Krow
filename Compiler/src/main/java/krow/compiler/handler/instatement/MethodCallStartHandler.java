@@ -28,7 +28,7 @@ public class MethodCallStartHandler implements Handler {
     }
     
     @Override
-    public HandleResult handle(String statement, PreClass data, CompileContext context) {
+    public HandleResult handle(String statement, PreClass data, CompileContext context, CompileState state) {
         final Matcher matcher = PATTERN.matcher(statement);
         matcher.find();
         final String input = matcher.group();
@@ -36,6 +36,7 @@ public class MethodCallStartHandler implements Handler {
         final Type type = context.child.point;
         boolean dynamic = !context.child.staticState;
         final PreMethodCall call;
+        context.child.nested.add(0, state == CompileState.IN_METHOD ? CompileState.IN_STATEMENT : state);
         context.child.preparing.add(0, call = new PreMethodCall());
         context.child.point = null;
         call.dynamic = dynamic;

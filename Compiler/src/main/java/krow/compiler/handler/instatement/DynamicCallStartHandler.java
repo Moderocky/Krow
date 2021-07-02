@@ -30,12 +30,13 @@ public class DynamicCallStartHandler implements Handler {
     }
     
     @Override
-    public HandleResult handle(String statement, PreClass data, CompileContext context) {
+    public HandleResult handle(String statement, PreClass data, CompileContext context, CompileState state) {
         final String input = matcher.group();
         final String name = matcher.group("name");
         final Type type = context.child.point;
         boolean dynamic = !context.child.staticState;
         final PreMethodCall call;
+        context.child.nested.add(0, state == CompileState.IN_METHOD ? CompileState.IN_STATEMENT : state);
         context.child.preparing.add(0, call = new PreMethodCall());
         context.child.point = null;
         call.indy = true;

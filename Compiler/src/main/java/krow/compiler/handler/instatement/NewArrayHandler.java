@@ -5,8 +5,8 @@ import krow.compiler.CompileExpectation;
 import krow.compiler.CompileState;
 import krow.compiler.HandleResult;
 import krow.compiler.handler.Handler;
+import krow.compiler.pre.PreArray;
 import krow.compiler.pre.PreClass;
-import krow.compiler.pre.PreMethodCall;
 import krow.compiler.pre.Signature;
 import mx.kenzie.foundation.Type;
 import mx.kenzie.foundation.WriteInstruction;
@@ -14,9 +14,9 @@ import mx.kenzie.foundation.WriteInstruction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class NewInstanceHandler implements Handler {
+public class NewArrayHandler implements Handler {
     
-    private static final Pattern PATTERN = Pattern.compile("^new\\s+(?<type>" + Signature.TYPE_STRING + ")\\s*\\(");
+    private static final Pattern PATTERN = Pattern.compile("^new\\s+(?<type>" + Signature.ARRAY_TYPE_STRING + ")\\s*\\(");
     
     Matcher matcher;
     
@@ -36,25 +36,24 @@ public class NewInstanceHandler implements Handler {
         final String target = matcher.group("type");
         final Type type = context.resolveType(target);
         assert type != null;
-        context.child.statement(WriteInstruction.allocate(type));
+        assert type.isArray();
+        final PreArray array = new PreArray();
+        array.type = type;
+        array.dimensions = type.getDimensions();
+        context.child.statement(array.create());
         if (context.duplicate) {
             context.child.statement(WriteInstruction.duplicate());
             context.duplicate = false;
         }
-        context.child.point = type;
-        final PreMethodCall call;
-        context.child.nested.add(0, state == CompileState.IN_METHOD ? CompileState.IN_STATEMENT : state);
-        context.child.preparing.add(0, call = new PreMethodCall());
         context.child.point = null;
-        call.dynamic = true;
-        call.owner = type;
-        call.name = "<init>";
+        context.child.nested.add(0, state);
+        context.child.preparing.add(0, array);
         context.expectation = CompileExpectation.OBJECT;
-        return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.IN_CALL);
+        return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.IN_ARRAY_HEADER);
     }
     
     @Override
     public String debugName() {
-        return "ALLOCATE_TOP";
+        return "ALLOCATE_ARRAY";
     }
 }

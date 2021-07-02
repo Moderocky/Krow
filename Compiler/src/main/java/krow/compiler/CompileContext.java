@@ -189,6 +189,11 @@ public class CompileContext {
         else modifiersUpcoming |= modifiers;
     }
     
+    public void clearUpcoming() {
+        if (child != null) child.modifiersUpcoming = 0;
+        else modifiersUpcoming = 0;
+    }
+    
     public int upcoming() {
         final int test;
         if (child != null) test = child.modifiersUpcoming;

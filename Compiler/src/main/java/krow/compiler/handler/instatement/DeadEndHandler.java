@@ -24,7 +24,8 @@ public class DeadEndHandler implements Handler {
             Collections.reverse(context.child.statement());
         if (context.child.skip != null)
             context.child.statement(context.child.skip);
-//        else if (context.child.point != null) context.child.statement.add(WriteInstruction.pop()); // assume dead type and no handler
+        else if (context.child.point != null)
+            context.child.statement(WriteInstruction.pop()); // assume dead type and no handler
         if (context.child.awaitAdjustedType && context.child.point != null) {
             final Type type = context.child.point;
             if (context.child.inReturnPhase) {
