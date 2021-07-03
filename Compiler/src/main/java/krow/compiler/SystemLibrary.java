@@ -20,11 +20,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class SystemLibrary implements Library {
+public final class SystemLibrary implements Library {
     
     static final SystemLibrary SYSTEM_LIBRARY = new SystemLibrary();
     
-    protected static final HandlerSet DEFAULT_HANDLERS = new HandlerSet();
+    private static final HandlerSet DEFAULT_HANDLERS = new HandlerSet();
     
     static {
         DEFAULT_HANDLERS.put(CompileState.FILE_ROOT, new ArrayList<>(List.of(

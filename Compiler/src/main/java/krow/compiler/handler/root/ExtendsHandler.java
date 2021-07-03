@@ -10,6 +10,7 @@ import krow.compiler.pre.Signature;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("ALL")
 public class ExtendsHandler implements DefaultHandler {
     private static final Pattern PATTERN = Pattern.compile("^extends\\s+(" + Signature.TYPE_STRING + ")");
     

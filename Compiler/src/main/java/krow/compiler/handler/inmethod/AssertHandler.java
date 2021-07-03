@@ -9,6 +9,7 @@ import krow.compiler.pre.PreClass;
 import mx.kenzie.foundation.Type;
 import mx.kenzie.foundation.WriteInstruction;
 
+@SuppressWarnings("ALL")
 public class AssertHandler implements DefaultHandler {
     
     @Override

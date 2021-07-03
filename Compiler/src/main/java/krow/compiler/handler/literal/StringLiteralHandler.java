@@ -20,11 +20,10 @@ public class StringLiteralHandler implements DefaultHandler {
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
-        switch (context.expectation) {
-            case TYPE, DEAD_END, PRIMITIVE, DOWN, UP, METHOD, FIELD:
-                return false;
-        }
-        return statement.startsWith("\"") && (matcher = PATTERN.matcher(statement)).find();
+        return switch (context.expectation) {
+            case TYPE, DEAD_END, PRIMITIVE, DOWN, UP, METHOD, FIELD -> false;
+            default -> statement.startsWith("\"") && (matcher = PATTERN.matcher(statement)).find();
+        };
     }
     
     @Override

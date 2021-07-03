@@ -12,6 +12,7 @@ import java.lang.reflect.Modifier;
 
 import static org.objectweb.asm.Opcodes.*;
 
+@SuppressWarnings("ALL")
 public class Handles {
     
     public static Handle getPBFG(boolean dynamic, boolean setter) {

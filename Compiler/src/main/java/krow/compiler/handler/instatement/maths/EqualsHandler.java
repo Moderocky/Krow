@@ -16,11 +16,10 @@ public class EqualsHandler implements DefaultHandler {
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
-        switch (context.expectation) {
-            case DEAD_END, SMALL, OBJECT, PRIMITIVE, DOWN, UP:
-                return false;
-        }
-        return (statement.startsWith("==") || statement.startsWith("!=")) && context.child.point != null;
+        return switch (context.expectation) {
+            case DEAD_END, SMALL, OBJECT, PRIMITIVE, DOWN, UP -> false;
+            default -> (statement.startsWith("==") || statement.startsWith("!=")) && context.child.point != null;
+        };
     }
     
     @Override

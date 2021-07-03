@@ -12,6 +12,7 @@ import org.objectweb.asm.Opcodes;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("ALL")
 public class InterfaceHandler implements DefaultHandler {
     private static final Pattern PATTERN = Pattern.compile("^interface\\s+(" + Signature.TYPE_STRING + ")");
     

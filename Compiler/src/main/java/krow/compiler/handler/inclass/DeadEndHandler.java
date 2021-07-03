@@ -7,6 +7,7 @@ import krow.compiler.api.CompileState;
 import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 
+@SuppressWarnings("ALL")
 public class DeadEndHandler implements DefaultHandler {
     
     @Override

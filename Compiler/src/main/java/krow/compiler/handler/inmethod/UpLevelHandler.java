@@ -8,6 +8,7 @@ import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import mx.kenzie.foundation.WriteInstruction;
 
+@SuppressWarnings("ALL")
 public class UpLevelHandler implements DefaultHandler {
     
     @Override

@@ -11,6 +11,7 @@ import mx.kenzie.foundation.WriteInstruction;
 
 import java.util.Collections;
 
+@SuppressWarnings("ALL")
 public class DeadEndHandler implements DefaultHandler {
     
     @Override

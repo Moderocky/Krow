@@ -14,6 +14,7 @@ import mx.kenzie.foundation.WriteInstruction;
 
 import java.lang.reflect.Modifier;
 
+@SuppressWarnings("ALL")
 public class MethodEndParameterHandler implements DefaultHandler {
     
     @Override

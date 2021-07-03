@@ -9,7 +9,7 @@ import java.util.List;
 public class PreLabel {
     
     public String name;
-    protected List<Label> uses = new ArrayList<>();
+    protected final List<Label> uses = new ArrayList<>();
     
     public Label use() {
         final Label label;

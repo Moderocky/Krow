@@ -10,6 +10,7 @@ import mx.kenzie.foundation.Type;
 
 import static mx.kenzie.foundation.WriteInstruction.*;
 
+@SuppressWarnings("ALL")
 public class ReturnHandler implements DefaultHandler {
     
     @Override

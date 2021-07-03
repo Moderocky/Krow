@@ -8,6 +8,7 @@ import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.PreConstant;
 
+@SuppressWarnings("ALL")
 public class DeadEndHandler implements DefaultHandler {
     
     @Override
@@ -20,6 +21,7 @@ public class DeadEndHandler implements DefaultHandler {
         final CompileState state = context.exitTo;
         final PreConstant constant = context.saveConstant;
         assert constant != null;
+        //noinspection ReplaceNullCheck
         if (context.child != null) context.child.constants.put(constant.name, constant.value);
         else context.constants.put(constant.name, constant.value);
         context.child.preparing.clear();

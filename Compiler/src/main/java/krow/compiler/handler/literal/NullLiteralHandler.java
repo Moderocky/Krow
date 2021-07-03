@@ -13,11 +13,10 @@ public class NullLiteralHandler implements DefaultHandler {
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
-        switch (context.expectation) {
-            case TYPE, DEAD_END, DOWN, UP, METHOD, FIELD:
-                return false;
-        }
-        return statement.startsWith("null");
+        return switch (context.expectation) {
+            case TYPE, DEAD_END, DOWN, UP, METHOD, FIELD -> false;
+            default -> statement.startsWith("null");
+        };
     }
     
     @Override

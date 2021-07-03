@@ -14,6 +14,7 @@ import mx.kenzie.foundation.Type;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("ALL")
 public class DeclareAssignVarHandler implements DefaultHandler {
     
     private static final Pattern PATTERN = Pattern.compile("^(?:final )?(?<type>" + Signature.TYPE_STRING + ")\\s+(?<name>" + Signature.IDENTIFIER + ")\\s*=");
@@ -22,11 +23,10 @@ public class DeclareAssignVarHandler implements DefaultHandler {
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
-        switch (context.expectation) {
-            case TYPE, DEAD_END, LITERAL, VARIABLE, SMALL, OBJECT:
-                return false;
-        }
-        return (matcher = PATTERN.matcher(statement)).find();
+        return switch (context.expectation) {
+            case TYPE, DEAD_END, LITERAL, VARIABLE, SMALL, OBJECT -> false;
+            default -> (matcher = PATTERN.matcher(statement)).find();
+        };
     }
     
     @Override

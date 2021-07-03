@@ -10,15 +10,15 @@ import krow.compiler.util.HiddenModifier;
 
 import java.lang.reflect.Modifier;
 
+@SuppressWarnings("ALL")
 public class DropLevelHandler implements DefaultHandler {
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
-        switch (context.expectation) {
-            case UP, DEAD_END, TYPE, OBJECT, PRIMITIVE, SMALL, META, METHOD:
-                return false;
-        }
-        return statement.startsWith("{");
+        return switch (context.expectation) {
+            case UP, DEAD_END, TYPE, OBJECT, PRIMITIVE, SMALL, META, METHOD -> false;
+            default -> statement.startsWith("{");
+        };
     }
     
     @Override

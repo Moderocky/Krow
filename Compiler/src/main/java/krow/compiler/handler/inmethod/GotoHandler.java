@@ -22,11 +22,10 @@ public class GotoHandler implements DefaultHandler {
     @Override
     public boolean accepts(String statement, CompileContext context) {
         if (!statement.startsWith("goto")) return false;
-        switch (context.expectation) {
-            case TYPE, DEAD_END, LITERAL, VARIABLE, PRIMITIVE, DOWN, UP, SMALL, OBJECT:
-                return false;
-        }
-        return (matcher = PATTERN.matcher(statement)).find();
+        return switch (context.expectation) {
+            case TYPE, DEAD_END, LITERAL, VARIABLE, PRIMITIVE, DOWN, UP, SMALL, OBJECT -> false;
+            default -> (matcher = PATTERN.matcher(statement)).find();
+        };
     }
     
     @Override

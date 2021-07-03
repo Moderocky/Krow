@@ -6,6 +6,7 @@ import mx.kenzie.foundation.Type;
 
 import java.util.regex.Pattern;
 
+@SuppressWarnings("ALL")
 public class Signature {
     
     public static final String IDENTIFIER = "\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*";

@@ -23,11 +23,10 @@ public class SmallLiteralHandler implements DefaultHandler {
     public boolean accepts(String statement, CompileContext context) {
         final char c = statement.charAt(0);
         if (c < LOW || c > HIGH) return false;
-        switch (context.expectation) {
-            case TYPE, DEAD_END, VARIABLE, DOWN, UP, METHOD, FIELD:
-                return false;
-        }
-        return (matcher = PATTERN.matcher(statement)).find();
+        return switch (context.expectation) {
+            case TYPE, DEAD_END, VARIABLE, DOWN, UP, METHOD, FIELD -> false;
+            default -> (matcher = PATTERN.matcher(statement)).find();
+        };
     }
     
     @Override

@@ -20,11 +20,10 @@ public class StructImplicitHandler implements DefaultHandler {
     @Override
     public boolean accepts(String statement, CompileContext context) {
         if (!statement.startsWith("struct")) return false;
-        switch (context.expectation) {
-            case DEAD_END, VARIABLE, SMALL, FIELD, METHOD, MEMBER, DOWN, UP:
-                return false;
-        }
-        return (matcher = PATTERN.matcher(statement)).find();
+        return switch (context.expectation) {
+            case DEAD_END, VARIABLE, SMALL, FIELD, METHOD, MEMBER, DOWN, UP -> false;
+            default -> (matcher = PATTERN.matcher(statement)).find();
+        };
     }
     
     @Override

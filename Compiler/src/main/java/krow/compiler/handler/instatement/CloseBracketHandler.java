@@ -11,11 +11,10 @@ public class CloseBracketHandler implements DefaultHandler {
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
-        switch (context.expectation) {
-            case VARIABLE, SMALL, OBJECT, PRIMITIVE, DOWN, UP:
-                return false;
-        }
-        return statement.startsWith(")") && !context.brackets().isEmpty();
+        return switch (context.expectation) {
+            case VARIABLE, SMALL, OBJECT, PRIMITIVE, DOWN, UP -> false;
+            default -> statement.startsWith(")") && !context.brackets().isEmpty();
+        };
     }
     
     @Override

@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("ALL")
 public class StringReader implements Iterable<Character> {
     public final char[] chars;
     protected transient int position;
@@ -210,8 +211,7 @@ public class StringReader implements Iterable<Character> {
         char[] var3 = this.chars;
         int var4 = var3.length;
         
-        for (int var5 = 0; var5 < var4; ++var5) {
-            char ch = var3[var5];
+        for (char ch : var3) {
             if (ch == c) {
                 ++i;
             }
@@ -229,6 +229,7 @@ public class StringReader implements Iterable<Character> {
         return new StringReader.Iterative();
     }
     
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
     public StringReader clone() {
         StringReader reader = new StringReader(this.chars);
         reader.position = this.position;
@@ -238,7 +239,7 @@ public class StringReader implements Iterable<Character> {
     protected class Iterative implements Iterator<Character> {
         int cursor;
         int lastRet = -1;
-        int size;
+        final int size;
         
         Iterative() {
             this.size = StringReader.this.chars.length;

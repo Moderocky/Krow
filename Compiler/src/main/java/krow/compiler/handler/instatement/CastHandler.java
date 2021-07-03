@@ -12,6 +12,7 @@ import mx.kenzie.foundation.WriteInstruction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("ALL")
 public class CastHandler implements DefaultHandler {
     
     private static final Pattern PATTERN = Pattern.compile("^<\\s*(?<name>" + Signature.TYPE_STRING + ")\\s*>");

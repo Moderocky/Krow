@@ -12,11 +12,10 @@ public class OpenBracketHandler implements DefaultHandler {
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
-        switch (context.expectation) {
-            case DEAD_END, DOWN, UP:
-                return false;
-        }
-        return statement.startsWith("(");
+        return switch (context.expectation) {
+            case DEAD_END, DOWN, UP -> false;
+            default -> statement.startsWith("(");
+        };
     }
     
     @Override

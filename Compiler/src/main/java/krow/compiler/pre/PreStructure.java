@@ -17,13 +17,14 @@ import static mx.kenzie.foundation.WriteInstruction.*;
 import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
 import static org.objectweb.asm.Opcodes.DUP;
 
+@SuppressWarnings("ALL")
 public class PreStructure {
     
     private Type type;
     public final Map<String, Type> fields = new LinkedHashMap<>();
     PreField[] preFields;
     
-    public WriteInstruction allocate = new AlterableWriteInstruction();
+    public final WriteInstruction allocate = new AlterableWriteInstruction();
     
     public PreStructure() {
     
@@ -62,6 +63,7 @@ public class PreStructure {
     public void generate(final CompileContext context) {
         final ClassBuilder builder;
         final JavaVersion version;
+        //noinspection UnusedAssignment
         context.builder.suppress(builder = new ClassBuilder(getType(), version = context.builder.getVersion()));
         builder.addModifiers(Modifier.PUBLIC, Modifier.FINAL).setSuperclass(new Type(Structure.class));
         final MethodBuilder constructor = builder.addConstructor().addModifiers(Modifier.PUBLIC);

@@ -8,6 +8,7 @@ import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.PreStructure;
 
+@SuppressWarnings("ALL")
 public class StructCallEndHandler implements DefaultHandler {
     
     @Override

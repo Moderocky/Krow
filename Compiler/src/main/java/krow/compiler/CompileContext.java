@@ -11,6 +11,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Function;
 
+@SuppressWarnings("ALL")
 public class CompileContext {
     
     public CompileContext child;
@@ -19,9 +20,9 @@ public class CompileContext {
     
     protected KrowCompiler compiler;
     public HandlerSet handlers;
-    public List<Type> availableTypes = new ArrayList<>();
-    public List<PreMethod> availableMethods = new ArrayList<>();
-    public List<PreField> availableFields = new ArrayList<>();
+    public final List<Type> availableTypes = new ArrayList<>();
+    public final List<PreMethod> availableMethods = new ArrayList<>();
+    public final List<PreField> availableFields = new ArrayList<>();
     
     {
         importJava(java.lang.String.class);
@@ -53,14 +54,14 @@ public class CompileContext {
     public boolean isClass;
     //region Child
     //region Keywords Upcoming
-    public Map<String, Object> constants = new HashMap<>();
+    public final Map<String, Object> constants = new HashMap<>();
     public int modifiersUpcoming;
     public PreMethod bridgeTarget;
     //endregion
-    public List<PreVariable> variables = new ArrayList<>();
+    public final List<PreVariable> variables = new ArrayList<>();
     private final List<WriteInstruction> statement = new ArrayList<>();
-    public List<PreMethodCall> preparing = new ArrayList<>();
-    public List<PreStructure> structures = new ArrayList<>();
+    public final List<PreMethodCall> preparing = new ArrayList<>();
+    public final List<PreStructure> structures = new ArrayList<>();
     public CompileExpectation expectation = CompileExpectation.NONE;
     public WriteInstruction skip; // stacked when DEAD_END reached (eol)
     public WriteInstruction doAfter; // done after swap
@@ -72,7 +73,7 @@ public class CompileContext {
     public boolean duplicate;
     public boolean staticState;
     public boolean inverted;
-    public List<Object> exports = new ArrayList<>();
+    public final List<Object> exports = new ArrayList<>();
     public boolean exported;
     public boolean hasBody;
     public boolean inReturnPhase;
@@ -80,7 +81,7 @@ public class CompileContext {
     public PreVariable forAdjustment;
     public PreConstant saveConstant;
     public CompileState exitTo;
-    public List<CompileState> nested = new ArrayList<>();
+    public final List<CompileState> nested = new ArrayList<>();
     private final List<PreBracket> brackets = new ArrayList<>();
     private final List<PreLabel> labels = new ArrayList<>();
     //endregion

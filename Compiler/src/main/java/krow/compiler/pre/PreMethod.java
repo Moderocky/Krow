@@ -13,12 +13,13 @@ import java.util.List;
 
 import static org.objectweb.asm.Opcodes.*;
 
+@SuppressWarnings("ALL")
 public class PreMethod {
     
     public Type owner;
     public Type returnType;
     public List<Type> parameters = new ArrayList<>();
-    public List<PreVariable> variables = new ArrayList<>();
+    public final List<PreVariable> variables = new ArrayList<>();
     public String name;
     public int modifiers;
     

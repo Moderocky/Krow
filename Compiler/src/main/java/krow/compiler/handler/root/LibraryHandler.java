@@ -10,6 +10,7 @@ import mx.kenzie.foundation.Type;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("ALL")
 public class LibraryHandler implements DefaultHandler {
     private static final Pattern PATTERN = Pattern.compile("^library\\s+(?<name>[^\\s;\"])\\s*(?=;)");
     

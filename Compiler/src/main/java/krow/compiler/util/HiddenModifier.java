@@ -1,5 +1,6 @@
 package krow.compiler.util;
 
+@SuppressWarnings("ALL")
 public class HiddenModifier {
     
     public static final int BRIDGE = 0x00000040;

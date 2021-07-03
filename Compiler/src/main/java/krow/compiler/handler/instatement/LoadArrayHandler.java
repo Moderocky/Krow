@@ -21,11 +21,10 @@ public class LoadArrayHandler implements DefaultHandler {
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
-        switch (context.expectation) {
-            case TYPE, DEAD_END, LITERAL, VARIABLE, SMALL, OBJECT:
-                return false;
-        }
-        return (matcher = PATTERN.matcher(statement)).find();
+        return switch (context.expectation) {
+            case TYPE, DEAD_END, LITERAL, VARIABLE, SMALL, OBJECT -> false;
+            default -> (matcher = PATTERN.matcher(statement)).find();
+        };
     }
     
     @Override

@@ -23,11 +23,10 @@ public class NewArrayHandler implements DefaultHandler {
     @Override
     public boolean accepts(String statement, CompileContext context) {
         if (!statement.startsWith("new")) return false;
-        switch (context.expectation) {
-            case TYPE, DEAD_END, LITERAL, VARIABLE, SMALL, FIELD, DOWN, UP:
-                return false;
-        }
-        return (matcher = PATTERN.matcher(statement)).find();
+        return switch (context.expectation) {
+            case TYPE, DEAD_END, LITERAL, VARIABLE, SMALL, FIELD, DOWN, UP -> false;
+            default -> (matcher = PATTERN.matcher(statement)).find();
+        };
     }
     
     @Override

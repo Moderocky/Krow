@@ -8,9 +8,10 @@ import mx.kenzie.foundation.WriteInstruction;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("ALL")
 public class PreBracket {
     
-    public List<WriteInstruction> instructions = new ArrayList<>();
+    public final List<WriteInstruction> instructions = new ArrayList<>();
     public Type exitType;
     public CompileState state;
     public boolean swap;

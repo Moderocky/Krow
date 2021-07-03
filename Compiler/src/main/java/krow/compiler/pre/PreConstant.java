@@ -2,7 +2,7 @@ package krow.compiler.pre;
 
 public class PreConstant {
     
-    public String name;
+    public final String name;
     public Object value;
     
     public PreConstant(String name) {

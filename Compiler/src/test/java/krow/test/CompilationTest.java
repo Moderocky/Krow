@@ -1,7 +1,7 @@
 package krow.test;
 
-import krow.compiler.ReKrow;
 import krow.compiler.Krow;
+import krow.compiler.ReKrow;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -11,6 +11,7 @@ import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
+@SuppressWarnings("ALL")
 public class CompilationTest {
     
     @BeforeClass
@@ -648,7 +649,7 @@ public class CompilationTest {
         final String source = """
             import <java/io/PrintStream> export <>
             class mx/kenzie/example/Field {
-            
+                
                 static String name;
                 
                 export <>
@@ -672,10 +673,10 @@ public class CompilationTest {
         final String source = """
             import <java/io/PrintStream> export <>
             class mx/kenzie/example/ClInit {
-            
+                
                 export <>
                 static void test() { }
-            
+                
                 static void <clinit> () {
                     System.out.println("ClInit works.");
                 }
@@ -694,7 +695,7 @@ public class CompilationTest {
             import <java/io/PrintStream> export <>
             implement <java/lang/Runnable>
             abstract interface mx/kenzie/example/Inter {
-            
+                
                 export <>
                 static void test() {
                     System.out.println("hello");
@@ -703,7 +704,6 @@ public class CompilationTest {
             }
             
             """;
-        debug(source);
         final Class<?> basic = new ReKrow().compileAndLoad(source);
         assert basic != null;
         basic.getMethod("test").invoke(null);

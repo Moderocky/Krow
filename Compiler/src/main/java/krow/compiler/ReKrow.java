@@ -19,12 +19,13 @@ import java.util.zip.ZipOutputStream;
 
 import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
 
+@SuppressWarnings("UnusedLabel")
 public class ReKrow implements Compiler<Krow>, HandlerInterface, KrowCompiler {
     
-    Pattern LINE_COMMENT = Pattern.compile("//.+(?=(\\R|$))");
-    Pattern BLOCK_COMMENT = Pattern.compile("/\\*[\\s\\S]*?\\*/");
+    final Pattern LINE_COMMENT = Pattern.compile("//.+(?=(\\R|$))");
+    final Pattern BLOCK_COMMENT = Pattern.compile("/\\*[\\s\\S]*?\\*/");
     
-    protected List<Library> libraries = new ArrayList<>();
+    protected final List<Library> libraries = new ArrayList<>();
     
     public ReKrow() {
         registerLibrary(SystemLibrary.SYSTEM_LIBRARY);

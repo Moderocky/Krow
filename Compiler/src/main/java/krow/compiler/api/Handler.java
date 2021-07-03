@@ -17,6 +17,7 @@ import krow.compiler.pre.PreClass;
  *
  * @author Moderocky
  */
+@SuppressWarnings("ALL")
 public interface Handler {
     
     @Deprecated

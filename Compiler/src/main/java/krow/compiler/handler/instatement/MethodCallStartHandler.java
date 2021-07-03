@@ -20,11 +20,10 @@ public class MethodCallStartHandler implements DefaultHandler {
     @Override
     public boolean accepts(String statement, CompileContext context) {
         if (!statement.startsWith(".")) return false;
-        switch (context.expectation) {
-            case TYPE, DEAD_END, LITERAL, VARIABLE, SMALL, DOWN, UP, FIELD, PRIMITIVE:
-                return false;
-        }
-        return PATTERN.matcher(statement).find();
+        return switch (context.expectation) {
+            case TYPE, DEAD_END, LITERAL, VARIABLE, SMALL, DOWN, UP, FIELD, PRIMITIVE -> false;
+            default -> PATTERN.matcher(statement).find();
+        };
     }
     
     @Override

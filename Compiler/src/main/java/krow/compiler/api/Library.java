@@ -12,6 +12,7 @@ import java.util.Collection;
  *
  * @author Moderocky
  */
+@SuppressWarnings("ALL")
 public interface Library {
     
     /**

@@ -12,17 +12,17 @@ import krow.compiler.pre.Signature;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("ALL")
 public class AssignVarHandler implements DefaultHandler {
     
     private static final Pattern PATTERN = Pattern.compile("^(?<name>" + Signature.IDENTIFIER + ")\\s*=");
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
-        switch (context.expectation) {
-            case TYPE, DEAD_END, LITERAL, VARIABLE, SMALL, OBJECT:
-                return false;
-        }
-        return PATTERN.matcher(statement).find();
+        return switch (context.expectation) {
+            case TYPE, DEAD_END, LITERAL, VARIABLE, SMALL, OBJECT -> false;
+            default -> PATTERN.matcher(statement).find();
+        };
     }
     
     @Override

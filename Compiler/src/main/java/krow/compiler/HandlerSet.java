@@ -8,7 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class HandlerSet extends HashMap<CompileState, List<DefaultHandler>> implements HandlerInterface {
+@SuppressWarnings("ALL")
+final class HandlerSet extends HashMap<CompileState, List<DefaultHandler>> implements HandlerInterface {
     
     public HandlerSet(Map<? extends CompileState, ? extends List<DefaultHandler>> m) {
         super(m);

@@ -8,6 +8,7 @@ import krow.compiler.pre.PreClass;
 
 import java.lang.reflect.Modifier;
 
+@SuppressWarnings("ALL")
 public class FinalHandler implements DefaultHandler {
     
     @Override

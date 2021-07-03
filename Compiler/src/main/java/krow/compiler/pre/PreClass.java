@@ -9,7 +9,7 @@ public class PreClass extends PreContext {
     
     public Type path;
     public Type extend = new Type(Object.class);
-    public List<Type> interfaces = new ArrayList<>();
+    public final List<Type> interfaces = new ArrayList<>();
     
     
 }

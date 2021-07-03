@@ -13,6 +13,7 @@ import mx.kenzie.foundation.Type;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("ALL")
 public class ExportHandler implements DefaultHandler {
     private static final Pattern PATTERN = Pattern.compile("^export\\s*?<([^<>]*?)>");
     

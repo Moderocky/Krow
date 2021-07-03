@@ -9,15 +9,15 @@ import krow.compiler.pre.PreArray;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.PreMethodCall;
 
+@SuppressWarnings("ALL")
 public class MethodCallEndHandler implements DefaultHandler {
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
-        switch (context.expectation) {
-            case TYPE, DEAD_END, LITERAL, VARIABLE, SMALL:
-                return false;
-        }
-        return statement.startsWith(")");
+        return switch (context.expectation) {
+            case TYPE, DEAD_END, LITERAL, VARIABLE, SMALL -> false;
+            default -> statement.startsWith(")");
+        };
     }
     
     @Override

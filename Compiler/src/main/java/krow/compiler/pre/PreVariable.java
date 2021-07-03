@@ -6,7 +6,7 @@ import mx.kenzie.foundation.WriteInstruction;
 import java.util.Objects;
 
 public class PreVariable {
-    public String name;
+    public final String name;
     public Type type;
     
     public PreVariable(String name, Type type) {

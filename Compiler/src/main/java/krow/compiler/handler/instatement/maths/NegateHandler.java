@@ -13,11 +13,10 @@ public class NegateHandler implements DefaultHandler {
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
-        switch (context.expectation) {
-            case DEAD_END, META, DOWN, UP:
-                return false;
-        }
-        return statement.startsWith("-");
+        return switch (context.expectation) {
+            case DEAD_END, META, DOWN, UP -> false;
+            default -> statement.startsWith("-");
+        };
     }
     
     @Override

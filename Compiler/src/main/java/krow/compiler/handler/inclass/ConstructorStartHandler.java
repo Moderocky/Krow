@@ -12,6 +12,7 @@ import mx.kenzie.foundation.Type;
 import java.lang.reflect.Modifier;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("ALL")
 public class ConstructorStartHandler implements DefaultHandler {
     private static final Pattern PATTERN = Pattern.compile("^void\\s+<init>\\s*\\(");
     

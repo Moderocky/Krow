@@ -8,6 +8,7 @@ import krow.compiler.pre.PreArray;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.PreVariable;
 
+@SuppressWarnings("ALL")
 public class ArraySplitParameterHandler implements DefaultHandler {
     
     @Override

@@ -6,6 +6,7 @@ import krow.compiler.api.CompileState;
 import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 
+@SuppressWarnings("ALL")
 public class StructSplitParameterHandler implements DefaultHandler {
     
     @Override

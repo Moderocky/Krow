@@ -19,11 +19,10 @@ public class ConstructorCallStartHandler implements DefaultHandler {
     @Override
     public boolean accepts(String statement, CompileContext context) {
         if (!statement.startsWith("this") && !statement.startsWith("super")) return false;
-        switch (context.expectation) {
-            case TYPE, DEAD_END, LITERAL, VARIABLE, SMALL:
-                return false;
-        }
-        return PATTERN.matcher(statement).find();
+        return switch (context.expectation) {
+            case TYPE, DEAD_END, LITERAL, VARIABLE, SMALL -> false;
+            default -> PATTERN.matcher(statement).find();
+        };
     }
     
     @Override

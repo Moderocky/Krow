@@ -4,11 +4,12 @@ import mx.kenzie.foundation.Type;
 
 import java.lang.reflect.Field;
 
+@SuppressWarnings("ALL")
 public class PreField {
     
-    public Type owner;
-    public Type type;
-    public String name;
+    public final Type owner;
+    public final Type type;
+    public final String name;
     public int modifiers;
     
     public PreField(Type owner, Type type, String name) {

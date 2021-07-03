@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+@SuppressWarnings("ALL")
 public class Resolver {
     
     public static Type resolveType(final String name, final Type... types) {
@@ -85,6 +86,7 @@ public class Resolver {
     
     }
     
+    @SuppressWarnings("UnusedAssignment")
     private static Result resolveStructure0(final String signature, final Type... types) {
         final String inner = signature.substring(2);
         final Type[] fieldTypes;

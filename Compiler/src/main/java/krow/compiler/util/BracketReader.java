@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@SuppressWarnings({"ALL", "MethodDoesntCallSuperMethod"})
 public class BracketReader extends StringReader {
     
     public BracketReader(String string) {

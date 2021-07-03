@@ -13,11 +13,10 @@ public class BooleanLiteralHandler implements DefaultHandler {
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
-        switch (context.expectation) {
-            case TYPE, DEAD_END, DOWN, UP, METHOD, FIELD:
-                return false;
-        }
-        return statement.startsWith("true") || statement.startsWith("false");
+        return switch (context.expectation) {
+            case TYPE, DEAD_END, DOWN, UP, METHOD, FIELD -> false;
+            default -> statement.startsWith("true") || statement.startsWith("false");
+        };
     }
     
     @Override

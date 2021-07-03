@@ -14,17 +14,17 @@ import mx.kenzie.foundation.Type;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("ALL")
 public class DeclareVarHandler implements DefaultHandler {
     
     private static final Pattern PATTERN = Pattern.compile("^(?<type>" + Signature.TYPE_STRING + ")\\s+(?<name>" + Signature.IDENTIFIER + ")");
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
-        switch (context.expectation) {
-            case TYPE, DEAD_END, LITERAL, VARIABLE, SMALL, OBJECT:
-                return false;
-        }
-        return PATTERN.matcher(statement).find();
+        return switch (context.expectation) {
+            case TYPE, DEAD_END, LITERAL, VARIABLE, SMALL, OBJECT -> false;
+            default -> PATTERN.matcher(statement).find();
+        };
     }
     
     @Override

@@ -8,6 +8,7 @@ import mx.kenzie.foundation.WriteInstruction;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("ALL")
 public class PreMethodCall {
     
     public boolean dynamic;
@@ -15,7 +16,7 @@ public class PreMethodCall {
     public Type owner;
     public String name;
     public Type returnType;
-    public List<Type> parameters = new ArrayList<>();
+    public final List<Type> parameters = new ArrayList<>();
     public CompileState state;
     
     public void addParameter(final Type type) {

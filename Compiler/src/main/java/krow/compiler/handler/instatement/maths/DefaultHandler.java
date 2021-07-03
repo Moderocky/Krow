@@ -12,11 +12,10 @@ public class DefaultHandler implements krow.compiler.DefaultHandler {
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
-        switch (context.expectation) {
-            case DEAD_END, SMALL, OBJECT, PRIMITIVE, LITERAL, DOWN, UP:
-                return false;
-        }
-        return (statement.startsWith("?")) && context.child.point != null;
+        return switch (context.expectation) {
+            case DEAD_END, SMALL, OBJECT, PRIMITIVE, LITERAL, DOWN, UP -> false;
+            default -> (statement.startsWith("?")) && context.child.point != null;
+        };
     }
     
     @Override
@@ -30,9 +29,7 @@ public class DefaultHandler implements krow.compiler.DefaultHandler {
             method.visitLabel(label);
             method.visitInsn(87);
         };
-        second = (writer, method) -> {
-            method.visitLabel(end);
-        };
+        second = (writer, method) -> method.visitLabel(end);
         context.child.statement(first);
         context.child.statement(second);
         context.expectation = CompileExpectation.OBJECT;

@@ -17,17 +17,17 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("ALL")
 public class VarLoadHandler implements DefaultHandler {
     
     private static final Pattern PATTERN = Pattern.compile("^(?<name>" + Signature.IDENTIFIER + ")");
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
-        switch (context.expectation) {
-            case TYPE, DEAD_END, LITERAL, METHOD, FIELD:
-                return false;
-        }
-        return PATTERN.matcher(statement).find();
+        return switch (context.expectation) {
+            case TYPE, DEAD_END, LITERAL, METHOD, FIELD -> false;
+            default -> PATTERN.matcher(statement).find();
+        };
     }
     
     @Override

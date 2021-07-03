@@ -12,6 +12,7 @@ import org.objectweb.asm.Label;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("ALL")
 public class IfHandler implements DefaultHandler {
     
     private static final Pattern PATTERN = Pattern.compile("^if\\s+\\(");

@@ -9,6 +9,7 @@ import mx.kenzie.foundation.ClassBuilder;
 import mx.kenzie.foundation.Type;
 import mx.kenzie.foundation.opcodes.JavaVersion;
 
+@SuppressWarnings("ALL")
 public class DropLevelHandler implements DefaultHandler {
     
     @Override

@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("ALL")
 public class ImplementHandler implements DefaultHandler {
     private static final Pattern PATTERN = Pattern.compile("^implements?\\s*?<([^<>]*?)>");
     
