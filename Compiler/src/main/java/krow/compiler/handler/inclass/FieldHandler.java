@@ -30,6 +30,7 @@ public class FieldHandler implements Handler {
         final PreField field = new PreField(data.path, Resolver.resolveType(type, context.availableTypes()
             .toArray(new Type[0])), name);
         field.modifiers |= context.upcoming();
+//        if (!Modifier.isStatic(field.modifiers) && context.isInterface) throw new RuntimeException("Cannot place dynamic field in interface: '" + name + "'");
         context.builder.addField(field.name).setType(field.type).addModifiers(field.modifiers);
         context.availableFields.add(field);
         context.clearUpcoming();

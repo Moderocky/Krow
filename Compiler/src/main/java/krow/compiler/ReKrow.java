@@ -45,6 +45,7 @@ public class ReKrow implements Compiler<Krow> {
             new ImportHandler(),
             new ExportHandler(),
             new ImplementHandler(),
+            new InterfaceHandler(),
             new ClassHandler(),
             new ExtendsHandler(),
             new DropLevelHandler(),

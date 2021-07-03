@@ -27,22 +27,6 @@ The Krow language spec and the original ReKrow compiler were designed and writte
 > 
 > Coincidentally, K comes after J in the alphabet.
 
-## Language Efficiency
-
-Whether or not Krow is 'faster' or 'better' than another JVM language is difficult to answer.
-
-The result code that ReKrow produces is minimalist: a class written in Krow will be much smaller than a class written in Java. This is because ReKrow includes no source metadata (line numbers, variable names) which take up a large amount of space in `javac`'s class result.
-
-Code compiled by Krow could be more efficient than Java code. Some results are natively more efficient than what `javac` produces, particularly when it comes to logic instructions.
-> *Note:* I don't know why this is the case. Krow is about 30% faster at inverting booleans, for example.
-
-On the other hand, `javac` will spot and remove loops and variable assignments it deems pointless, whereas ReKrow will not. This is very minor - JIT will catch it all in the end.
-
-Outside these small edge cases, the efficiency of Krow code will depend entirely on the programmer: ReKrow does exactly what you tell it to, mistakes and all. :)
-
-> *Note:* I would imagine a very proficient programmer could write much more efficient code in Krow but, equally, a mere mortal like myself would probably benefit from `javac`'s hand-holding a lot of the time. :)
-
-
 ## The ReKrow Compiler
 
 The basic Krow compiler is called 'ReKrow'. 
@@ -70,6 +54,134 @@ Fortunately, Krow's runtime is tiny - with only a few stubs - and very unobtrusi
 The runtime contains the four bootstraps needed for dynamic methods and the `Structure` stub class that all structs extend under the hood. It also contains the endpoints for the built-in targets.
 
 > *Fun fact:* the first version of the Krow runtime was written before number literals were added to the language spec. This meant I had to use booleans and bit-shift them to obtain number values.
+
+## File Structure
+
+While it may look unusual at first, the Krow source file structure is very similar to that of Java.
+
+There are four major differences:
+1. Krow uses `/` as the class path separator.
+2. There is no explicit package declaration. 
+3. There are no explicit modifiers.
+4. Special methods are visible.
+
+### Class Path Separators
+
+JVM bytecode uses `/` as the class path separator internally. Rather than find-and-replacing a Java-style `org.example.Type` path, Krow opts to cut out the middle man and use the 'internal' `org/example/Type` style instead.
+
+This may take some getting used to, but should be a trivial change.
+
+The name of a class (and its superclass, where applicable) must **always** use their fully-qualified names. This is because the `class` and `extends` keywords are given special treatment internally and do not get access to imported types.
+
+Example:
+```java 
+class org/example/Type extends box/path/Thing {
+    
+}
+```
+
+### Packages
+
+Krow does not place the same sanctity on packages as Java does: there is no explicit `package x.y.z;` declaration in a Krow source file.
+
+Instead, the package is taken from the name in the `class` declaration.
+
+Furthermore, Krow classes do not need to be put in a file structure matching the package or class names, though this is recommended for better organisation.
+
+### Modifiers
+
+Krow does not have Java's 'public/private/protected' modifiers. See [here](#targeted-exporting) for more information on the reasons behind this and alternatives.
+
+For simplicity, adding an empty `export <>` metadata tag will make the subsequent element public.
+
+Example:
+```java 
+export <> // public class
+class org/example/Type extends box/path/Thing {
+    
+    export <> // public method
+    static void foo() {
+    }
+    
+    // non-public method
+    static void bar() {
+    }
+    
+}
+```
+
+### Special Methods
+
+Java hides key methods behind special syntax, and sometimes completely.
+
+Krow makes all of these 'special' methods accessible, since there is no good reason not to.
+
+#### Class Initialiser
+
+Java's `static {...}` block is the class initialiser.
+Krow uses an explicit declaration: `static void <clinit>() {...}`
+This is to keep parity with the method's real name.
+
+Example:
+```java 
+class org/example/Obj {
+    
+    static void <clinit> () {
+    
+    }
+    
+}
+```
+
+The class initialiser will be run by the classloader and should not be invoked manually.
+
+#### Object Initialiser
+
+Krow also exposes the real constructor method: `void <init>() {...}`.
+This is equivalent to Java's `Type()` constructor or `{...}` initialiser block.
+This is to keep parity with the method's real name.
+
+Usage of this is the same as a regular constructor:
+```java 
+class org/example/Obj {
+    String name;
+    
+    export <> // public constructor
+    void <init>(String name) {
+        this.name = name;
+    }
+    
+}
+```
+
+Note: this method is a void method, and it should never be called explicitly.
+When creating a new object, the constructor will be run by the `invokespecial` instruction `obj(...)`.
+This means you can use `new Obj(...)` as you would in java.
+
+#### Bridge Methods
+
+Krow does not offer generic classes or methods - these are unnecessary as the `bridge` method is exposed at a source level.
+
+Bridge methods are synthetic members added by the Java compiler to link up a generic superclass method with its actual implementation.
+In Krow, bridges are used in order to bind one method to another, effectively giving a single method two endpoints.
+
+```
+class org/example/Obj {
+    
+    String myMethod(String var) {
+    }
+    
+    export <>
+    bridge <Obj::myMethod(String)String>
+    Object myMethod(Object var); // Invoking this method will invoke the real version
+    
+}
+```
+
+Bridge methods are very useful for properly extending a Java library class with generic parameters - the real implementation can be written with the actual types required, and then a bridge version with `Object`s replacing the type parameters will make sure it overrides the correct superclass version.
+
+The full method signature is required for the bridge metadata - the compiler cannot infer which method it targets, since multiple methods could be valid targets.
+
 
 ## Keywords
 
@@ -478,3 +590,19 @@ In cases where the method is void or the value is not used, the null-value is po
 
 Reserved.
 Potentially for easier invocation of utilities from the Krow runtime.
+
+
+## Language Efficiency
+
+Whether or not Krow is 'faster' or 'better' than another JVM language is difficult to answer.
+
+The result code that ReKrow produces is minimalist: a class written in Krow will be much smaller than a class written in Java. This is because ReKrow includes no source metadata (line numbers, variable names) which take up a large amount of space in `javac`'s class result.
+
+Code compiled by Krow could be more efficient than Java code. Some results are natively more efficient than what `javac` produces, particularly when it comes to logic instructions.
+> *Note:* I don't know why this is the case. Krow is about 30% faster at inverting booleans, for example.
+
+On the other hand, `javac` will spot and remove loops and variable assignments it deems pointless, whereas ReKrow will not. This is very minor - JIT will catch it all in the end.
+
+Outside these small edge cases, the efficiency of Krow code will depend entirely on the programmer: ReKrow does exactly what you tell it to, mistakes and all. :)
+
+> *Note:* I would imagine a very proficient programmer could write much more efficient code in Krow but, equally, a mere mortal like myself would probably benefit from `javac`'s hand-holding a lot of the time. :)

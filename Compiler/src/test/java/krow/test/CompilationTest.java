@@ -689,6 +689,27 @@ public class CompilationTest {
     }
     
     @Test
+    public void interfacio() throws Throwable {
+        final String source = """
+            import <java/io/PrintStream> export <>
+            implement <java/lang/Runnable>
+            abstract interface mx/kenzie/example/Inter {
+            
+                export <>
+                static void test() {
+                    System.out.println("hello");
+                }
+                
+            }
+            
+            """;
+        debug(source);
+        final Class<?> basic = new ReKrow().compileAndLoad(source);
+        assert basic != null;
+        basic.getMethod("test").invoke(null);
+    }
+    
+    @Test
     public void full() {
         Krow.main("TestTarget.ark", "src/test/krow", "mx.kenzie.example.Main");
     }

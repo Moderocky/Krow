@@ -15,7 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ImplementHandler implements Handler {
-    private static final Pattern PATTERN = Pattern.compile("^implement\\s*?<([^<>]*?)>");
+    private static final Pattern PATTERN = Pattern.compile("^implements?\\s*?<([^<>]*?)>");
     
     Matcher matcher;
     

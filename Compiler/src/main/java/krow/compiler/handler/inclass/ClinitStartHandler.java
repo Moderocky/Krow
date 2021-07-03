@@ -6,7 +6,6 @@ import krow.compiler.HandleResult;
 import krow.compiler.handler.Handler;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.PreMethod;
-import krow.compiler.pre.PreVariable;
 import mx.kenzie.foundation.Type;
 
 import java.lang.reflect.Modifier;

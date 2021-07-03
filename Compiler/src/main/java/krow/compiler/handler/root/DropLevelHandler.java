@@ -19,7 +19,7 @@ public class DropLevelHandler implements Handler {
     @Override
     public HandleResult handle(String statement, PreClass data, CompileContext context) {
         context.hasBody = true;
-        context.child = new CompileContext();
+        if (!context.isInterface && !context.isClass) throw new RuntimeException("No type declaration present.");
         context.builder = new ClassBuilder(new Type(data.path.dotPath()), JavaVersion.JAVA_8)
             .addInterfaces(data.interfaces.toArray(new Type[0]))
             .setSuperclass(data.extend)
@@ -28,6 +28,7 @@ public class DropLevelHandler implements Handler {
         context.availableTypes.add(data.path);
         context.availableTypes.add(data.extend);
         context.availableTypes.addAll(data.interfaces);
+        context.child = new CompileContext();
         return new HandleResult(null, statement.substring(1).trim(), CompileState.IN_CLASS);
     }
     

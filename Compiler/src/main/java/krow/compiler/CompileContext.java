@@ -44,6 +44,8 @@ public class CompileContext {
         importJava(java.lang.Number.class);
     }
     
+    public boolean isInterface;
+    public boolean isClass;
     //region Child
     //region Keywords Upcoming
     public Map<String, Object> constants = new HashMap<>();
