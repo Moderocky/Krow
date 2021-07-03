@@ -1,10 +1,10 @@
 package krow.compiler.handler.inmethod;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileExpectation;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileExpectation;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.PreConstant;
 import krow.compiler.pre.Signature;
@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ConstHandler implements Handler {
+public class ConstHandler implements DefaultHandler {
     
     private static final Pattern PATTERN = Pattern.compile("^const\\s+(?<name>" + Signature.IDENTIFIER + ")\\s*=");
     
@@ -40,7 +40,7 @@ public class ConstHandler implements Handler {
         context.exitTo = state;
         context.expectation = CompileExpectation.LITERAL;
         context.lookingFor = new Type(Object.class);
-        return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.IN_CONST);
+        return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.CONST_DECLARATION);
     }
     
     @Override

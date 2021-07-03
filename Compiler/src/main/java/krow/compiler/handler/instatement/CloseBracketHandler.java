@@ -1,13 +1,13 @@
 package krow.compiler.handler.instatement;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreBracket;
 import krow.compiler.pre.PreClass;
 
-public class CloseBracketHandler implements Handler {
+public class CloseBracketHandler implements DefaultHandler {
     
     @Override
     public boolean accepts(String statement, CompileContext context) {

@@ -1,15 +1,15 @@
 package krow.compiler.handler.root;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import mx.kenzie.foundation.ClassBuilder;
 import mx.kenzie.foundation.Type;
 import mx.kenzie.foundation.opcodes.JavaVersion;
 
-public class DropLevelHandler implements Handler {
+public class DropLevelHandler implements DefaultHandler {
     
     @Override
     public boolean accepts(String statement) {
@@ -28,8 +28,8 @@ public class DropLevelHandler implements Handler {
         context.availableTypes.add(data.path);
         context.availableTypes.add(data.extend);
         context.availableTypes.addAll(data.interfaces);
-        context.child = new CompileContext();
-        return new HandleResult(null, statement.substring(1).trim(), CompileState.IN_CLASS);
+        context.createChild();
+        return new HandleResult(null, statement.substring(1).trim(), CompileState.CLASS_BODY);
     }
     
     @Override

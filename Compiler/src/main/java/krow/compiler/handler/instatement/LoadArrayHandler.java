@@ -1,10 +1,10 @@
 package krow.compiler.handler.instatement;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileExpectation;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileExpectation;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.PreVariable;
 import mx.kenzie.foundation.Type;
@@ -13,7 +13,7 @@ import mx.kenzie.foundation.WriteInstruction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class LoadArrayHandler implements Handler {
+public class LoadArrayHandler implements DefaultHandler {
     
     private static final Pattern PATTERN = Pattern.compile("^\\[(?<index>\\d+)]\\s*(?!=)");
     

@@ -1,14 +1,14 @@
 package krow.compiler.handler.instatement.maths;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileExpectation;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileExpectation;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import mx.kenzie.foundation.WriteInstruction;
 
-public class MultiplyHandler implements Handler {
+public class MultiplyHandler implements DefaultHandler {
     
     @Override
     public boolean accepts(String statement, CompileContext context) {

@@ -1,10 +1,10 @@
 package krow.compiler.handler.instatement;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileExpectation;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileExpectation;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreArray;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.Signature;
@@ -14,7 +14,7 @@ import mx.kenzie.foundation.WriteInstruction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class NewArrayHandler implements Handler {
+public class NewArrayHandler implements DefaultHandler {
     
     private static final Pattern PATTERN = Pattern.compile("^new\\s+(?<type>" + Signature.ARRAY_TYPE_STRING + ")\\s*\\(");
     
@@ -49,7 +49,7 @@ public class NewArrayHandler implements Handler {
         context.child.nested.add(0, state);
         context.child.preparing.add(0, array);
         context.expectation = CompileExpectation.OBJECT;
-        return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.IN_ARRAY_HEADER);
+        return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.IMPLICIT_ARRAY_HEADER);
     }
     
     @Override

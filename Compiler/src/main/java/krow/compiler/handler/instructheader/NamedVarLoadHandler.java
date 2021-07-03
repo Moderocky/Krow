@@ -1,10 +1,10 @@
 package krow.compiler.handler.instructheader;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileExpectation;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileExpectation;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.PreStructure;
 import krow.compiler.pre.PreVariable;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class NamedVarLoadHandler implements Handler {
+public class NamedVarLoadHandler implements DefaultHandler {
     
     private static final Pattern PATTERN = Pattern.compile("^(?<name>" + Signature.IDENTIFIER + ")");
     

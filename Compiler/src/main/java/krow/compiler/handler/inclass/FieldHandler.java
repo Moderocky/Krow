@@ -1,10 +1,10 @@
 package krow.compiler.handler.inclass;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
+import krow.compiler.DefaultHandler;
 import krow.compiler.Resolver;
-import krow.compiler.handler.Handler;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.PreField;
 import krow.compiler.pre.Signature;
@@ -13,7 +13,7 @@ import mx.kenzie.foundation.Type;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class FieldHandler implements Handler {
+public class FieldHandler implements DefaultHandler {
     private static final Pattern PATTERN = Pattern.compile("^(?<type>" + Signature.TYPE_STRING + ")\\s+(?<name>" + Signature.IDENTIFIER + ")\\s*(?=;)");
     
     Matcher matcher;

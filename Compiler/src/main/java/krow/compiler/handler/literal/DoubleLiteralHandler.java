@@ -1,10 +1,10 @@
 package krow.compiler.handler.literal;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileExpectation;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileExpectation;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import mx.kenzie.foundation.Type;
 import mx.kenzie.foundation.WriteInstruction;
@@ -12,7 +12,7 @@ import mx.kenzie.foundation.WriteInstruction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DoubleLiteralHandler implements Handler {
+public class DoubleLiteralHandler implements DefaultHandler {
     
     private static final Pattern PATTERN = Pattern.compile("^\\d+(?:.\\d+)?D(?![\\d.#])");
     private static final int LOW = 48, HIGH = 57;
@@ -38,7 +38,7 @@ public class DoubleLiteralHandler implements Handler {
         context.child.point = new Type(double.class);
         context.child.statement(WriteInstruction.loadConstant(value));
         context.expectation = CompileExpectation.NONE;
-        if (state == CompileState.IN_CONST) {
+        if (state == CompileState.CONST_DECLARATION) {
             context.saveConstant.value = value;
             context.expectation = CompileExpectation.DEAD_END;
         }

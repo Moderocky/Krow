@@ -1,9 +1,9 @@
 package krow.compiler.handler.inclass;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.PreMethod;
 import mx.kenzie.foundation.Type;
@@ -11,7 +11,7 @@ import mx.kenzie.foundation.Type;
 import java.lang.reflect.Modifier;
 import java.util.regex.Pattern;
 
-public class ClinitStartHandler implements Handler {
+public class ClinitStartHandler implements DefaultHandler {
     private static final Pattern PATTERN = Pattern.compile("^void\\s+<clinit>\\s*\\(");
     
     @Override
@@ -31,7 +31,7 @@ public class ClinitStartHandler implements Handler {
         context.method = method;
         context.availableMethods.add(method);
         return new HandleResult(null, statement.substring(statement.indexOf('(') + 1)
-            .trim(), CompileState.IN_METHOD_HEADER);
+            .trim(), CompileState.METHOD_HEADER_DECLARATION);
     }
     
     @Override

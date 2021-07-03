@@ -1,12 +1,14 @@
-package krow.compiler.handler;
+package krow.compiler;
 
-import krow.compiler.CompileContext;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
+import krow.compiler.api.Handler;
+import krow.compiler.api.Library;
 import krow.compiler.pre.PreClass;
 
-public interface Handler {
+public interface DefaultHandler extends Handler {
     
+    @Deprecated
     default boolean accepts(final String statement) {
         return false;
     }
@@ -15,14 +17,16 @@ public interface Handler {
         return accepts(statement);
     }
     
+    @Deprecated
     default HandleResult handle(final String statement, final PreClass data, final CompileContext context) {
-        return new HandleResult(null, statement, CompileState.ROOT);
+        throw new IllegalStateException("No handle result provided.");
     }
     
     default HandleResult handle(final String statement, final PreClass data, final CompileContext context, final CompileState state) {
         return handle(statement, data, context);
     }
     
+    @Deprecated
     default HandleResult handle0(final String statement, final PreClass data, final CompileContext context, final CompileState state) {
         final HandleResult result = this.handle(statement, data, context, state);
         if (result == null || result.remainder().isEmpty()) return null;
@@ -31,4 +35,8 @@ public interface Handler {
     
     String debugName();
     
+    @Override
+    default Library owner() {
+        return SystemLibrary.SYSTEM_LIBRARY;
+    }
 }

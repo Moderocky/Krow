@@ -1,9 +1,9 @@
 package krow.compiler.handler.inclass;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.PreMethod;
 import krow.compiler.pre.PreVariable;
@@ -12,7 +12,7 @@ import mx.kenzie.foundation.Type;
 import java.lang.reflect.Modifier;
 import java.util.regex.Pattern;
 
-public class ConstructorStartHandler implements Handler {
+public class ConstructorStartHandler implements DefaultHandler {
     private static final Pattern PATTERN = Pattern.compile("^void\\s+<init>\\s*\\(");
     
     @Override
@@ -34,7 +34,7 @@ public class ConstructorStartHandler implements Handler {
         if (context.upcoming(Modifier.STATIC)) throw new RuntimeException("Class <init> declared static.");
         context.child.variables.add(new PreVariable("this", data.path));
         return new HandleResult(null, statement.substring(statement.indexOf('(') + 1)
-            .trim(), CompileState.IN_METHOD_HEADER);
+            .trim(), CompileState.METHOD_HEADER_DECLARATION);
     }
     
     @Override

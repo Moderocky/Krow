@@ -1,16 +1,16 @@
 package krow.compiler.handler.inmethod;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileExpectation;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileExpectation;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import mx.kenzie.foundation.Type;
 
 import static mx.kenzie.foundation.WriteInstruction.*;
 
-public class ReturnHandler implements Handler {
+public class ReturnHandler implements DefaultHandler {
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
@@ -45,7 +45,7 @@ public class ReturnHandler implements Handler {
             context.expectation = CompileExpectation.OBJECT;
             context.child.skip = (returnObject());
         }
-        return new HandleResult(null, statement.substring(6).trim(), CompileState.IN_STATEMENT);
+        return new HandleResult(null, statement.substring(6).trim(), CompileState.STATEMENT);
     }
     
     @Override

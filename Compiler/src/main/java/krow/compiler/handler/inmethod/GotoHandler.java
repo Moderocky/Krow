@@ -1,10 +1,10 @@
 package krow.compiler.handler.inmethod;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileExpectation;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileExpectation;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.PreLabel;
 import krow.compiler.pre.Signature;
@@ -13,7 +13,7 @@ import org.objectweb.asm.Label;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class GotoHandler implements Handler {
+public class GotoHandler implements DefaultHandler {
     
     private static final Pattern PATTERN = Pattern.compile("^goto\\s+(?<name>" + Signature.IDENTIFIER + ")\\s*(?=;)");
     
@@ -37,7 +37,7 @@ public class GotoHandler implements Handler {
         final Label to = label.use();
         context.statement((writer, method) -> method.visitJumpInsn(167, to));
         context.expectation = CompileExpectation.DEAD_END;
-        return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.IN_STATEMENT);
+        return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.STATEMENT);
     }
     
     @Override

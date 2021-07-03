@@ -1,10 +1,10 @@
 package krow.compiler.handler.inmethod;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileExpectation;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileExpectation;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.PreMethodCall;
 import krow.compiler.pre.PreVariable;
@@ -13,7 +13,7 @@ import krow.compiler.pre.Signature;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class InitCallStartHandler implements Handler {
+public class InitCallStartHandler implements DefaultHandler {
     
     private static final Pattern PATTERN = Pattern.compile("^(?<name>" + Signature.IDENTIFIER + ")\\s*\\(");
     
@@ -37,7 +37,7 @@ public class InitCallStartHandler implements Handler {
         final PreMethodCall call;
         final PreVariable variable = context.getVariable(name);
         assert variable != null;
-        context.child.nested.add(0, state == CompileState.IN_METHOD ? CompileState.IN_STATEMENT : state);
+        context.child.nested.add(0, state == CompileState.METHOD_BODY ? CompileState.STATEMENT : state);
         context.child.preparing.add(0, call = new PreMethodCall());
         context.child.point = null;
         call.dynamic = true;
@@ -45,7 +45,7 @@ public class InitCallStartHandler implements Handler {
         call.name = "<init>";
         context.child.statement(variable.load(context.getSlot(variable)));
         context.expectation = CompileExpectation.OBJECT;
-        return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.IN_CALL);
+        return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.METHOD_CALL_HEADER);
     }
     
     @Override

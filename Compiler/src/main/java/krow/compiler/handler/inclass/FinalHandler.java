@@ -1,14 +1,14 @@
 package krow.compiler.handler.inclass;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 
 import java.lang.reflect.Modifier;
 
-public class FinalHandler implements Handler {
+public class FinalHandler implements DefaultHandler {
     
     @Override
     public boolean accepts(String statement) {

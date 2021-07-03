@@ -1,10 +1,10 @@
 package krow.compiler.handler.inmethod;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileExpectation;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileExpectation;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.Signature;
 import mx.kenzie.foundation.Type;
@@ -12,7 +12,7 @@ import mx.kenzie.foundation.Type;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TypeHandler implements Handler {
+public class TypeHandler implements DefaultHandler {
     
     private static final Pattern PATTERN = Pattern.compile("^(?<target>" + Signature.TYPE_STRING + ")\\s*(?=[.#])");
     
@@ -40,7 +40,7 @@ public class TypeHandler implements Handler {
         context.child.staticState = true;
         context.expectation = CompileExpectation.MEMBER;
         return new HandleResult(null, statement.substring(length)
-            .trim(), state == CompileState.IN_METHOD ? CompileState.IN_STATEMENT : state);
+            .trim(), state == CompileState.METHOD_BODY ? CompileState.STATEMENT : state);
     }
     
     @Override

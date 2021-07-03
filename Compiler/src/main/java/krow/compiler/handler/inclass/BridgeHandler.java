@@ -1,9 +1,9 @@
 package krow.compiler.handler.inclass;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.PreMethod;
 import krow.compiler.pre.Signature;
@@ -13,7 +13,7 @@ import mx.kenzie.foundation.Type;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class BridgeHandler implements Handler {
+public class BridgeHandler implements DefaultHandler {
     private static final Pattern PATTERN = Pattern.compile("^bridge\\s*?<(?<target>.*?)>");
     
     @Override
@@ -32,7 +32,7 @@ public class BridgeHandler implements Handler {
         context.addUpcoming(HiddenModifier.BRIDGE);
         context.addUpcoming(HiddenModifier.SYNTHETIC);
         context.child.bridgeTarget = method;
-        return new HandleResult(null, statement.substring(statement.indexOf('>') + 1).trim(), CompileState.IN_CLASS);
+        return new HandleResult(null, statement.substring(statement.indexOf('>') + 1).trim(), CompileState.CLASS_BODY);
     }
     
     @Override

@@ -1,14 +1,14 @@
 package krow.compiler.handler.instatement;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileExpectation;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileExpectation;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreBracket;
 import krow.compiler.pre.PreClass;
 
-public class OpenBracketHandler implements Handler {
+public class OpenBracketHandler implements DefaultHandler {
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
@@ -25,7 +25,7 @@ public class OpenBracketHandler implements Handler {
         context.brackets().add(0, bracket = new PreBracket());
         context.expectation = CompileExpectation.NONE;
         bracket.state = state;
-        return new HandleResult(null, statement.substring(1).trim(), CompileState.IN_STATEMENT);
+        return new HandleResult(null, statement.substring(1).trim(), CompileState.STATEMENT);
     }
     
     @Override

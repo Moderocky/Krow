@@ -1,13 +1,13 @@
 package krow.compiler.handler.inclass;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileExpectation;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileExpectation;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 
-public class DeadEndHandler implements Handler {
+public class DeadEndHandler implements DefaultHandler {
     
     @Override
     public boolean accepts(String statement) {
@@ -16,14 +16,14 @@ public class DeadEndHandler implements Handler {
     
     @Override
     public HandleResult handle(String statement, PreClass data, CompileContext context) {
-        context.child = new CompileContext();
+        context.createChild();
         context.variables.clear();
         context.currentField = null;
         context.currentMethod = null;
         context.method = null;
         context.clearUpcoming();
         context.expectation = CompileExpectation.NONE;
-        return new HandleResult(null, statement.substring(1).trim(), CompileState.IN_CLASS);
+        return new HandleResult(null, statement.substring(1).trim(), CompileState.CLASS_BODY);
     }
     
     @Override

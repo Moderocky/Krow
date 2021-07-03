@@ -1,17 +1,17 @@
 package krow.compiler.handler.instatement;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileExpectation;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileExpectation;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.PreStructure;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class StructImplicitHandler implements Handler {
+public class StructImplicitHandler implements DefaultHandler {
     
     private static final Pattern PATTERN = Pattern.compile("^struct\\s*\\(");
     
@@ -36,7 +36,7 @@ public class StructImplicitHandler implements Handler {
         context.expectation = CompileExpectation.OBJECT;
         context.child.nested.add(0, state);
         context.child.statement(structure.allocate);
-        return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.IN_STRUCT_HEADER);
+        return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.IMPLICIT_STRUCT_HEADER);
     }
     
     @Override

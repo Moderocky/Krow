@@ -1,9 +1,9 @@
 package krow.compiler.handler.root;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.Signature;
 import krow.compiler.util.BracketReader;
@@ -12,7 +12,7 @@ import mx.kenzie.foundation.Type;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ExportHandler implements Handler {
+public class ExportHandler implements DefaultHandler {
     private static final Pattern PATTERN = Pattern.compile("^export\\s*?<([^<>]*?)>");
     
     @Override
@@ -32,7 +32,7 @@ public class ExportHandler implements Handler {
                 new Signature(string.trim(), context.availableTypes().toArray(new Type[0])).export(context);
             }
         }
-        return new HandleResult(null, statement.substring(statement.indexOf('>') + 1).trim(), CompileState.ROOT);
+        return new HandleResult(null, statement.substring(statement.indexOf('>') + 1).trim(), CompileState.FILE_ROOT);
     }
     
     @Override

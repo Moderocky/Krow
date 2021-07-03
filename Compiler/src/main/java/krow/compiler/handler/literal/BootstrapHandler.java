@@ -1,10 +1,10 @@
 package krow.compiler.handler.literal;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileExpectation;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileExpectation;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.PreMethod;
 import krow.compiler.pre.Signature;
@@ -15,7 +15,7 @@ import java.lang.invoke.CallSite;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class BootstrapHandler implements Handler {
+public class BootstrapHandler implements DefaultHandler {
     
     private static final Pattern PATTERN = Pattern.compile("^" + Signature.METHOD_PATTERN.pattern() + "\\s*(?=;)");
     
@@ -38,12 +38,12 @@ public class BootstrapHandler implements Handler {
         context.child.point = new Type(CallSite.class);
         context.child.statement(WriteInstruction.loadConstant(method.handle()));
         context.expectation = CompileExpectation.NONE;
-        if (state == CompileState.IN_CONST) {
+        if (state == CompileState.CONST_DECLARATION) {
             context.saveConstant.value = method.handle();
             context.expectation = CompileExpectation.DEAD_END;
         }
         return new HandleResult(null, statement.substring(input.length())
-            .trim(), state == CompileState.IN_METHOD ? CompileState.IN_STATEMENT : state);
+            .trim(), state == CompileState.METHOD_BODY ? CompileState.STATEMENT : state);
     }
     
     @Override

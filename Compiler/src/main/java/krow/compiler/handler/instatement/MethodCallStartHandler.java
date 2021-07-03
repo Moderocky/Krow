@@ -1,10 +1,10 @@
 package krow.compiler.handler.instatement;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileExpectation;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileExpectation;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.PreMethodCall;
 import krow.compiler.pre.Signature;
@@ -13,7 +13,7 @@ import mx.kenzie.foundation.Type;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MethodCallStartHandler implements Handler {
+public class MethodCallStartHandler implements DefaultHandler {
     
     private static final Pattern PATTERN = Pattern.compile("^\\.\\s*(?<name>" + Signature.IDENTIFIER + ")\\s*\\(");
     
@@ -36,14 +36,14 @@ public class MethodCallStartHandler implements Handler {
         final Type type = context.child.point;
         boolean dynamic = !context.child.staticState;
         final PreMethodCall call;
-        context.child.nested.add(0, state == CompileState.IN_METHOD ? CompileState.IN_STATEMENT : state);
+        context.child.nested.add(0, state == CompileState.METHOD_BODY ? CompileState.STATEMENT : state);
         context.child.preparing.add(0, call = new PreMethodCall());
         context.child.point = null;
         call.dynamic = dynamic;
         call.owner = type;
         call.name = name;
         context.expectation = CompileExpectation.OBJECT;
-        return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.IN_CALL);
+        return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.METHOD_CALL_HEADER);
     }
     
     @Override

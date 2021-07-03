@@ -1,6 +1,7 @@
-package krow.compiler;
+package krow.compiler.api;
 
-import krow.compiler.instruction.Instruction;
-
+/**
+ * The handler result - used for multiple returns.
+ */
 public record HandleResult(Instruction instruction, String remainder, CompileState future) {
 }

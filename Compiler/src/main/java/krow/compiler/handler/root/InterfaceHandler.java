@@ -1,9 +1,9 @@
 package krow.compiler.handler.root;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.Signature;
 import mx.kenzie.foundation.Type;
@@ -12,7 +12,7 @@ import org.objectweb.asm.Opcodes;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class InterfaceHandler implements Handler {
+public class InterfaceHandler implements DefaultHandler {
     private static final Pattern PATTERN = Pattern.compile("^interface\\s+(" + Signature.TYPE_STRING + ")");
     
     Matcher matcher;
@@ -32,7 +32,7 @@ public class InterfaceHandler implements Handler {
         data.path = Type.of(group);
         context.addUpcoming(Opcodes.ACC_INTERFACE);
 //        context.addUpcoming(Opcodes.ACC_ABSTRACT);
-        return new HandleResult(null, statement.substring(instruction.length()).trim(), CompileState.ROOT);
+        return new HandleResult(null, statement.substring(instruction.length()).trim(), CompileState.FILE_ROOT);
     }
     
     @Override

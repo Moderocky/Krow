@@ -1,17 +1,17 @@
 package krow.compiler.handler.instatement;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileExpectation;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileExpectation;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import mx.kenzie.foundation.Type;
 import mx.kenzie.foundation.WriteInstruction;
 
 import java.util.Collections;
 
-public class DeadEndHandler implements Handler {
+public class DeadEndHandler implements DefaultHandler {
     
     @Override
     public boolean accepts(String statement) {
@@ -49,7 +49,7 @@ public class DeadEndHandler implements Handler {
         context.lookingFor = null;
         context.duplicate = false;
         context.expectation = CompileExpectation.NONE;
-        return new HandleResult(null, statement.substring(1).trim(), CompileState.IN_METHOD);
+        return new HandleResult(null, statement.substring(1).trim(), CompileState.METHOD_BODY);
     }
     
     @Override

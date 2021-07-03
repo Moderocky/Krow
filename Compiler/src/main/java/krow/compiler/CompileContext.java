@@ -1,5 +1,8 @@
 package krow.compiler;
 
+import krow.compiler.api.CompileExpectation;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.Library;
 import krow.compiler.pre.*;
 import mx.kenzie.foundation.*;
 
@@ -14,6 +17,8 @@ public class CompileContext {
     
     public CompileState superState;
     
+    protected KrowCompiler compiler;
+    public HandlerSet handlers;
     public List<Type> availableTypes = new ArrayList<>();
     public List<PreMethod> availableMethods = new ArrayList<>();
     public List<PreField> availableFields = new ArrayList<>();
@@ -85,6 +90,24 @@ public class CompileContext {
     public FieldBuilder currentField;
     public MethodBuilder currentMethod;
     public PreMethod method;
+    
+    public void createChild() {
+        this.child = new CompileContext();
+        this.child.handlers = handlers;
+    }
+    
+    public void addCompileTimeLibrary(final String identifier) {
+        Library library = null;
+        for (final Library check : compiler.getLibraries()) {
+            if (!check.identifier().equals(identifier)) continue;
+            library = check;
+            break;
+        }
+        if (library == null) throw new RuntimeException("Library '" + identifier + "' not registered.");
+        for (final CompileState state : handlers.keySet()) {
+            handlers.get(state).addAll(library.getHandlers(state));
+        }
+    }
     
     public List<PreLabel> labels() {
         return child != null ? child.labels() : labels;

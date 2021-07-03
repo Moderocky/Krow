@@ -1,7 +1,7 @@
 package krow.compiler.pre;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileState;
+import krow.compiler.api.CompileState;
 import mx.kenzie.foundation.Type;
 import mx.kenzie.foundation.WriteInstruction;
 

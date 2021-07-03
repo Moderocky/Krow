@@ -1,16 +1,16 @@
 package krow.compiler.handler.root;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.Signature;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ExtendsHandler implements Handler {
+public class ExtendsHandler implements DefaultHandler {
     private static final Pattern PATTERN = Pattern.compile("^extends\\s+(" + Signature.TYPE_STRING + ")");
     
     @Override
@@ -25,7 +25,7 @@ public class ExtendsHandler implements Handler {
         final String instruction = matcher.group();
         final String group = matcher.group(1);
         data.extend = context.resolveType(group);
-        return new HandleResult(null, statement.substring(instruction.length()).trim(), CompileState.ROOT);
+        return new HandleResult(null, statement.substring(instruction.length()).trim(), CompileState.FILE_ROOT);
     }
     
     @Override

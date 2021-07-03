@@ -1,10 +1,10 @@
 package krow.compiler.handler.instatement;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileExpectation;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileExpectation;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.PreFieldCall;
 import krow.compiler.pre.Signature;
@@ -12,7 +12,7 @@ import krow.compiler.pre.Signature;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DynamicFieldAssignHandler implements Handler {
+public class DynamicFieldAssignHandler implements DefaultHandler {
     
     private static final Pattern PATTERN = Pattern.compile("^#\\s*(?<name>" + Signature.IDENTIFIER + ")\\s*=");
     Matcher matcher;
@@ -40,7 +40,7 @@ public class DynamicFieldAssignHandler implements Handler {
         context.child.point = null;
         context.child.staticState = false;
         context.expectation = CompileExpectation.OBJECT;
-        return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.IN_STATEMENT);
+        return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.STATEMENT);
     }
     
     @Override

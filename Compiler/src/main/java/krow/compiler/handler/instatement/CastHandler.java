@@ -1,9 +1,9 @@
 package krow.compiler.handler.instatement;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.Signature;
 import mx.kenzie.foundation.Type;
@@ -12,7 +12,7 @@ import mx.kenzie.foundation.WriteInstruction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CastHandler implements Handler {
+public class CastHandler implements DefaultHandler {
     
     private static final Pattern PATTERN = Pattern.compile("^<\\s*(?<name>" + Signature.TYPE_STRING + ")\\s*>");
     

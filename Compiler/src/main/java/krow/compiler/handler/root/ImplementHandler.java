@@ -1,9 +1,9 @@
 package krow.compiler.handler.root;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.Signature;
 import krow.compiler.util.BracketReader;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ImplementHandler implements Handler {
+public class ImplementHandler implements DefaultHandler {
     private static final Pattern PATTERN = Pattern.compile("^implements?\\s*?<([^<>]*?)>");
     
     Matcher matcher;
@@ -37,7 +37,7 @@ public class ImplementHandler implements Handler {
             }
         }
         data.interfaces.addAll(list);
-        return new HandleResult(null, statement.substring(statement.indexOf('>') + 1).trim(), CompileState.ROOT);
+        return new HandleResult(null, statement.substring(statement.indexOf('>') + 1).trim(), CompileState.FILE_ROOT);
     }
     
     @Override

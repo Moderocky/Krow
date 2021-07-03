@@ -1,9 +1,9 @@
 package krow.compiler.handler.inmethod;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
-import krow.compiler.handler.Handler;
+import krow.compiler.DefaultHandler;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreBracket;
 import krow.compiler.pre.PreClass;
 import mx.kenzie.foundation.Type;
@@ -12,7 +12,7 @@ import org.objectweb.asm.Label;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class IfHandler implements Handler {
+public class IfHandler implements DefaultHandler {
     
     private static final Pattern PATTERN = Pattern.compile("^if\\s+\\(");
     
@@ -38,8 +38,8 @@ public class IfHandler implements Handler {
         context.child.skip = (writer, method) -> method.visitLabel(end);
         final PreBracket bracket;
         context.brackets().add(0, bracket = new PreBracket());
-        bracket.state = CompileState.IN_METHOD;
-        return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.IN_STATEMENT);
+        bracket.state = CompileState.METHOD_BODY;
+        return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.STATEMENT);
     }
     
     @Override

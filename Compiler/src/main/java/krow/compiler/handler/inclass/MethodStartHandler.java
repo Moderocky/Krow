@@ -1,10 +1,10 @@
 package krow.compiler.handler.inclass;
 
 import krow.compiler.CompileContext;
-import krow.compiler.CompileState;
-import krow.compiler.HandleResult;
+import krow.compiler.DefaultHandler;
 import krow.compiler.Resolver;
-import krow.compiler.handler.Handler;
+import krow.compiler.api.CompileState;
+import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.PreMethod;
 import krow.compiler.pre.PreVariable;
@@ -15,7 +15,7 @@ import java.lang.reflect.Modifier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MethodStartHandler implements Handler {
+public class MethodStartHandler implements DefaultHandler {
     private static final Pattern PATTERN = Pattern.compile("^(?<type>" + Signature.TYPE_STRING + ")\\s+(?<name>" + Signature.IDENTIFIER + ")\\s*\\(");
     
     Matcher matcher;
@@ -40,7 +40,7 @@ public class MethodStartHandler implements Handler {
             context.child.variables.add(new PreVariable("this", data.path));
         }
         return new HandleResult(null, statement.substring(statement.indexOf('(') + 1)
-            .trim(), CompileState.IN_METHOD_HEADER);
+            .trim(), CompileState.METHOD_HEADER_DECLARATION);
     }
     
     @Override
