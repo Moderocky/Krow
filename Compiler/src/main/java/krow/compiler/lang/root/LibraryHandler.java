@@ -1,18 +1,17 @@
-package krow.compiler.handler.root;
+package krow.compiler.lang.root;
 
 import krow.compiler.CompileContext;
 import krow.compiler.DefaultHandler;
 import krow.compiler.api.CompileState;
 import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
-import mx.kenzie.foundation.Type;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @SuppressWarnings("ALL")
 public class LibraryHandler implements DefaultHandler {
-    private static final Pattern PATTERN = Pattern.compile("^library\\s+(?<name>[^\\s;\"])\\s*(?=;)");
+    private static final Pattern PATTERN = Pattern.compile("^library\\s+(?<name>[^\\s;\"]+)\\s*;");
     
     Matcher matcher;
     
@@ -26,10 +25,6 @@ public class LibraryHandler implements DefaultHandler {
         final String instruction = matcher.group();
         final String group = matcher.group("name");
         context.addCompileTimeLibrary(group.trim());
-        if (context.isClass || context.isInterface)
-            throw new RuntimeException("Duplicate member declaration: '" + group + "'");
-        context.isClass = true;
-        data.path = Type.of(group);
         return new HandleResult(null, statement.substring(instruction.length()).trim(), CompileState.FILE_ROOT);
     }
     

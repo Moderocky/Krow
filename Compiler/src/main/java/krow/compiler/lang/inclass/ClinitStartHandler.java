@@ -1,4 +1,4 @@
-package krow.compiler.handler.inclass;
+package krow.compiler.lang.inclass;
 
 import krow.compiler.CompileContext;
 import krow.compiler.DefaultHandler;

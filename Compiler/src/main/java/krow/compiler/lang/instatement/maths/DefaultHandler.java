@@ -1,4 +1,4 @@
-package krow.compiler.handler.instatement.maths;
+package krow.compiler.lang.instatement.maths;
 
 import krow.compiler.CompileContext;
 import krow.compiler.api.CompileExpectation;

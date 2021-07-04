@@ -10,36 +10,41 @@ import krow.compiler.pre.PreClass;
 import krow.compiler.pre.PreMethod;
 import krow.compiler.pre.Signature;
 import krow.compiler.util.HiddenModifier;
+import krow.compiler.util.SourceReader;
 import mx.kenzie.foundation.Type;
+import mx.kenzie.foundation.WriteInstruction;
 
+import java.lang.reflect.Method;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class BindHandler implements Handler {
-    private static final Pattern PATTERN = Pattern.compile("^bind\\s*?<(?<target>.*?)>");
+public class CloneHandler implements Handler {
+    private static final Pattern PATTERN = Pattern.compile("^clone\\s*?<(?<target>.*?)>");
     Matcher matcher;
     
     @Override
     public boolean accepts(String statement) {
-        return statement.startsWith("bind") && PATTERN.matcher(statement).find();
+        return statement.startsWith("clone") && (matcher = PATTERN.matcher(statement)).find();
     }
     
     @Override
     public HandleResult handle(String statement, PreClass data, CompileContext context) {
-        final Matcher matcher = PATTERN.matcher(statement);
-        matcher.find();
         final String group = matcher.group("target");
         final Signature signature = new Signature(group.trim(), context.availableTypes().toArray(new Type[0]));
         assert signature.getType() == Signature.Mode.METHOD;
-        final PreMethod method = context.findMethod(signature);
+        final PreMethod pre = context.findMethod(signature);
+        final Method method = pre.getLoadCopy();
+        if (method == null) throw new RuntimeException("Method unavailable to compiler: '" + pre + "'");
+        final List<WriteInstruction> instructions = SourceReader.getSource(method);
         context.addUpcoming(HiddenModifier.SYNTHETIC);
-        context.child.bridgeTarget = method;
+        context.child.advance.addAll(instructions);
         return new HandleResult(null, statement.substring(statement.indexOf('>') + 1).trim(), CompileState.CLASS_BODY);
     }
     
     @Override
     public String debugName() {
-        return "UPCOMING_BIND";
+        return "UPCOMING_CLONE";
     }
     
     @Override

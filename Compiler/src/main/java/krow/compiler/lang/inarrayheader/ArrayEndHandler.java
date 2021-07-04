@@ -1,4 +1,4 @@
-package krow.compiler.handler.inarrayheader;
+package krow.compiler.lang.inarrayheader;
 
 import krow.compiler.CompileContext;
 import krow.compiler.DefaultHandler;

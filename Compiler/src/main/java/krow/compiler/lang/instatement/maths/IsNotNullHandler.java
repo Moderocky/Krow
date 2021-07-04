@@ -9,14 +9,15 @@ import krow.compiler.pre.PreClass;
 import mx.kenzie.foundation.Type;
 import mx.kenzie.foundation.WriteInstruction;
 import org.objectweb.asm.Label;
+import org.objectweb.asm.Opcodes;
 
-public class IsNullHandler implements DefaultHandler {
+public class IsNotNullHandler implements DefaultHandler {
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
         return switch (context.expectation) {
             case DEAD_END, DOWN, UP -> false;
-            default -> (statement.startsWith("?")) && context.child.point == null;
+            default -> (statement.startsWith("!?")) && context.child.point == null;
         };
     }
     
@@ -25,25 +26,24 @@ public class IsNullHandler implements DefaultHandler {
         final WriteInstruction first, second;
         final Label label = new Label(), end = new Label();
         first = (writer, method) -> {
-            method.visitJumpInsn(198, label);
-            method.visitInsn(4);
-            method.visitJumpInsn(167, end);
+            method.visitJumpInsn(Opcodes.IFNONNULL, label);
+            method.visitInsn(Opcodes.ICONST_1);
+            method.visitJumpInsn(Opcodes.GOTO, end);
             method.visitLabel(label);
-            method.visitInsn(3);
+            method.visitInsn(Opcodes.ICONST_0);
+            method.visitLabel(end);
         };
-        second = (writer, method) -> method.visitLabel(end);
         context.child.statement(first);
-        context.child.statement(second);
         context.expectation = CompileExpectation.OBJECT;
         context.lookingFor = context.child.point;
         context.child.point = null;
         context.child.pointAfter = new Type(boolean.class);
         context.child.swap(true);
-        return new HandleResult(null, statement.substring(1).trim(), state);
+        return new HandleResult(null, statement.substring(2).trim(), state);
     }
     
     @Override
     public String debugName() {
-        return "IS_NULL";
+        return "IS_NOT_NULL";
     }
 }

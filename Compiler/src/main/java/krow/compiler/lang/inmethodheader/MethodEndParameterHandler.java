@@ -1,4 +1,4 @@
-package krow.compiler.handler.inmethodheader;
+package krow.compiler.lang.inmethodheader;
 
 import krow.compiler.CompileContext;
 import krow.compiler.DefaultHandler;
@@ -36,7 +36,12 @@ public class MethodEndParameterHandler implements DefaultHandler {
         builder.addParameter(method.parameters.toArray(new Type[0]));
         builder.setReturnType(method.returnType);
         context.expectation = CompileExpectation.DOWN;
-        if (context.child.bridgeTarget != null) {
+        if (!context.child.advance.isEmpty()) {
+            // TODO use this more ?
+            builder.writeCode(context.child.advance.toArray(new WriteInstruction[0]));
+            context.child.advance.clear();
+            context.expectation = CompileExpectation.DEAD_END;
+        } else if (context.child.bridgeTarget != null) {
             // TODO better bridge method handler ?
             final PreMethod target = context.child.bridgeTarget;
             int slot = 0;
