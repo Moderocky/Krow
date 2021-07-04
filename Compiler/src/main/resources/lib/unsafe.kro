@@ -1,0 +1,68 @@
+library krow.binder;
+import <
+    sun/misc/Unsafe,
+    sun/reflect/ReflectionFactory,
+    krow/memory/OverseerTemplate
+>
+export <>
+final class krow/memory/Overseer {
+
+    static final Unsafe UNSAFE;
+    static final ReflectionFactory FACTORY;
+
+    import <Unsafe.theUnsafe:Unsafe>
+    static void <clinit> () {
+        Unsafe unsafe = Unsafe#theUnsafe;
+        Overseer.UNSAFE = unsafe;
+        Overseer.FACTORY = ReflectionFactory.getReflectionFactory();
+    }
+
+    export <>
+    static Unsafe getUnsafe() {
+        return Overseer.UNSAFE;
+    }
+
+    clone <OverseerTemplate::getMemorySize(Class,Unsafe)J>
+    static long getMemorySize(Class cls, Unsafe unsafe);
+
+    clone <OverseerTemplate::getAddress(Object,Unsafe)J>
+    static long getAddress(Object object, Unsafe unsafe);
+
+    clone <OverseerTemplate::allocateInstance(Class,Unsafe)Object>
+    static Object allocateInstance(Class type, Unsafe unsafe);
+
+    export <>
+    static long getAddress(Object object) {
+        return Overseer.getAddress(object, Overseer.UNSAFE);
+    }
+
+    export <>
+    static long getMemorySize(Class cls) {
+        long length = Overseer.getMemorySize(cls, Overseer.UNSAFE);
+        return length;
+    }
+
+    export <>
+    static Object allocateInstance(Class type) {
+        return Overseer.allocateInstance(object, Overseer.UNSAFE);
+    }
+
+    export <>
+    static long allocateMemory(Class cls) {
+        long length = Overseer.getMemorySize(cls, Overseer.UNSAFE);
+        long pointer = Overseer.UNSAFE.allocateMemory(length);
+        return pointer;
+    }
+
+    export <>
+    static long allocateMemory(long length) {
+        long pointer = Overseer.UNSAFE.allocateMemory(length);
+        return pointer;
+    }
+
+    export <>
+    static void freeMemory(long pointer) {
+        Overseer.UNSAFE.freeMemory(pointer);
+    }
+
+}

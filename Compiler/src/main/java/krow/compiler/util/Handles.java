@@ -31,6 +31,27 @@ public class Handles {
         }
     }
     
+    public static Handle getHandle(final Method method) {
+        final int code;
+        if (Modifier.isStatic(method.getModifiers())) code = H_INVOKESTATIC;
+        else if (Modifier.isAbstract(method.getModifiers())) code = H_INVOKEINTERFACE;
+        else if (Modifier.isPrivate(method.getModifiers())) code = H_INVOKESPECIAL;
+        else code = H_INVOKEVIRTUAL;
+        return new Handle(code, new Type(method.getDeclaringClass()).internalName(), method.getName(), getDescriptor(new Type(method.getReturnType()), Type.of(method.getParameterTypes())), code == H_INVOKEINTERFACE);
+    }
+    
+    public static String getDescriptor(final Type ret, final Type... params) {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("(");
+        for (Type type : params) {
+            builder.append(type.descriptorString());
+        }
+        builder
+            .append(")")
+            .append(ret.descriptorString());
+        return builder.toString();
+    }
+    
     public static Handle getBFG(boolean dynamic, boolean setter) {
         try {
             if (setter) {
@@ -73,29 +94,8 @@ public class Handles {
         }
     }
     
-    public static Handle getHandle(final Method method) {
-        final int code;
-        if (Modifier.isStatic(method.getModifiers())) code = H_INVOKESTATIC;
-        else if (Modifier.isAbstract(method.getModifiers())) code = H_INVOKEINTERFACE;
-        else if (Modifier.isPrivate(method.getModifiers())) code = H_INVOKESPECIAL;
-        else code = H_INVOKEVIRTUAL;
-        return new Handle(code, new Type(method.getDeclaringClass()).internalName(), method.getName(), getDescriptor(new Type(method.getReturnType()), Type.of(method.getParameterTypes())), code == H_INVOKEINTERFACE);
-    }
-    
     public static String getDescriptor(final PreMethod method) {
         return getDescriptor(method.returnType, method.parameters.toArray(new Type[0]));
-    }
-    
-    public static String getDescriptor(final Type ret, final Type... params) {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("(");
-        for (Type type : params) {
-            builder.append(type.descriptorString());
-        }
-        builder
-            .append(")")
-            .append(ret.descriptorString());
-        return builder.toString();
     }
     
 }

@@ -1,6 +1,6 @@
 package krow.compiler.api;
 
-import krow.compiler.DefaultHandler;
+import mx.kenzie.foundation.language.PostCompileClass;
 
 import java.util.Collection;
 
@@ -28,6 +28,14 @@ public interface Library {
      */
     String name();
     
-    Collection<DefaultHandler> getHandlers(final CompileState state);
+    /**
+     * Source-level language handlers for a given compile state.
+     */
+    Collection<Handler> getHandlers(final CompileState state);
+    
+    /**
+     * Runtime dependencies to be included in complete archives.
+     */
+    Collection<PostCompileClass> getRuntime();
     
 }

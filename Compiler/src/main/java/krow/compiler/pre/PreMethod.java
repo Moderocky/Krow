@@ -16,10 +16,10 @@ import static org.objectweb.asm.Opcodes.*;
 @SuppressWarnings("ALL")
 public class PreMethod {
     
+    public final List<PreVariable> variables = new ArrayList<>();
     public Type owner;
     public Type returnType;
     public List<Type> parameters = new ArrayList<>();
-    public final List<PreVariable> variables = new ArrayList<>();
     public String name;
     public int modifiers;
     
@@ -75,6 +75,18 @@ public class PreMethod {
         else if (Modifier.isPrivate(this.modifiers)) code = H_INVOKESPECIAL;
         else code = H_INVOKEVIRTUAL;
         return new Handle(code, this.owner.internalName(), this.name, getDescriptor(returnType, parameters.toArray(new Type[0])), code == H_INVOKEINTERFACE);
+    }
+    
+    static String getDescriptor(final Type ret, final Type... params) {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("(");
+        for (Type type : params) {
+            builder.append(type.descriptorString());
+        }
+        builder
+            .append(")")
+            .append(ret.descriptorString());
+        return builder.toString();
     }
     
     public WriteInstruction invokeDynamic(boolean dynamic) {
@@ -137,17 +149,24 @@ public class PreMethod {
         return owner.getSimpleName() + "::" + name + "(" + String.join(",", params) + ")" + returnType.getSimpleName();
     }
     
-    
-    static String getDescriptor(final Type ret, final Type... params) {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("(");
-        for (Type type : params) {
-            builder.append(type.descriptorString());
+    public Method getLoadCopy() {
+        try {
+            final Class<?> owner = Class.forName(this.owner.dotPath());
+            Method method;
+            final List<Class<?>> params = new ArrayList<>();
+            for (final Type parameter : this.parameters) {
+                final Class<?> type = Class.forName(parameter.dotPath());
+                params.add(type);
+            }
+            try {
+                method = owner.getMethod(this.name, params.toArray(new Class[0]));
+            } catch (Throwable ex) {
+                method = owner.getDeclaredMethod(this.name, params.toArray(new Class[0]));
+            }
+            return method;
+        } catch (Throwable ex) {
+            return null;
         }
-        builder
-            .append(")")
-            .append(ret.descriptorString());
-        return builder.toString();
     }
     
 }

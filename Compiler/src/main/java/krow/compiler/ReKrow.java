@@ -1,9 +1,6 @@
 package krow.compiler;
 
-import krow.compiler.api.CompileState;
-import krow.compiler.api.HandleResult;
-import krow.compiler.api.HandlerInterface;
-import krow.compiler.api.Library;
+import krow.compiler.api.*;
 import krow.compiler.pre.PreClass;
 import mx.kenzie.foundation.ClassBuilder;
 import mx.kenzie.foundation.language.Compiler;
@@ -12,7 +9,9 @@ import mx.kenzie.foundation.language.PostCompileClass;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -22,13 +21,14 @@ import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
 @SuppressWarnings("UnusedLabel")
 public class ReKrow implements Compiler<Krow>, HandlerInterface, KrowCompiler {
     
+    protected final List<Library> libraries = new ArrayList<>();
     final Pattern LINE_COMMENT = Pattern.compile("//.+(?=(\\R|$))");
     final Pattern BLOCK_COMMENT = Pattern.compile("/\\*[\\s\\S]*?\\*/");
     
-    protected final List<Library> libraries = new ArrayList<>();
-    
     public ReKrow() {
         registerLibrary(SystemLibrary.SYSTEM_LIBRARY);
+        registerLibrary(BinderLibrary.BINDER_LIBRARY);
+        registerLibrary(MemoryLibrary.MEMORY_LIBRARY);
     }
     
     public List<Library> getLibraries() {
@@ -40,19 +40,11 @@ public class ReKrow implements Compiler<Krow>, HandlerInterface, KrowCompiler {
         libraries.add(library);
     }
     
-    public DefaultHandler getHandler(final String statement, final CompileState state, final CompileContext context) {
-        return context.handlers.getHandler(statement, state, context);
+    public byte[] compile(final String file) {
+        return this.compile0(file).builder.compile();
     }
     
-    protected HandleResult compile(final String statement, final CompileState state, final PreClass data, final CompileContext context) {
-        final DefaultHandler handler = this.getHandler(statement, state, context);
-        if ("1".equals(System.getProperty("TEST_STATE"))) {
-            System.out.println(handler.owner().identifier() + "/" + handler.debugName());
-        }
-        return handler.handle0(statement, data, context, state);
-    }
-    
-    public ClassBuilder compile0(final String file) {
+    public CompileContext compile0(final String file) {
         final PreClass pre = new PreClass();
         final CompileContext context = new CompileContext();
         context.compiler = this;
@@ -68,16 +60,19 @@ public class ReKrow implements Compiler<Krow>, HandlerInterface, KrowCompiler {
         } while (result != null);
         final ClassBuilder builder = context.builder;
         if (context.exported) builder.addModifiers(ACC_PUBLIC);
-        return builder;
+        return context;
     }
     
-    public byte[] compile(final String file) {
-        return this.compile0(file).compile();
+    protected HandleResult compile(final String statement, final CompileState state, final PreClass data, final CompileContext context) {
+        final Handler handler = this.getHandler(statement, state, context);
+        if ("1".equals(System.getProperty("TEST_STATE"))) {
+            System.out.println(handler.owner().identifier() + "/" + handler.debugName());
+        }
+        return handler.handle0(statement, data, context, state);
     }
     
-    public Class<?> compileAndLoad(final String file) {
-        final ClassBuilder builder = this.compile0(file);
-        return builder.compileAndLoad();
+    public Handler getHandler(final String statement, final CompileState state, final CompileContext context) {
+        return context.handlers.getHandler(statement, state, context);
     }
     
     @Override
@@ -92,7 +87,7 @@ public class ReKrow implements Compiler<Krow>, HandlerInterface, KrowCompiler {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        final ClassBuilder finish = compile0(builder.toString());
+        final ClassBuilder finish = compile0(builder.toString()).builder;
         return new PostCompileClass(finish.compile(), finish.getName(), finish.getInternalName());
     }
     
@@ -108,8 +103,9 @@ public class ReKrow implements Compiler<Krow>, HandlerInterface, KrowCompiler {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        final ClassBuilder finish = compile0(builder.toString());
-        final List<PostCompileClass> classes = new ArrayList<>();
+        final CompileContext context = compile0(builder.toString());
+        final ClassBuilder finish = context.builder;
+        final List<PostCompileClass> classes = new ArrayList<>(context.attachments);
         classes.add(new PostCompileClass(finish.compile(), finish.getName(), finish.getInternalName()));
         for (final ClassBuilder suppressed : finish.getSuppressed()) {
             classes.add(new PostCompileClass(suppressed.compile(), suppressed.getName(), suppressed.getInternalName()));
@@ -132,9 +128,18 @@ public class ReKrow implements Compiler<Krow>, HandlerInterface, KrowCompiler {
         compileAndLoad(builder.toString());
     }
     
+    public Class<?> compileAndLoad(final String file) {
+        final CompileContext context = this.compile0(file);
+        for (PostCompileClass attachment : context.attachments) {
+            attachment.compileAndLoad();
+        }
+        final ClassBuilder builder = context.builder;
+        return builder.compileAndLoad();
+    }
+    
     @Override
     public void compileResource(String main, File file, File... files) {
-        final List<PostCompileClass> classes = new ArrayList<>();
+        final Set<PostCompileClass> classes = new HashSet<>();
         final List<File> extra = new ArrayList<>();
         final InputStream[] sources = new InputStream[files.length];
         try (
@@ -181,12 +186,13 @@ public class ReKrow implements Compiler<Krow>, HandlerInterface, KrowCompiler {
                 out.closeEntry();
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
+            throw new RuntimeException(ex);
         } finally {
             for (final InputStream source : sources) {
                 try {
                     source.close();
                 } catch (Throwable ignored) {
+                    throw new RuntimeException(ignored);
                 }
             }
         }

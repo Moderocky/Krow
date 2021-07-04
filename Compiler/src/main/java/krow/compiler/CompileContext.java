@@ -1,29 +1,36 @@
 package krow.compiler;
 
-import krow.compiler.api.CompileExpectation;
 import krow.compiler.api.CompileState;
 import krow.compiler.api.Library;
 import krow.compiler.pre.*;
 import mx.kenzie.foundation.*;
+import mx.kenzie.foundation.language.PostCompileClass;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.function.Function;
 
 @SuppressWarnings("ALL")
-public class CompileContext {
+public class CompileContext extends WorkContext {
     
-    public CompileContext child;
-    
-    public CompileState superState;
-    
-    protected KrowCompiler compiler;
-    public HandlerSet handlers;
     public final List<Type> availableTypes = new ArrayList<>();
     public final List<PreMethod> availableMethods = new ArrayList<>();
     public final List<PreField> availableFields = new ArrayList<>();
-    
+    public final List<PostCompileClass> attachments = new ArrayList<>();
+    public final Map<String, Object> constants = new HashMap<>();
+    public CompileContext child;
+    public CompileState superState;
+    public HandlerSet handlers;
+    public boolean isInterface;
+    public boolean isClass;
+    public int modifiersUpcoming;
+    public PreMethod bridgeTarget;
+    public ClassBuilder builder;
+    public FieldBuilder currentField;
+    public MethodBuilder currentMethod;
+    public PreMethod method;
+    protected KrowCompiler compiler;
+
     {
         importJava(java.lang.String.class);
         importJava(java.lang.Object.class);
@@ -50,48 +57,6 @@ public class CompileContext {
         importJava(java.lang.Number.class);
     }
     
-    public boolean isInterface;
-    public boolean isClass;
-    //region Child
-    //region Keywords Upcoming
-    public final Map<String, Object> constants = new HashMap<>();
-    public int modifiersUpcoming;
-    public PreMethod bridgeTarget;
-    //endregion
-    public final List<PreVariable> variables = new ArrayList<>();
-    private final List<WriteInstruction> statement = new ArrayList<>();
-    public final List<PreMethodCall> preparing = new ArrayList<>();
-    public final List<PreStructure> structures = new ArrayList<>();
-    public CompileExpectation expectation = CompileExpectation.NONE;
-    public WriteInstruction skip; // stacked when DEAD_END reached (eol)
-    public WriteInstruction doAfter; // done after swap
-    public Function<Type, WriteInstruction> doExpecting; // done after swap
-    public PreVariable store;
-    public Type point;
-    public Type lookingFor;
-    private boolean swap;
-    public boolean duplicate;
-    public boolean staticState;
-    public boolean inverted;
-    public final List<Object> exports = new ArrayList<>();
-    public boolean exported;
-    public boolean hasBody;
-    public boolean inReturnPhase;
-    public boolean awaitAdjustedType;
-    public PreVariable forAdjustment;
-    public PreConstant saveConstant;
-    public CompileState exitTo;
-    public final List<CompileState> nested = new ArrayList<>();
-    private final List<PreBracket> brackets = new ArrayList<>();
-    private final List<PreLabel> labels = new ArrayList<>();
-    //endregion
-    
-    
-    public ClassBuilder builder;
-    public FieldBuilder currentField;
-    public MethodBuilder currentMethod;
-    public PreMethod method;
-    
     public void createChild() {
         this.child = new CompileContext();
         this.child.handlers = handlers;
@@ -108,6 +73,7 @@ public class CompileContext {
         for (final CompileState state : handlers.keySet()) {
             handlers.get(state).addAll(library.getHandlers(state));
         }
+        attachments.addAll(library.getRuntime());
     }
     
     public List<PreLabel> labels() {
@@ -129,67 +95,15 @@ public class CompileContext {
         return child != null ? child.brackets() : brackets;
     }
     
-    public boolean swap() {
-        if (brackets().isEmpty())
-            return child != null ? child.swap() : swap;
-        else return brackets().get(0).swap;
-    }
-    
-    public void swap(final boolean value) {
-        if (brackets().isEmpty()) {
-            if (child != null) child.swap(value);
-            else swap = value;
-        } else {
-            brackets().get(0).swap = value;
-        }
-    }
-    
-    public Function<Type, WriteInstruction> doExpecting() {
-        final CompileContext context;
-        final Function<Type, WriteInstruction> after;
-        context = child == null ? this : child;
-        after = context.doExpecting;
-        context.doExpecting = null;
-        return after;
-    }
-    
-    public WriteInstruction doAfter() {
-        final CompileContext context;
-        final WriteInstruction after;
-        context = child == null ? this : child;
-        after = context.doAfter;
-        context.doAfter = null;
-        return after;
+    @Override
+    public WorkContext child() {
+        return child;
     }
     
     public List<WriteInstruction> statement() {
         if (brackets.isEmpty())
             return child == null ? statement : child.statement;
-        else return brackets.get(0).instructions;
-    }
-    
-    public void statement(final WriteInstruction instruction) {
-        final List<WriteInstruction> list = statement();
-        if (swap()) {
-            list.add(list.size() - 1, instruction);
-            swap(false);
-        } else list.add(instruction);
-        final WriteInstruction after = doAfter();
-        final Function<Type, WriteInstruction> expecting = doExpecting();
-        if (after != null) list.add(after);
-        if (expecting != null) list.add(expecting.apply(point));
-    }
-    
-    public void statementRaw(final WriteInstruction instruction) {
-        final List<WriteInstruction> list = child == null ? statement : child.statement;
-        if (swap()) {
-            list.add(list.size() - 1, instruction);
-            swap(false);
-        } else list.add(instruction);
-        final WriteInstruction after = doAfter();
-        final Function<Type, WriteInstruction> expecting = doExpecting();
-        if (after != null) list.add(after);
-        if (expecting != null) list.add(expecting.apply(point));
+        else return brackets.get(0).statement();
     }
     
     public void importJava(final Class<?> cls) {

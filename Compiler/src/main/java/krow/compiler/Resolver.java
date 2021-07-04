@@ -82,10 +82,6 @@ public class Resolver {
         return new Type(resolveStructurePath(resolveStructure(signature, types)));
     }
     
-    private record Result(String remainder, PreStructure type) {
-    
-    }
-    
     @SuppressWarnings("UnusedAssignment")
     private static Result resolveStructure0(final String signature, final Type... types) {
         final String inner = signature.substring(2);
@@ -156,6 +152,10 @@ public class Resolver {
         buffer.putInt(4, second);
         final long strong = buffer.getLong();
         return "krow.lang.Structure$L" + Math.abs(label) + "W" + Math.abs(weak) + "S" + Math.abs(strong);
+    }
+    
+    private record Result(String remainder, PreStructure type) {
+    
     }
     
 }

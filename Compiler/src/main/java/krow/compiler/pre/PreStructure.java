@@ -20,11 +20,10 @@ import static org.objectweb.asm.Opcodes.DUP;
 @SuppressWarnings("ALL")
 public class PreStructure {
     
-    private Type type;
     public final Map<String, Type> fields = new LinkedHashMap<>();
-    PreField[] preFields;
-    
     public final WriteInstruction allocate = new AlterableWriteInstruction();
+    PreField[] preFields;
+    private Type type;
     
     public PreStructure() {
     
@@ -47,10 +46,6 @@ public class PreStructure {
         return "S(" + String.join(",", list) + ")";
     }
     
-    public Type getType() {
-        return type != null ? type : (type = Resolver.resolveStructureType(this));
-    }
-    
     public PreField[] getFields() {
         if (preFields != null) return preFields;
         final List<PreField> fields = new ArrayList<>();
@@ -58,6 +53,10 @@ public class PreStructure {
             fields.add(new PreField(getType(), entry.getValue(), entry.getKey()));
         }
         return preFields = fields.toArray(new PreField[0]);
+    }
+    
+    public Type getType() {
+        return type != null ? type : (type = Resolver.resolveStructureType(this));
     }
     
     public void generate(final CompileContext context) {

@@ -45,6 +45,47 @@ ReKrow is a 'flyover' compiler. This means it reads the input source in one line
 
 ReKrow uses [ASM](https://asm.ow2.io/) for assembling its output bytecode. ASM is a very old and established tool, so much so that the Java JDK uses it internally.
 
+## Krow Compiler Libraries
+
+The ReKrow compiler uses modular 'Libraries' which define all the keywords and compile-time behaviour.
+Additional libraries can be used to add new source-level language features on a per-file basis.
+
+This gives Krow the potential to have DSL modifications added, to tailor the language for a particular use case.
+As libraries may also export (compiled) classes to the Krow runtime, this means that modifiers have much more freedom as to what they can and cannot add.
+
+Libraries are registered at the top of the file (in the root level) by name, for example:
+```java 
+library krow.binder;
+library my.custom.library;
+class org/example/MyClass {
+    
+}
+```
+
+Libraries can:
+- Register new keywords.
+- Register new language concepts.
+- Register new operators.
+- Register new in-statement behaviour.
+- Register new class-level or block-level structures.
+- Export utility classes to the Krow runtime.
+
+Libraries cannot:
+- Overload base language structures.
+- Remove existing language structures.
+- Add new compile-states.
+
+### Built-in Libraries
+
+Krow maintains a few built-in libraries: `krow.binder` (for API creation and internal language modification) and `krow.memory` for direct memory management.
+
+These features were moved to separate libraries in order to preserve the language integrity and, also, to avoid bloating the runtime with unused features.
+
+#### Binder
+
+Binder adds a `clone` method metadata keyword. This allows the programmer to target an existing Java method (available at compile-time) and directly copy its bytecode into a synthetic result method.
+This allows a combination of Java and Krow source code to be used in a single class.
+
 ## The Krow Runtime
 
 Krow has a runtime environment. This is very small (limited to a couple of classes) and designed to be as unobtrusive as possible. Basic Krow can be used without the runtime, but some of the more advanced features (structs, dynamic invocation, targets) require it.

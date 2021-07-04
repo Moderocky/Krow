@@ -3,10 +3,20 @@ package krow.test;
 import krow.compiler.Resolver;
 import krow.compiler.pre.PreStructure;
 import krow.compiler.pre.Signature;
+import krow.compiler.util.SourceReader;
+import mx.kenzie.foundation.ClassBuilder;
 import mx.kenzie.foundation.Type;
+import mx.kenzie.foundation.WriteInstruction;
 import org.junit.Test;
 
+import java.lang.reflect.Modifier;
+import java.util.List;
+
 public class ResolutionTest {
+    
+    public static void test() {
+        System.out.println("hello");
+    }
     
     @Test
     public void types() {
@@ -66,6 +76,16 @@ public class ResolutionTest {
         assert Object.class.descriptorString().equals(new Type(Object.class).descriptorString());
         assert org.objectweb.asm.Type.getInternalName(String.class).equals(new Type(String.class).internalName());
         assert int.class.descriptorString().equals(new Type(int.class).descriptorString());
+    }
+    
+    @Test
+    public void source() throws Throwable {
+        final List<WriteInstruction> list = SourceReader.getSource(ResolutionTest.class.getMethod("test"));
+        final Class<?> cls = new ClassBuilder("Blob").addModifiers(Modifier.PUBLIC)
+            .addMethod("test").addModifiers(Modifier.STATIC, Modifier.PUBLIC)
+            .writeCode(list.toArray(new WriteInstruction[0])).finish().compileAndLoad();
+        assert cls != null;
+        cls.getMethod("test").invoke(null);
     }
     
 }

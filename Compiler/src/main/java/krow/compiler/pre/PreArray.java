@@ -13,19 +13,6 @@ public class PreArray extends PreMethodCall {
     public int dimensions;
     public int length;
     
-    public int length() {
-        return length;
-    }
-    
-    public WriteInstruction create() {
-        assert type.isArray();
-        final Type component = type.componentType();
-        return (writer, method) -> {
-            method.visitIntInsn(BIPUSH, length());
-            method.visitTypeInsn(ANEWARRAY, component.internalName());
-        };
-    }
-    
     public WriteInstruction create(int[] dims) {
         assert type.isArray();
         final Type component = type;
@@ -40,6 +27,19 @@ public class PreArray extends PreMethodCall {
     @Override
     public WriteInstruction execute(CompileContext context) {
         return create();
+    }
+    
+    public WriteInstruction create() {
+        assert type.isArray();
+        final Type component = type.componentType();
+        return (writer, method) -> {
+            method.visitIntInsn(BIPUSH, length());
+            method.visitTypeInsn(ANEWARRAY, component.internalName());
+        };
+    }
+    
+    public int length() {
+        return length;
     }
     
     @Override

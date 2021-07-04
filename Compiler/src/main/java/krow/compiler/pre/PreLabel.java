@@ -8,8 +8,8 @@ import java.util.List;
 
 public class PreLabel {
     
-    public String name;
     protected final List<Label> uses = new ArrayList<>();
+    public String name;
     
     public Label use() {
         final Label label;

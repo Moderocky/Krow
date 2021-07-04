@@ -1,27 +1,27 @@
 package krow.compiler.pre;
 
 import krow.compiler.CompileContext;
+import krow.compiler.WorkContext;
 import krow.compiler.api.CompileState;
 import mx.kenzie.foundation.Type;
 import mx.kenzie.foundation.WriteInstruction;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @SuppressWarnings("ALL")
-public class PreBracket {
+public class PreBracket extends WorkContext {
     
-    public final List<WriteInstruction> instructions = new ArrayList<>();
     public Type exitType;
     public CompileState state;
-    public boolean swap;
     
     public void close(final CompileContext context) {
-        context.statementRaw((codeWriter, methodVisitor) -> {
-            for (WriteInstruction instruction : instructions) {
+        context.child.statementRaw((codeWriter, methodVisitor) -> {
+            for (WriteInstruction instruction : statement) {
                 instruction.accept(codeWriter, methodVisitor);
             }
         });
     }
     
+    @Override
+    public WorkContext child() {
+        return null;
+    }
 }

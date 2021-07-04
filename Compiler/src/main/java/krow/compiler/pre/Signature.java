@@ -11,20 +11,27 @@ public class Signature {
     
     public static final String IDENTIFIER = "\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*";
     public static final String TYPE_STRING = IDENTIFIER + "(/" + IDENTIFIER + ")*(?:\\[])*";
-    public static final String ARRAY_TYPE_STRING = IDENTIFIER + "(/" + IDENTIFIER + ")*(?:\\[])+";
     public static final String STRUCTURE_STRING = "S\\(" + IDENTIFIER + ":" + TYPE_STRING + "(," + IDENTIFIER + ":" + TYPE_STRING + ")*" + "\\)";
     public static final String CL_TYPE_STRING = "(" + TYPE_STRING + "|" + STRUCTURE_STRING + ")";
+    public static final Pattern METHOD_PATTERN = Pattern.compile(TYPE_STRING + "::" + IDENTIFIER + "\\(" + "(" + CL_TYPE_STRING + ",?)*" + "\\)" + CL_TYPE_STRING);
+    public static final Pattern STRUCTURE_PATTERN = Pattern.compile(STRUCTURE_STRING);
     public static final Pattern TYPE_PATTERN = Pattern.compile(TYPE_STRING);
     public static final Pattern FIELD_PATTERN = Pattern.compile(TYPE_STRING + "\\." + IDENTIFIER + ":" + TYPE_STRING);
-    public static final Pattern STRUCTURE_PATTERN = Pattern.compile(STRUCTURE_STRING);
-    public static final Pattern METHOD_PATTERN = Pattern.compile(TYPE_STRING + "::" + IDENTIFIER + "\\(" + "(" + CL_TYPE_STRING + ",?)*" + "\\)" + CL_TYPE_STRING);
-    
+    public static final String ARRAY_TYPE_STRING = IDENTIFIER + "(/" + IDENTIFIER + ")*(?:\\[])+";
     protected String value;
     protected Mode mode;
     protected mx.kenzie.foundation.Type owner;
     protected String name;
     protected mx.kenzie.foundation.Type bound;
     protected mx.kenzie.foundation.Type[] inside;
+    
+    Signature() {
+    
+    }
+    
+    public Signature(final String value, final Type... available) {
+        this(value, Mode.getType(value), available);
+    }
     
     public Signature(final String value, final Mode mode, final Type... available) {
         this.value = value;
@@ -65,14 +72,6 @@ public class Signature {
                 inside = structure.fields.values().toArray(new Type[0]);
             }
         }
-    }
-    
-    Signature() {
-    
-    }
-    
-    public Signature(final String value, final Type... available) {
-        this(value, Mode.getType(value), available);
     }
     
     public Signature(final String value) {

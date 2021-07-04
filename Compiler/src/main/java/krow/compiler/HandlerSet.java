@@ -1,6 +1,7 @@
 package krow.compiler;
 
 import krow.compiler.api.CompileState;
+import krow.compiler.api.Handler;
 import krow.compiler.api.HandlerInterface;
 
 import java.util.ArrayList;
@@ -9,9 +10,9 @@ import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("ALL")
-final class HandlerSet extends HashMap<CompileState, List<DefaultHandler>> implements HandlerInterface {
+final class HandlerSet extends HashMap<CompileState, List<Handler>> implements HandlerInterface {
     
-    public HandlerSet(Map<? extends CompileState, ? extends List<DefaultHandler>> m) {
+    public HandlerSet(Map<? extends CompileState, ? extends List<Handler>> m) {
         super(m);
     }
     
@@ -21,8 +22,8 @@ final class HandlerSet extends HashMap<CompileState, List<DefaultHandler>> imple
         }
     }
     
-    public DefaultHandler getHandler(final String statement, final CompileState state, final CompileContext context) {
-        for (final DefaultHandler handler : this.get(state)) {
+    public Handler getHandler(final String statement, final CompileState state, final CompileContext context) {
+        for (final Handler handler : this.get(state)) {
             if (handler.accepts(statement, context)) return handler;
         }
         final String help;

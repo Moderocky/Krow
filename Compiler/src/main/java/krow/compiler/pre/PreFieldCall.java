@@ -36,6 +36,15 @@ public class PreFieldCall {
         return invokeFieldDynamic(field, !context.child.staticState, true);
     }
     
+    public WriteInstruction invokeFieldDynamic(PreField field, boolean dynamic, boolean set) {
+        final Handle bootstrap = Handles.getPBFG(dynamic, set);
+        if (set)
+            return WriteInstruction.invokeDynamic(new Type(void.class), name, new Type[]{field.type}, bootstrap, org.objectweb.asm.Type.getType(owner.descriptor()));
+        else {
+            return WriteInstruction.invokeDynamic(field.type, name, new Type[0], bootstrap, org.objectweb.asm.Type.getType(owner.descriptor()));
+        }
+    }
+    
     public WriteInstruction get(final CompileContext context) {
         if (dynamic) return getDynamic(context);
         final PreField field = context.findField(owner, name);
@@ -52,15 +61,6 @@ public class PreFieldCall {
         if (field == null)
             throw new RuntimeException("Unavailable field: '" + owner.getSimpleName() + "." + name + "'");
         return invokeFieldDynamic(field, !context.child.staticState, false);
-    }
-    
-    public WriteInstruction invokeFieldDynamic(PreField field, boolean dynamic, boolean set) {
-        final Handle bootstrap = Handles.getPBFG(dynamic, set);
-        if (set)
-            return WriteInstruction.invokeDynamic(new Type(void.class), name, new Type[]{field.type}, bootstrap, org.objectweb.asm.Type.getType(owner.descriptor()));
-        else {
-            return WriteInstruction.invokeDynamic(field.type, name, new Type[0], bootstrap, org.objectweb.asm.Type.getType(owner.descriptor()));
-        }
     }
     
 }

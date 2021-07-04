@@ -14,6 +14,8 @@ import java.lang.reflect.Modifier;
 @SuppressWarnings("ALL")
 public class CompilationTest {
     
+    private static String testField = "hello"; // we're accessing this :D
+    
     @BeforeClass
     public static void first() {
         System.setProperty("TEST_STATE", "1");
@@ -617,8 +619,6 @@ public class CompilationTest {
         }
     }
     
-    private static String testField = "hello"; // we're accessing this :D
-    
     @Test
     public void dynamicField() throws Throwable {
         final String source = """
@@ -699,6 +699,53 @@ public class CompilationTest {
                 export <>
                 static void test() {
                     System.out.println("hello");
+                }
+                
+            }
+            
+            """;
+        final Class<?> basic = new ReKrow().compileAndLoad(source);
+        assert basic != null;
+        basic.getMethod("test").invoke(null);
+    }
+    
+    @Test
+    public void oversee() throws Throwable {
+        final String source = """
+            library krow.memory;
+            import <java/io/PrintStream, krow/memory/Overseer>
+            export <>
+            class mx/kenzie/example/LibraryTest {
+                
+                import <Overseer::getMemorySize(Object)J>
+                export <>
+                static void test() {
+                    System.out.println("hello");
+                    long value = Overseer.getMemorySize("hi");
+                    System.out.println(value);
+                }
+                
+            }
+            
+            """;
+        final Class<?> basic = new ReKrow().compileAndLoad(source);
+        assert basic != null;
+        basic.getMethod("test").invoke(null);
+    }
+    
+    @Test
+    public void question() throws Throwable {
+        final String source = """
+            import <java/io/PrintStream>
+            export <>
+            class mx/kenzie/example/Ques {
+                
+                export <>
+                static void test() {
+                    Object blob = null;
+                    assert ?"hello";
+                    assert !?blob;
+                    assert !(?blob);
                 }
                 
             }

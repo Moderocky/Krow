@@ -30,6 +30,10 @@ public class StringReader implements Iterable<Character> {
         return builder.toString();
     }
     
+    public boolean canRead() {
+        return this.position < this.chars.length && this.position >= 0;
+    }
+    
     public String read(int length) {
         int end = this.position + length;
         
@@ -125,6 +129,10 @@ public class StringReader implements Iterable<Character> {
         return this.remaining().length > index;
     }
     
+    public char[] remaining() {
+        return Arrays.copyOfRange(this.chars, this.position, this.chars.length);
+    }
+    
     public char getApproaching(int index) {
         return this.remaining()[index];
     }
@@ -146,10 +154,6 @@ public class StringReader implements Iterable<Character> {
     
     public void rotateBack(int i) {
         this.position -= i;
-    }
-    
-    public boolean canRead() {
-        return this.position < this.chars.length && this.position >= 0;
     }
     
     public int getPosition() {
@@ -202,10 +206,6 @@ public class StringReader implements Iterable<Character> {
         this.position = 0;
     }
     
-    public String toString() {
-        return new String(this.chars);
-    }
-    
     public int charCount(char c) {
         int i = 0;
         char[] var3 = this.chars;
@@ -220,10 +220,6 @@ public class StringReader implements Iterable<Character> {
         return i;
     }
     
-    public char[] remaining() {
-        return Arrays.copyOfRange(this.chars, this.position, this.chars.length);
-    }
-    
     @NotNull
     public Iterator<Character> iterator() {
         return new StringReader.Iterative();
@@ -236,10 +232,14 @@ public class StringReader implements Iterable<Character> {
         return reader;
     }
     
+    public String toString() {
+        return new String(this.chars);
+    }
+    
     protected class Iterative implements Iterator<Character> {
+        final int size;
         int cursor;
         int lastRet = -1;
-        final int size;
         
         Iterative() {
             this.size = StringReader.this.chars.length;

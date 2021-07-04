@@ -11,12 +11,12 @@ import java.util.List;
 @SuppressWarnings("ALL")
 public class PreMethodCall {
     
+    public final List<Type> parameters = new ArrayList<>();
     public boolean dynamic;
     public boolean indy;
     public Type owner;
     public String name;
     public Type returnType;
-    public final List<Type> parameters = new ArrayList<>();
     public CompileState state;
     
     public void addParameter(final Type type) {

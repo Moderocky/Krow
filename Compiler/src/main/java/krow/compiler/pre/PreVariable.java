@@ -14,16 +14,6 @@ public class PreVariable {
         this.type = type;
     }
     
-    public WriteInstruction load(int slot) {
-        return switch (type.dotPath()) {
-            case "char", "boolean", "byte", "int", "short", "void" -> WriteInstruction.loadSmall(slot);
-            case "long" -> WriteInstruction.loadLong(slot);
-            case "float" -> WriteInstruction.loadFloat(slot);
-            case "double" -> WriteInstruction.loadDouble(slot);
-            default -> WriteInstruction.loadObject(slot);
-        };
-    }
-    
     public static WriteInstruction load(final Type type, final int slot) {
         if (type.isArray()) {
             if (type.isPrimitiveArray()) {
@@ -44,16 +34,6 @@ public class PreVariable {
             case "float" -> WriteInstruction.loadFloat(slot);
             case "double" -> WriteInstruction.loadDouble(slot);
             default -> WriteInstruction.loadObject(slot);
-        };
-    }
-    
-    public WriteInstruction store(int slot) {
-        return switch (type.dotPath()) {
-            case "char", "boolean", "byte", "int", "short", "void" -> WriteInstruction.storeSmall(slot);
-            case "long" -> WriteInstruction.storeLong(slot);
-            case "float" -> WriteInstruction.storeFloat(slot);
-            case "double" -> WriteInstruction.storeDouble(slot);
-            default -> WriteInstruction.storeObject(slot);
         };
     }
     
@@ -80,6 +60,26 @@ public class PreVariable {
         };
     }
     
+    public WriteInstruction load(int slot) {
+        return switch (type.dotPath()) {
+            case "char", "boolean", "byte", "int", "short", "void" -> WriteInstruction.loadSmall(slot);
+            case "long" -> WriteInstruction.loadLong(slot);
+            case "float" -> WriteInstruction.loadFloat(slot);
+            case "double" -> WriteInstruction.loadDouble(slot);
+            default -> WriteInstruction.loadObject(slot);
+        };
+    }
+    
+    public WriteInstruction store(int slot) {
+        return switch (type.dotPath()) {
+            case "char", "boolean", "byte", "int", "short", "void" -> WriteInstruction.storeSmall(slot);
+            case "long" -> WriteInstruction.storeLong(slot);
+            case "float" -> WriteInstruction.storeFloat(slot);
+            case "double" -> WriteInstruction.storeDouble(slot);
+            default -> WriteInstruction.storeObject(slot);
+        };
+    }
+    
     public String name() {
         return name;
     }
@@ -89,17 +89,17 @@ public class PreVariable {
     }
     
     @Override
+    public int hashCode() {
+        return Objects.hash(name, type);
+    }
+    
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
         var that = (PreVariable) obj;
         return Objects.equals(this.name, that.name) &&
             Objects.equals(this.type, that.type);
-    }
-    
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, type);
     }
     
     @Override

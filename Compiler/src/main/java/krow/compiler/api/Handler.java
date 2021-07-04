@@ -20,22 +20,13 @@ import krow.compiler.pre.PreClass;
 @SuppressWarnings("ALL")
 public interface Handler {
     
-    @Deprecated
-    default boolean accepts(final String statement) {
-        return false;
-    }
-    
     default boolean accepts(final String statement, final CompileContext context) {
         return accepts(statement);
     }
     
     @Deprecated
-    default HandleResult handle(final String statement, final PreClass data, final CompileContext context) {
-        throw new IllegalStateException("No handle result provided.");
-    }
-    
-    default HandleResult handle(final String statement, final PreClass data, final CompileContext context, final CompileState state) {
-        return handle(statement, data, context);
+    default boolean accepts(final String statement) {
+        return false;
     }
     
     /**
@@ -46,6 +37,15 @@ public interface Handler {
         final HandleResult result = this.handle(statement, data, context, state);
         if (result == null || result.remainder().isEmpty()) return null;
         return result;
+    }
+    
+    default HandleResult handle(final String statement, final PreClass data, final CompileContext context, final CompileState state) {
+        return handle(statement, data, context);
+    }
+    
+    @Deprecated
+    default HandleResult handle(final String statement, final PreClass data, final CompileContext context) {
+        throw new IllegalStateException("No handle result provided.");
     }
     
     /**

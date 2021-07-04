@@ -12,16 +12,6 @@ import java.util.List;
 
 public final class Krow implements LanguageDefinition {
     
-    @Override
-    public String name() {
-        return "Krow";
-    }
-    
-    @Override
-    public String sourceFileExt() {
-        return "kro";
-    }
-    
     public static void main(String... args) {
         if (args.length > 1) {
             final File target = new File(args[0]);
@@ -50,6 +40,16 @@ public final class Krow implements LanguageDefinition {
             e.printStackTrace();
         }
         return files;
+    }
+    
+    @Override
+    public String name() {
+        return "Krow";
+    }
+    
+    @Override
+    public String sourceFileExt() {
+        return "kro";
     }
     
 }
