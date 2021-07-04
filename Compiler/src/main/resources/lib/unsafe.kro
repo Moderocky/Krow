@@ -44,7 +44,7 @@ final class krow/memory/Overseer {
 
     export <>
     static Object allocateInstance(Class type) {
-        return Overseer.allocateInstance(object, Overseer.UNSAFE);
+        return Overseer.allocateInstance(type, Overseer.UNSAFE);
     }
 
     export <>

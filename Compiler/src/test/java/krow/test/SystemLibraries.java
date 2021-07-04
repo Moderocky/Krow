@@ -18,8 +18,8 @@ public class SystemLibraries {
         krow = new ReKrow();
         compile("Runtime.class", "lib/runtime.kro");
         compile("Structure.class", "lib/struct.kro");
-        System.setProperty("TEST_STATE", "1");
         compile("Overseer.class", "lib/unsafe.kro");
+        System.setProperty("TEST_STATE", "1");
         System.clearProperty("TEST_STATE");
     }
     

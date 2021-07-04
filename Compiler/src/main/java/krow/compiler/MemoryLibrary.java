@@ -14,7 +14,7 @@ public final class MemoryLibrary implements Library, InternalLibrary {
     static final MemoryLibrary MEMORY_LIBRARY = new MemoryLibrary();
     
     private static final HandlerSet DEFAULT_HANDLERS = new HandlerSet();
-
+    
     static {
     }
     

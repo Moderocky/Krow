@@ -717,11 +717,11 @@ public class CompilationTest {
             export <>
             class mx/kenzie/example/LibraryTest {
                 
-                import <Overseer::getMemorySize(Object)J>
+                import <Overseer::getMemorySize(Class)J>
                 export <>
                 static void test() {
                     System.out.println("hello");
-                    long value = Overseer.getMemorySize("hi");
+                    long value = Overseer.getMemorySize(String.class);
                     System.out.println(value);
                 }
                 
@@ -746,6 +746,28 @@ public class CompilationTest {
                     assert ?"hello";
                     assert !?blob;
                     assert !(?blob);
+                }
+                
+            }
+            
+            """;
+        final Class<?> basic = new ReKrow().compileAndLoad(source);
+        assert basic != null;
+        basic.getMethod("test").invoke(null);
+    }
+    
+    @Test
+    public void ifelse() throws Throwable {
+        final String source = """
+            import <java/io/PrintStream>
+            export <>
+            class mx/kenzie/example/IfElse {
+                
+                export <>
+                static void test() {
+                    Object blob = null;
+                    if (!?blob) System.out.println("yes");
+                    else System.out.println("no");
                 }
                 
             }

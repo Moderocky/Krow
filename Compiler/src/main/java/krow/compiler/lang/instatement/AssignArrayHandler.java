@@ -38,7 +38,7 @@ public class AssignArrayHandler implements DefaultHandler {
         context.duplicate = true;
         context.expectation = CompileExpectation.OBJECT;
         context.lookingFor = type.componentType();
-        context.child.skip = PreVariable.store(type, 0);
+        context.child.skip.add(0, PreVariable.store(type, 0));
         return new HandleResult(null, statement.substring(input.length()).trim(), state);
     }
     

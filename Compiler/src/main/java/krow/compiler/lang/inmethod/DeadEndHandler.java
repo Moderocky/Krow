@@ -16,6 +16,7 @@ public class DeadEndHandler implements DefaultHandler {
     
     @Override
     public HandleResult handle(String statement, PreClass data, CompileContext context) {
+        if (context.conditionPhase > 0) context.conditionPhase--;
         return new HandleResult(null, statement.substring(1).trim(), CompileState.METHOD_BODY);
     }
     

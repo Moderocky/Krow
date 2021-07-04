@@ -27,7 +27,7 @@ public final class SystemLibrary implements Library, InternalLibrary {
     static final SystemLibrary SYSTEM_LIBRARY = new SystemLibrary();
     
     private static final HandlerSet DEFAULT_HANDLERS = new HandlerSet();
-
+    
     static {
         DEFAULT_HANDLERS.put(CompileState.FILE_ROOT, new ArrayList<>(List.of(
             new LibraryHandler(),
@@ -90,6 +90,7 @@ public final class SystemLibrary implements Library, InternalLibrary {
             new krow.compiler.lang.inmethod.LabelHandler(),
             new krow.compiler.lang.inmethod.GotoHandler(),
             new krow.compiler.lang.inmethod.IfHandler(),
+            new krow.compiler.lang.inmethod.ElseHandler(),
             new krow.compiler.lang.inmethod.ConstructorCallStartHandler(),
             new krow.compiler.lang.inmethod.AssignVarHandler(),
             new krow.compiler.lang.inmethod.DeclareAssignVarHandler(),
@@ -132,6 +133,7 @@ public final class SystemLibrary implements Library, InternalLibrary {
             new LongLiteralHandler(),
             new DoubleLiteralHandler(),
             new FloatLiteralHandler(),
+            new ClassSuffixHandler(),
             new StructImplicitHandler(),
             new krow.compiler.lang.instatement.AllocateInstanceHandler(),
             new DynamicCallStartHandler(), // goes in either
@@ -164,6 +166,7 @@ public final class SystemLibrary implements Library, InternalLibrary {
             new InvertHandler(),
             new IsNullHandler(),
             new NegateHandler(),
+            new ClassSuffixHandler(),
             new krow.compiler.lang.instatement.LoadArrayHandler(),
             new ArrayLengthHandler(),
             new StructImplicitHandler(),
@@ -195,6 +198,7 @@ public final class SystemLibrary implements Library, InternalLibrary {
             new InvertHandler(),
             new IsNullHandler(),
             new NegateHandler(),
+            new ClassSuffixHandler(),
             new krow.compiler.lang.instatement.LoadArrayHandler(),
             new ArrayLengthHandler(),
             new StructImplicitHandler(),

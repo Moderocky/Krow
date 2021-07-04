@@ -6,8 +6,11 @@ import krow.compiler.api.CompileState;
 import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreBracket;
 import krow.compiler.pre.PreClass;
+import mx.kenzie.foundation.CodeWriter;
 import mx.kenzie.foundation.Type;
+import mx.kenzie.foundation.WriteInstruction;
 import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,10 +39,14 @@ public class IfHandler implements DefaultHandler {
         context.lookingFor = new Type(boolean.class);
         context.child.statement((writer, method) -> method.visitJumpInsn(153, end));
         context.child.swap(true);
-        context.child.skip = (writer, method) -> method.visitLabel(end);
+        final PassJumpInstruction instruction = new PassJumpInstruction();
+        instruction.end = end;
+        context.child.elseJumps.add(instruction);
+        context.child.skip.add(0, instruction);
         final PreBracket bracket;
         context.brackets().add(0, bracket = new PreBracket());
         bracket.state = CompileState.METHOD_BODY;
+        context.conditionPhase += 2;
         return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.STATEMENT);
     }
     
@@ -47,4 +54,17 @@ public class IfHandler implements DefaultHandler {
     public String debugName() {
         return "IF";
     }
+    
+    public static class PassJumpInstruction implements WriteInstruction {
+        
+        public WriteInstruction jump;
+        public Label end;
+        
+        @Override
+        public void accept(CodeWriter codeWriter, MethodVisitor methodVisitor) {
+            if (jump != null) jump.accept(codeWriter, methodVisitor);
+            methodVisitor.visitLabel(end);
+        }
+    }
+    
 }

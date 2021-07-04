@@ -41,7 +41,7 @@ public class DeclareAssignVarHandler implements DefaultHandler {
         context.lookingFor = type;
         context.duplicate = true;
         context.child.variables.add(assignment = new PreVariable(name, type));
-        context.child.skip = assignment.store(context.getSlot(assignment));
+        context.child.skip.add(0, assignment.store(context.getSlot(assignment)));
         if (type.matches(Structure.class)) { // need to grab subclass from implicit declaration
             context.child.awaitAdjustedType = true;
             context.child.forAdjustment = assignment;

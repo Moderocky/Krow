@@ -17,7 +17,7 @@ public class CompileContext extends WorkContext {
     public final List<PreMethod> availableMethods = new ArrayList<>();
     public final List<PreField> availableFields = new ArrayList<>();
     public final List<PostCompileClass> attachments = new ArrayList<>();
-    public final Map<String, Object> constants = new HashMap<>();
+    private final List<BlockSectionContext> blocks = new ArrayList<>();
     public CompileContext child;
     public CompileState superState;
     public HandlerSet handlers;
@@ -29,8 +29,9 @@ public class CompileContext extends WorkContext {
     public FieldBuilder currentField;
     public MethodBuilder currentMethod;
     public PreMethod method;
+    public int conditionPhase;
     protected KrowCompiler compiler;
-
+    
     {
         importJava(java.lang.String.class);
         importJava(java.lang.Object.class);
@@ -55,6 +56,36 @@ public class CompileContext extends WorkContext {
         importJava(java.lang.Throwable.class);
         importJava(java.lang.Exception.class);
         importJava(java.lang.Number.class);
+    }
+    
+    public BlockSectionContext createBlock(final Library library) {
+        // Can't be in bracket so child is fine here
+        if (child != null) return child.createBlock(library);
+        final BlockSectionContext section;
+        blocks.add(0, section = new BlockSectionContext(library));
+        return section;
+    }
+    
+    public BlockSectionContext getCurrentBlock() {
+        // Can't be in bracket so child is fine here
+        if (child != null) return child.getCurrentBlock();
+        return blocks.isEmpty() ? null : blocks.get(0);
+    }
+    
+    public boolean inBlock() {
+        if (child != null) return child.inBlock();
+        return !blocks.isEmpty();
+    }
+    
+    public void closeBlock() {
+        // Can't be in bracket so child is fine here
+        if (child != null) {
+            child.closeBlock();
+            return;
+        }
+        if (blocks.isEmpty()) return;
+        final WriteInstruction instruction = blocks.remove(0).complete();
+        statement(instruction);
     }
     
     public void createChild() {
@@ -104,6 +135,14 @@ public class CompileContext extends WorkContext {
         if (brackets.isEmpty())
             return child == null ? statement : child.statement;
         else return brackets.get(0).statement();
+    }
+    
+    @Override
+    public void statement(final WriteInstruction instruction) {
+        if (child() != null) child().statement(instruction);
+        else if (!brackets.isEmpty()) brackets.get(0).statement(instruction);
+        else if (!blocks.isEmpty()) blocks.get(0).statement(instruction);
+        else statementRaw(instruction);
     }
     
     public void importJava(final Class<?> cls) {

@@ -28,23 +28,23 @@ public class ReturnHandler implements DefaultHandler {
             context.child.awaitAdjustedType = true;
         context.child.inReturnPhase = true;
         if (type.matches(void.class)) {
-            context.child.skip = (returnEmpty());
+            context.child.skip.add(0, returnEmpty());
             context.expectation = CompileExpectation.DEAD_END;
         } else if (type.words() == 1) {
-            context.child.skip = (returnSmall());
+            context.child.skip.add(0, returnSmall());
             context.expectation = CompileExpectation.PRIMITIVE;
         } else if (type.dotPath().equals("long")) {
             context.expectation = CompileExpectation.PRIMITIVE;
-            context.child.skip = (returnLong());
+            context.child.skip.add(0, returnLong());
         } else if (type.dotPath().equals("float")) {
             context.expectation = CompileExpectation.PRIMITIVE;
-            context.child.skip = (returnFloat());
+            context.child.skip.add(0, returnFloat());
         } else if (type.dotPath().equals("double")) {
             context.expectation = CompileExpectation.PRIMITIVE;
-            context.child.skip = (returnDouble());
+            context.child.skip.add(0, returnDouble());
         } else {
             context.expectation = CompileExpectation.OBJECT;
-            context.child.skip = (returnObject());
+            context.child.skip.add(0, returnObject());
         }
         return new HandleResult(null, statement.substring(6).trim(), CompileState.STATEMENT);
     }

@@ -2,12 +2,15 @@ package krow.compiler;
 
 import krow.compiler.api.CompileExpectation;
 import krow.compiler.api.CompileState;
+import krow.compiler.lang.inmethod.IfHandler;
 import krow.compiler.pre.*;
 import mx.kenzie.foundation.Type;
 import mx.kenzie.foundation.WriteInstruction;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 public abstract class WorkContext {
@@ -18,10 +21,12 @@ public abstract class WorkContext {
     public final List<PreStructure> structures = new ArrayList<>();
     public final List<Object> exports = new ArrayList<>();
     public final List<CompileState> nested = new ArrayList<>();
+    public final Map<String, Object> constants = new HashMap<>();
     protected final List<PreBracket> brackets = new ArrayList<>();
     protected final List<PreLabel> labels = new ArrayList<>();
     public CompileExpectation expectation = CompileExpectation.NONE;
-    public WriteInstruction skip; // stacked when DEAD_END reached (eol)
+    public List<WriteInstruction> skip = new ArrayList<>(); // stacked when DEAD_END reached (eol)
+    public List<IfHandler.PassJumpInstruction> elseJumps = new ArrayList<>();
     public WriteInstruction doAfter; // done after swap
     public Function<Type, WriteInstruction> doExpecting; // done after swap
     public PreVariable store;

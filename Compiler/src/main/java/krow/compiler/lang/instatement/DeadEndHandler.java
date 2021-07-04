@@ -23,9 +23,11 @@ public class DeadEndHandler implements DefaultHandler {
     public HandleResult handle(String statement, PreClass data, CompileContext context) {
         if (context.child.inverted)
             Collections.reverse(context.child.statement());
-        if (context.child.skip != null)
-            context.child.statement(context.child.skip);
-        else if (context.child.point != null)
+        if (!context.child.skip.isEmpty()) {
+            for (final WriteInstruction instruction : context.child.skip) {
+                context.child.statement(instruction);
+            }
+        } else if (context.child.point != null)
             context.child.statement(WriteInstruction.pop()); // assume dead type and no handler
         if (context.child.awaitAdjustedType && context.child.point != null) {
             final Type type = context.child.point;
@@ -41,7 +43,7 @@ public class DeadEndHandler implements DefaultHandler {
         context.child.statement().clear();
         context.child.expectation = CompileExpectation.NONE;
         context.child.store = null;
-        context.child.skip = null;
+        context.child.skip.clear();
         context.child.staticState = false;
         context.child.awaitAdjustedType = false;
         context.child.inReturnPhase = false;
@@ -50,6 +52,7 @@ public class DeadEndHandler implements DefaultHandler {
         context.lookingFor = null;
         context.duplicate = false;
         context.expectation = CompileExpectation.NONE;
+        if (context.conditionPhase > 0) --context.conditionPhase;
         return new HandleResult(null, statement.substring(1).trim(), CompileState.METHOD_BODY);
     }
     

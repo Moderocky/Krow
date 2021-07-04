@@ -38,7 +38,6 @@ public class SourceReader {
         final List<WriteInstruction> instructions;
         
         public MethodFinder(final List<WriteInstruction> instructions, final String name, Type returnType, Type[] parameters) {
-//            super(Opcodes.ASM9, cv);
             super(Opcodes.ASM9);
             this.instructions = instructions;
             final StringBuilder builder = new StringBuilder();

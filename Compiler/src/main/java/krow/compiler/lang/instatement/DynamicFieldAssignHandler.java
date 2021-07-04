@@ -37,7 +37,7 @@ public class DynamicFieldAssignHandler implements DefaultHandler {
         call.owner = context.child.point;
         call.name = name;
         call.dynamic = true;
-        context.child.skip = call.set(context);
+        context.child.skip.add(0, call.set(context));
         context.child.point = null;
         context.child.staticState = false;
         context.expectation = CompileExpectation.OBJECT;
