@@ -25,7 +25,6 @@ public abstract class WorkContext {
     protected final List<PreBracket> brackets = new ArrayList<>();
     protected final List<PreLabel> labels = new ArrayList<>();
     public CompileExpectation expectation = CompileExpectation.NONE;
-    public List<WriteInstruction> skip = new ArrayList<>(); // stacked when DEAD_END reached (eol)
     public List<IfHandler.PassJumpInstruction> elseJumps = new ArrayList<>();
     public WriteInstruction doAfter; // done after swap
     public Function<Type, WriteInstruction> doExpecting; // done after swap
@@ -33,6 +32,7 @@ public abstract class WorkContext {
     public Type point;
     public Type lookingFor;
     public Type pointAfter;
+    public boolean allowBlock;
     public boolean duplicate;
     public boolean staticState;
     public boolean inverted;
@@ -43,9 +43,21 @@ public abstract class WorkContext {
     public PreVariable forAdjustment;
     public PreConstant saveConstant;
     public CompileState exitTo;
+    protected List<WriteInstruction> skip = new ArrayList<>(); // stacked when DEAD_END reached (eol)
+    protected int conditionPhase;
     private boolean swap;
     
     public abstract WorkContext child();
+    
+    public void skip(final WriteInstruction instruction) {
+        if (child() != null) child().skip(instruction);
+        else this.skip.add(0, instruction);
+    }
+    
+    public List<WriteInstruction> skip() {
+        if (child() != null) return child().skip();
+        else return this.skip;
+    }
     
     public List<WriteInstruction> statement() {
         if (brackets.isEmpty())
@@ -104,6 +116,31 @@ public abstract class WorkContext {
         else {
             swap = value;
         }
+    }
+    
+    public boolean isBlockAllowed() {
+        if (child() != null) return child().isBlockAllowed();
+        return allowBlock;
+    }
+    
+    public void setBlockAllowed(final boolean z) {
+        if (child() != null) child().setBlockAllowed(z);
+        else allowBlock = z;
+    }
+    
+    public int getConditionPhase() {
+        if (child() != null) return child().getConditionPhase();
+        else return this.conditionPhase;
+    }
+    
+    public void setConditionPhase(final int i) {
+        if (child() != null) child().setConditionPhase(i);
+        else this.conditionPhase = i;
+    }
+    
+    public void decayConditionPhase() {
+        if (child() != null) child().decayConditionPhase();
+        else if (this.conditionPhase > 0) this.conditionPhase--;
     }
     
 }

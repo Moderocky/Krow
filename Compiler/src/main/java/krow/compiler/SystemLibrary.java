@@ -24,7 +24,7 @@ import java.util.List;
 
 public final class SystemLibrary implements Library, InternalLibrary {
     
-    static final SystemLibrary SYSTEM_LIBRARY = new SystemLibrary();
+    public static final SystemLibrary SYSTEM_LIBRARY = new SystemLibrary();
     
     private static final HandlerSet DEFAULT_HANDLERS = new HandlerSet();
     
@@ -91,6 +91,8 @@ public final class SystemLibrary implements Library, InternalLibrary {
             new krow.compiler.lang.inmethod.GotoHandler(),
             new krow.compiler.lang.inmethod.IfHandler(),
             new krow.compiler.lang.inmethod.ElseHandler(),
+            new krow.compiler.lang.inmethod.DropLevelHandler(),
+            new krow.compiler.lang.inblock.UpLevelHandler(),
             new krow.compiler.lang.inmethod.ConstructorCallStartHandler(),
             new krow.compiler.lang.inmethod.AssignVarHandler(),
             new krow.compiler.lang.inmethod.DeclareAssignVarHandler(),

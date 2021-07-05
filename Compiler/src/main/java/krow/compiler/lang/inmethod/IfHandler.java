@@ -42,11 +42,12 @@ public class IfHandler implements DefaultHandler {
         final PassJumpInstruction instruction = new PassJumpInstruction();
         instruction.end = end;
         context.child.elseJumps.add(instruction);
-        context.child.skip.add(0, instruction);
+        context.child.skip(instruction);
+        context.child.setBlockAllowed(true);
         final PreBracket bracket;
         context.brackets().add(0, bracket = new PreBracket());
         bracket.state = CompileState.METHOD_BODY;
-        context.conditionPhase += 2;
+        context.setConditionPhase(2);
         return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.STATEMENT);
     }
     

@@ -16,7 +16,7 @@ public class ElseHandler implements DefaultHandler {
             case TYPE, DEAD_END, LITERAL, VARIABLE, SMALL, OBJECT:
                 return false;
         }
-        if (context.conditionPhase % 2 == 0) return false;
+        if (context.getConditionPhase() % 2 == 0) return false;
         return (statement.startsWith("else"));
     }
     
@@ -25,8 +25,9 @@ public class ElseHandler implements DefaultHandler {
         final Label end = new Label();
         final IfHandler.PassJumpInstruction instruction = context.child.elseJumps.get(0);
         instruction.jump = (writer, method) -> method.visitJumpInsn(Opcodes.GOTO, end);
-        context.child.skip.add(0, (writer, method) -> method.visitLabel(end));
-        context.conditionPhase--;
+        context.child.skip((writer, method) -> method.visitLabel(end));
+        context.child.setBlockAllowed(true);
+        context.decayConditionPhase();
         return new HandleResult(null, statement.substring(4).trim(), CompileState.METHOD_BODY);
     }
     

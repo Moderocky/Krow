@@ -36,7 +36,7 @@ public class AssignVarHandler implements DefaultHandler {
         final PreVariable assignment = context.getVariable(name);
         assert (assignment != null);
         context.lookingFor = assignment.type();
-        context.child.skip.add(0, assignment.store(context.getSlot(assignment)));
+        context.child.skip(assignment.store(context.getSlot(assignment)));
         return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.STATEMENT);
     }
     

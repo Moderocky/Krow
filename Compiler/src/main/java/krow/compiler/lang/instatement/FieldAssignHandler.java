@@ -37,7 +37,7 @@ public class FieldAssignHandler implements DefaultHandler {
         final PreFieldCall call = new PreFieldCall();
         call.owner = context.child.point;
         call.name = name;
-        context.child.skip.add(0, call.set(context));
+        context.child.skip(call.set(context));
         context.child.point = null;
         context.child.staticState = false;
         context.expectation = CompileExpectation.OBJECT;

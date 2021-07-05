@@ -28,7 +28,7 @@ public class DeadEndHandler implements DefaultHandler {
         context.child.statement().clear();
         context.child.expectation = CompileExpectation.NONE;
         context.child.store = null;
-        context.child.skip.clear();
+        context.child.skip().clear();
         context.child.staticState = false;
         context.child.point = null;
         context.duplicate = false;

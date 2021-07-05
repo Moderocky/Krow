@@ -779,12 +779,41 @@ public class CompilationTest {
     }
     
     @Test
-    public void full() {
-        Krow.main("TestTarget.ark", "src/test/krow", "mx.kenzie.example.Main");
+    public void ifelseblock() throws Throwable {
+        final String source = """
+            import <java/io/PrintStream>
+            export <>
+            class mx/kenzie/example/IfElseBlock {
+                
+                export <>
+                static void test() {
+                    Object blob = null;
+                    if (true) {
+                        System.out.println("yes");
+                        System.out.println("in a block");
+                    } else {
+                        System.out.println(":(");
+                        System.out.println("no in a block");
+                        assert false;
+                    }
+                }
+                
+            }
+            
+            """;
+        debug(source);
+        final Class<?> basic = new ReKrow().compileAndLoad(source);
+        assert basic != null;
+        basic.getMethod("test").invoke(null);
     }
     
     private void debug(final String source) throws Throwable {
         new FileOutputStream("debug.class").write(new ReKrow().compile(source));
+    }
+    
+    @Test
+    public void full() {
+        Krow.main("TestTarget.ark", "src/test/krow", "mx.kenzie.example.Main");
     }
     
 }

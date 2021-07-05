@@ -22,7 +22,7 @@ public class AssertHandler implements DefaultHandler {
         assert context.method != null;
         context.lookingFor = new Type(boolean.class);
         context.expectation = CompileExpectation.PRIMITIVE;
-        context.child.skip.add(0, WriteInstruction.assertTrue());
+        context.child.skip(WriteInstruction.assertTrue());
         return new HandleResult(null, statement.substring(6).trim(), CompileState.STATEMENT);
     }
     

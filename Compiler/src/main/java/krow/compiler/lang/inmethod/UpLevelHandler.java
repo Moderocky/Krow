@@ -12,8 +12,8 @@ import mx.kenzie.foundation.WriteInstruction;
 public class UpLevelHandler implements DefaultHandler {
     
     @Override
-    public boolean accepts(String statement) {
-        return statement.startsWith("}");
+    public boolean accepts(String statement, CompileContext context) {
+        return statement.startsWith("}") && !context.inBlock();
     }
     
     @Override

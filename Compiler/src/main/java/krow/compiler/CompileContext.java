@@ -29,7 +29,6 @@ public class CompileContext extends WorkContext {
     public FieldBuilder currentField;
     public MethodBuilder currentMethod;
     public PreMethod method;
-    public int conditionPhase;
     protected KrowCompiler compiler;
     
     {
@@ -131,6 +130,17 @@ public class CompileContext extends WorkContext {
         return child;
     }
     
+    @Override
+    public void skip(final WriteInstruction instruction) {
+        if (inBlock()) getCurrentBlock().skip(instruction);
+        else super.skip(instruction);
+    }
+    
+    public List<WriteInstruction> skip() {
+        if (inBlock()) return getCurrentBlock().skip();
+        else return super.skip();
+    }
+    
     public List<WriteInstruction> statement() {
         if (brackets.isEmpty())
             return child == null ? statement : child.statement;
@@ -143,6 +153,41 @@ public class CompileContext extends WorkContext {
         else if (!brackets.isEmpty()) brackets.get(0).statement(instruction);
         else if (!blocks.isEmpty()) blocks.get(0).statement(instruction);
         else statementRaw(instruction);
+    }
+    
+    @Override
+    public boolean isBlockAllowed() {
+        final BlockSectionContext block = getCurrentBlock();
+        if (block != null) return block.isBlockAllowed();
+        else return super.isBlockAllowed();
+    }
+    
+    @Override
+    public void setBlockAllowed(final boolean z) {
+        final BlockSectionContext block = getCurrentBlock();
+        if (block != null) block.setBlockAllowed(z);
+        else super.setBlockAllowed(z);
+    }
+    
+    @Override
+    public int getConditionPhase() {
+        final BlockSectionContext block = getCurrentBlock();
+        if (block != null) return block.getConditionPhase();
+        else return super.getConditionPhase();
+    }
+    
+    @Override
+    public void setConditionPhase(final int i) {
+        final BlockSectionContext block = getCurrentBlock();
+        if (block != null) block.setConditionPhase(i);
+        else super.setConditionPhase(i);
+    }
+    
+    @Override
+    public void decayConditionPhase() {
+        final BlockSectionContext block = getCurrentBlock();
+        if (block != null) block.decayConditionPhase();
+        else super.decayConditionPhase();
     }
     
     public void importJava(final Class<?> cls) {

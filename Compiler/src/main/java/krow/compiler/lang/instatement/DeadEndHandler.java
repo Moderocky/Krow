@@ -21,12 +21,23 @@ public class DeadEndHandler implements DefaultHandler {
     
     @Override
     public HandleResult handle(String statement, PreClass data, CompileContext context) {
+        deadEndStatement(context);
+        return new HandleResult(null, statement.substring(1).trim(), CompileState.METHOD_BODY);
+    }
+    
+    @Override
+    public String debugName() {
+        return "END_OF_STATEMENT";
+    }
+    
+    public static void deadEndStatement(final CompileContext context) {
         if (context.child.inverted)
             Collections.reverse(context.child.statement());
-        if (!context.child.skip.isEmpty()) {
-            for (final WriteInstruction instruction : context.child.skip) {
+        if (!context.child.skip().isEmpty()) {
+            for (final WriteInstruction instruction : context.child.skip()) {
                 context.child.statement(instruction);
             }
+            context.child.skip().clear();
         } else if (context.child.point != null)
             context.child.statement(WriteInstruction.pop()); // assume dead type and no handler
         if (context.child.awaitAdjustedType && context.child.point != null) {
@@ -38,12 +49,13 @@ public class DeadEndHandler implements DefaultHandler {
                 context.child.forAdjustment.type = type;
             }
         }
-        context.currentMethod.writeCode(context.child.statement().toArray(new WriteInstruction[0]));
+        if (!context.inBlock()) {
+            context.currentMethod.writeCode(context.child.statement().toArray(new WriteInstruction[0]));
+            context.child.statement().clear();
+        }
         context.child.preparing.clear();
-        context.child.statement().clear();
         context.child.expectation = CompileExpectation.NONE;
         context.child.store = null;
-        context.child.skip.clear();
         context.child.staticState = false;
         context.child.awaitAdjustedType = false;
         context.child.inReturnPhase = false;
@@ -52,12 +64,8 @@ public class DeadEndHandler implements DefaultHandler {
         context.lookingFor = null;
         context.duplicate = false;
         context.expectation = CompileExpectation.NONE;
-        if (context.conditionPhase > 0) --context.conditionPhase;
-        return new HandleResult(null, statement.substring(1).trim(), CompileState.METHOD_BODY);
+        context.child.setBlockAllowed(false);
+        context.decayConditionPhase();
     }
     
-    @Override
-    public String debugName() {
-        return "END_OF_STATEMENT";
-    }
 }
