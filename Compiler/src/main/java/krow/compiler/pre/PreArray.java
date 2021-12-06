@@ -12,6 +12,8 @@ public class PreArray extends PreMethodCall {
     public Type type;
     public int dimensions;
     public int length;
+    protected int argNumber = 0;
+    public boolean mode;
     
     public WriteInstruction create(int[] dims) {
         assert type.isArray();
@@ -36,6 +38,12 @@ public class PreArray extends PreMethodCall {
             method.visitIntInsn(BIPUSH, length());
             method.visitTypeInsn(ANEWARRAY, component.internalName());
         };
+    }
+    
+    public int[] incrementMatrixSlotCoordinates() {
+        final int[] coords = new int[]{ Math.floorMod(argNumber, dimensions), argNumber/dimensions};
+        argNumber++;
+        return coords;
     }
     
     public int length() {

@@ -231,7 +231,11 @@ public class CompilationTest {
                     System.out.println(bean[1]);
                     assert bean[0].equals("hello");
                     assert bean[1].equals("there");
-                    int[ ] ints = new int[10];
+                    int[][] ints = new int[10][5];
+                    assert ints[1][2] == 0;
+                    ints[1][2] = 3;
+                    int two = 2;
+                    assert ints[1][two] == 3;
                 }
                 
             }
@@ -239,6 +243,37 @@ public class CompilationTest {
         final Class<?> basic = new ReKrow().compileAndLoad(source);
         assert basic != null;
         basic.getMethod("main", String[].class).invoke(null, (Object) new String[]{"hello", "there"});
+    }
+    
+    @Test
+    public void matrices() throws Throwable {
+        final String source = """
+            import <java/io/PrintStream, java/util/Arrays>
+            export <>
+            class mx/kenzie/Matrices {
+                
+                export <>
+                static void blob() {
+                    int[,] simple = new int[3,2];
+                    int[,] complex = new int[3,2] (
+                        3, 2, 1,
+                        0, 2, 2
+                    );
+                    assert complex[0,0] == 3;
+                    assert complex[1,0] == 2;
+                    assert complex[2,0] == 1;
+                    assert complex[0,1] == 0;
+                    assert complex[1,1] == 2;
+                    assert complex[2,1] == 2;
+                    complex[0,0] = 4;
+                    assert complex[0,0] == 4;
+                }
+                
+            }
+            """;
+        final Class<?> basic = new ReKrow().compileAndLoad(source);
+        assert basic != null;
+        basic.getMethod("blob").invoke(null);
     }
     
     @Test

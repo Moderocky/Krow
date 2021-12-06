@@ -9,15 +9,14 @@ import krow.compiler.pre.PreArray;
 import krow.compiler.pre.PreClass;
 import krow.compiler.pre.Signature;
 import mx.kenzie.foundation.Type;
+import mx.kenzie.foundation.WriteInstruction;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class NewDimArrayHandler implements DefaultHandler {
+public class NewMatrixHandler implements DefaultHandler {
     
-    private static final Pattern PATTERN = Pattern.compile("^new\\s+(?<type>" + Signature.TYPE_STRING + "\\s*(?:\\[\\s*\\d+\\s*])+)\\s*(?!\\()");
+    private static final Pattern PATTERN = Pattern.compile("^new\\s+(?<type>" + Signature.TYPE_STRING + "\\s*(?:\\[\\s*\\d+\\s*,\\s*\\d+\\s*])+)\\s*\\(");
     
     Matcher matcher;
     
@@ -39,32 +38,22 @@ public class NewDimArrayHandler implements DefaultHandler {
         assert type.isArray();
         final PreArray array = new PreArray();
         array.type = type;
-        final int[] dimensions = count(input);
+        final int[] dimensions = NewDimMatrixHandler.count(input);
         array.dimensions = dimensions[0];
         context.child.statement(array.create(dimensions));
+        if (context.duplicate) {
+            context.child.statement(WriteInstruction.duplicate());
+            context.duplicate = false;
+        }
         context.child.point = array.type;
-        context.expectation = CompileExpectation.NONE;
-        return new HandleResult(null, statement.substring(input.length()).trim(), state);
+        context.child.nested.add(0, state);
+        context.child.preparing.add(0, array);
+        context.expectation = CompileExpectation.OBJECT;
+        return new HandleResult(null, statement.substring(input.length()).trim(), CompileState.IMPLICIT_MATRIX_HEADER);
     }
     
     @Override
     public String debugName() {
-        return "ALLOCATE_MULTI_ARRAY";
-    }
-    
-    protected int[] count(String input) {
-        List<Integer> list = new ArrayList<>();
-        while (input.indexOf('[') > -1) {
-            input = input.substring(input.indexOf('[') + 1);
-            int index = input.indexOf(']');
-            list.add(Integer.valueOf(input.substring(0, index).trim()));
-            input = input.substring(index + 1);
-        }
-        Integer[] integers = list.toArray(new Integer[0]);
-        int[] ints = new int[integers.length];
-        for (int i = 0; i < ints.length; i++) {
-            ints[i] = integers[i];
-        }
-        return ints;
+        return "ALLOCATE_MATRIX";
     }
 }

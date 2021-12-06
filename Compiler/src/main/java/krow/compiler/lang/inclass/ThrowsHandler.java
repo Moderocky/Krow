@@ -5,10 +5,8 @@ import krow.compiler.DefaultHandler;
 import krow.compiler.api.CompileState;
 import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
-import krow.compiler.pre.PreMethod;
 import krow.compiler.pre.Signature;
 import krow.compiler.util.BracketReader;
-import krow.compiler.util.HiddenModifier;
 import mx.kenzie.foundation.Type;
 
 import java.util.regex.Matcher;

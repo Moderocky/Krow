@@ -6,7 +6,6 @@ import krow.compiler.api.CompileExpectation;
 import krow.compiler.api.CompileState;
 import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
-import mx.kenzie.foundation.Type;
 import mx.kenzie.foundation.WriteInstruction;
 
 @SuppressWarnings("ALL")

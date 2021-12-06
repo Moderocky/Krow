@@ -18,8 +18,11 @@ public class Resolver {
             Type end = resolveType(name.substring(0, name.indexOf("[")), types);
             if (end == null) return null;
             String input = name;
-            int x;
+            int x, y;
             while ((x = input.indexOf("[")) > -1) {
+                if ((y = input.indexOf(",")) > -1 && y < input.indexOf("]")) {
+                    end = end.arrayType(); // matrix
+                }
                 input = input.substring(x + 1); // count array dimensions
                 end = end.arrayType(); // stack array dimensions
             }

@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class NewDimArrayHandler implements DefaultHandler {
+public class NewDimMatrixHandler implements DefaultHandler {
     
-    private static final Pattern PATTERN = Pattern.compile("^new\\s+(?<type>" + Signature.TYPE_STRING + "\\s*(?:\\[\\s*\\d+\\s*])+)\\s*(?!\\()");
+    private static final Pattern PATTERN = Pattern.compile("^new\\s+(?<type>" + Signature.TYPE_STRING + "\\s*(?:\\[\\s*\\d+\\s*,\\s*\\d+\\s*])+)\\s*(?!\\()");
     
     Matcher matcher;
     
@@ -49,15 +49,17 @@ public class NewDimArrayHandler implements DefaultHandler {
     
     @Override
     public String debugName() {
-        return "ALLOCATE_MULTI_ARRAY";
+        return "ALLOCATE_MULTI_MATRIX";
     }
     
-    protected int[] count(String input) {
+    static int[] count(String input) {
         List<Integer> list = new ArrayList<>();
         while (input.indexOf('[') > -1) {
             input = input.substring(input.indexOf('[') + 1);
+            int split = input.indexOf(',');
+            list.add(Integer.valueOf(input.substring(0, split).trim()));
             int index = input.indexOf(']');
-            list.add(Integer.valueOf(input.substring(0, index).trim()));
+            list.add(Integer.valueOf(input.substring(split + 1, index).trim()));
             input = input.substring(index + 1);
         }
         Integer[] integers = list.toArray(new Integer[0]);

@@ -19,6 +19,7 @@ import krow.compiler.lang.root.*;
 import mx.kenzie.foundation.language.PostCompileClass;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -121,8 +122,9 @@ public final class SystemLibrary implements Library, InternalLibrary {
             new NegateHandler(),
             new AndHandler(),
             new OrHandler(),
-            new krow.compiler.lang.instatement.AssignArrayHandler(),
-            new krow.compiler.lang.instatement.LoadArrayHandler(),
+//            new krow.compiler.lang.instatement.AssignArrayHandler(),
+            new AccessArrayHandler(),
+            new AccessMatrixHandler(),
             new ArrayLengthHandler(),
             new CastHandler(),
             new UShiftHandler(),
@@ -143,7 +145,9 @@ public final class SystemLibrary implements Library, InternalLibrary {
             new DynamicCallStartHandler(), // goes in either
             new MethodCallStartHandler(), // goes in either
             new krow.compiler.lang.instatement.NewArrayHandler(),
+            new krow.compiler.lang.instatement.NewMatrixHandler(),
             new krow.compiler.lang.instatement.NewDimArrayHandler(),
+            new krow.compiler.lang.instatement.NewDimMatrixHandler(),
             new krow.compiler.lang.instatement.NewInstanceHandler(),
             new FieldAssignHandler(),
             new FieldAccessHandler(), // goes in either
@@ -154,70 +158,65 @@ public final class SystemLibrary implements Library, InternalLibrary {
 //            new krow.compiler.handler.instatement.HandleHandler(),
             new krow.compiler.lang.instatement.VarLoadHandler()
         ));
-        DEFAULT_HANDLERS.put(CompileState.METHOD_CALL_HEADER, List.of(
+        final List<DefaultHandler> statementHandlers = List.of(
+            new OpenBracketHandler(),
+            new NullLiteralHandler(),
+            new BooleanLiteralHandler(),
+            new CharLiteralHandler(),
+            new StringLiteralHandler(),
+            new SmallLiteralHandler(),
+            new LongLiteralHandler(),
+            new DoubleLiteralHandler(),
+            new FloatLiteralHandler(),
+            new IsNotNullHandler(),
+            new InvertHandler(),
+            new IsNullHandler(),
+            new NegateHandler(),
+            new ClassSuffixHandler(),
+            new AccessArrayHandler(),
+            new AccessMatrixHandler(),
+            new ArrayLengthHandler(),
+            new StructImplicitHandler(),
+            new CastHandler(),
+            new NewArrayHandler(),
+            new DynamicCallStartHandler(), // goes in either
+            new MethodCallStartHandler(), // goes in either
+            new krow.compiler.lang.instatement.NewInstanceHandler(),
+            new FieldAccessHandler(),
+            new DynamicFieldAccessHandler(), // goes in either
+            new krow.compiler.lang.inmethod.TypeHandler(),
+            new krow.compiler.lang.inmethod.InitCallStartHandler(),
+//            new krow.compiler.handler.instatement.HandleHandler(),
+            new krow.compiler.lang.incall.VarLoadHandler()
+        );
+        DEFAULT_HANDLERS.put(CompileState.METHOD_CALL_HEADER, list(
             new krow.compiler.lang.incall.MethodCallEndHandler(),
-            new krow.compiler.lang.incall.MethodSplitParameterHandler(),
-            new OpenBracketHandler(),
-            new NullLiteralHandler(),
-            new BooleanLiteralHandler(),
-            new CharLiteralHandler(),
-            new StringLiteralHandler(),
-            new SmallLiteralHandler(),
-            new LongLiteralHandler(),
-            new DoubleLiteralHandler(),
-            new FloatLiteralHandler(),
-            new IsNotNullHandler(),
-            new InvertHandler(),
-            new IsNullHandler(),
-            new NegateHandler(),
-            new ClassSuffixHandler(),
-            new krow.compiler.lang.instatement.LoadArrayHandler(),
-            new ArrayLengthHandler(),
-            new StructImplicitHandler(),
-            new CastHandler(),
-            new NewArrayHandler(),
-            new DynamicCallStartHandler(), // goes in either
-            new MethodCallStartHandler(), // goes in either
-            new krow.compiler.lang.instatement.NewInstanceHandler(),
-            new FieldAccessHandler(),
-            new DynamicFieldAccessHandler(), // goes in either
-            new krow.compiler.lang.inmethod.TypeHandler(),
-            new krow.compiler.lang.inmethod.InitCallStartHandler(),
-//            new krow.compiler.handler.instatement.HandleHandler(),
-            new krow.compiler.lang.incall.VarLoadHandler()
+            new krow.compiler.lang.incall.MethodSplitParameterHandler()
         ));
-        DEFAULT_HANDLERS.put(CompileState.IMPLICIT_ARRAY_HEADER, List.of(
+        DEFAULT_HANDLERS.get(CompileState.METHOD_CALL_HEADER).addAll(statementHandlers);
+        DEFAULT_HANDLERS.put(CompileState.IMPLICIT_ARRAY_HEADER, list(
             new krow.compiler.lang.inarrayheader.ArrayEndHandler(),
-            new krow.compiler.lang.inarrayheader.ArraySplitParameterHandler(),
-            new OpenBracketHandler(),
-            new NullLiteralHandler(),
-            new BooleanLiteralHandler(),
-            new CharLiteralHandler(),
-            new StringLiteralHandler(),
-            new SmallLiteralHandler(),
-            new LongLiteralHandler(),
-            new DoubleLiteralHandler(),
-            new FloatLiteralHandler(),
-            new IsNotNullHandler(),
-            new InvertHandler(),
-            new IsNullHandler(),
-            new NegateHandler(),
-            new ClassSuffixHandler(),
-            new krow.compiler.lang.instatement.LoadArrayHandler(),
-            new ArrayLengthHandler(),
-            new StructImplicitHandler(),
-            new CastHandler(),
-            new NewArrayHandler(),
-            new DynamicCallStartHandler(), // goes in either
-            new MethodCallStartHandler(), // goes in either
-            new krow.compiler.lang.instatement.NewInstanceHandler(),
-            new FieldAccessHandler(),
-            new DynamicFieldAccessHandler(), // goes in either
-            new krow.compiler.lang.inmethod.TypeHandler(),
-            new krow.compiler.lang.inmethod.InitCallStartHandler(),
-//            new krow.compiler.handler.instatement.HandleHandler(),
-            new krow.compiler.lang.incall.VarLoadHandler()
+            new krow.compiler.lang.inarrayheader.ArraySplitParameterHandler()
         ));
+        DEFAULT_HANDLERS.get(CompileState.IMPLICIT_ARRAY_HEADER).addAll(statementHandlers);
+        DEFAULT_HANDLERS.put(CompileState.IMPLICIT_MATRIX_HEADER, list(
+            new krow.compiler.lang.inmatrixheader.MatrixEndHandler(),
+            new krow.compiler.lang.inmatrixheader.MatrixSplitParameterHandler()
+        ));
+        DEFAULT_HANDLERS.get(CompileState.IMPLICIT_MATRIX_HEADER).addAll(statementHandlers);
+        DEFAULT_HANDLERS.put(CompileState.ARRAY_ACCESSOR, list(
+            new krow.compiler.lang.inarrayaccess.ArrayEndHandler()
+        ));
+        DEFAULT_HANDLERS.get(CompileState.ARRAY_ACCESSOR).addAll(statementHandlers);
+        DEFAULT_HANDLERS.put(CompileState.MATRIX_ACCESSOR, list(
+            new krow.compiler.lang.inmatrixaccess.MatrixEndHandler(),
+            new krow.compiler.lang.inmatrixaccess.MatrixSplitParameterHandler()
+        ));
+        DEFAULT_HANDLERS.get(CompileState.MATRIX_ACCESSOR).addAll(statementHandlers);
+    }
+    
+    private static List<Handler> list(Handler... objects) {
+        return new ArrayList<>(Arrays.asList(objects));
     }
     
     private final List<PostCompileClass> list;

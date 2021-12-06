@@ -17,7 +17,7 @@ public class PreVariable {
     public static WriteInstruction load(final Type type, final int slot) {
         if (type.isArray()) {
             if (type.isPrimitiveArray()) {
-                char c = type.descriptor().charAt(type.descriptor().length());
+                char c = type.descriptor().charAt(type.descriptor().length()-1);
                 return switch (c) {
                     case 'L' -> WriteInstruction.arrayLoad(long.class);
                     case 'F' -> WriteInstruction.arrayLoad(float.class);
@@ -40,7 +40,7 @@ public class PreVariable {
     public static WriteInstruction store(final Type type, final int slot) {
         if (type.isArray()) {
             if (type.isPrimitiveArray()) {
-                char c = type.descriptor().charAt(type.descriptor().length());
+                char c = type.descriptor().charAt(type.descriptor().length()-1);
                 return switch (c) {
                     case 'L' -> WriteInstruction.arrayStore(long.class);
                     case 'F' -> WriteInstruction.arrayStore(float.class);

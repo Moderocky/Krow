@@ -13,9 +13,9 @@ import mx.kenzie.foundation.WriteInstruction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class AssignArrayHandler implements DefaultHandler {
+public class AssignMatrixHandler implements DefaultHandler {
     
-    private static final Pattern PATTERN = Pattern.compile("^\\[(?<index>\\d+)]\\s*=\\s*(?!=)");
+    private static final Pattern PATTERN = Pattern.compile("^\\[(?<x>\\d+),(?<y>\\d+)]\\s*="); // todo
     
     Matcher matcher;
     

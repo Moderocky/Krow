@@ -18,6 +18,7 @@ public class Signature {
     public static final Pattern TYPE_PATTERN = Pattern.compile(TYPE_STRING);
     public static final Pattern FIELD_PATTERN = Pattern.compile(TYPE_STRING + "\\." + IDENTIFIER + ":" + TYPE_STRING);
     public static final String ARRAY_TYPE_STRING = IDENTIFIER + "(/" + IDENTIFIER + ")*(?:\\[])+";
+    public static final String MATRIX_TYPE_STRING = IDENTIFIER + "(/" + IDENTIFIER + ")*(?:\\[,])+";
     protected String value;
     protected Mode mode;
     protected mx.kenzie.foundation.Type owner;

@@ -44,6 +44,19 @@ public enum CompileState {
      */
     IMPLICIT_ARRAY_HEADER,
     /**
+     * Within the `(...)` header of the implicit `new Type[,](a, b, ...)` matrix constructor.
+     * Note: this is not the same as a method header since it allows only elements of the type.
+     */
+    IMPLICIT_MATRIX_HEADER,
+    /**
+     * Within the `[...]` accessor of an array.
+     */
+    ARRAY_ACCESSOR,
+    /**
+     * Within the `[...,...]` accessor of a matrix.
+     */
+    MATRIX_ACCESSOR,
+    /**
      * Before the DEAD_END `;` of a constant declaration.
      * Note: this typically allows only literal values.
      */
