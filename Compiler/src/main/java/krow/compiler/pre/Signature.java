@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 public class Signature {
     
     public static final String IDENTIFIER = "\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*";
-    public static final String TYPE_STRING = IDENTIFIER + "(/" + IDENTIFIER + ")*(?:\\[])*";
+    public static final String TYPE_STRING = IDENTIFIER + "(/" + IDENTIFIER + ")*(?:\\[\\s*]|\\[\\s*,\\s*])*";
     public static final String STRUCTURE_STRING = "S\\(" + IDENTIFIER + ":" + TYPE_STRING + "(," + IDENTIFIER + ":" + TYPE_STRING + ")*" + "\\)";
     public static final String CL_TYPE_STRING = "(" + TYPE_STRING + "|" + STRUCTURE_STRING + ")";
     public static final Pattern METHOD_PATTERN = Pattern.compile(TYPE_STRING + "::" + IDENTIFIER + "\\(" + "(?:" + CL_TYPE_STRING + "(?:, ?" + CL_TYPE_STRING + ")*" + ")?" + "\\)" + CL_TYPE_STRING);

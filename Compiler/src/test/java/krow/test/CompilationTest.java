@@ -231,6 +231,7 @@ public class CompilationTest {
                     System.out.println(bean[1]);
                     assert bean[0].equals("hello");
                     assert bean[1].equals("there");
+                    int[ ] ints = new int[10];
                 }
                 
             }
@@ -639,7 +640,7 @@ public class CompilationTest {
                 
             }
             
-            """; // todo
+            """;
         final Class<?> basic = new ReKrow().compileAndLoad(source);
         assert basic != null;
         basic.getMethod("test").invoke(null);
