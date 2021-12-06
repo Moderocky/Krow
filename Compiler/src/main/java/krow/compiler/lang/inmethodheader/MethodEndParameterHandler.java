@@ -31,7 +31,8 @@ public class MethodEndParameterHandler implements DefaultHandler {
         method.modifiers |= context.upcoming();
         final MethodBuilder builder = context.builder
             .addMethod(method.name)
-            .setModifiers(method.modifiers);
+            .setModifiers(method.modifiers)
+            .addThrown(context.throwables.toArray(new Type[0]));
         if (context.child.exported) builder.addModifiers(Modifier.PUBLIC);
         builder.addParameter(method.parameters.toArray(new Type[0]));
         builder.setReturnType(method.returnType);

@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 @SuppressWarnings("ALL")
 public class DynamicFieldAssignHandler implements DefaultHandler {
     
-    private static final Pattern PATTERN = Pattern.compile("^#\\s*(?<name>" + Signature.IDENTIFIER + ")\\s*=");
+    private static final Pattern PATTERN = Pattern.compile("^#\\s*(?<name>" + Signature.IDENTIFIER + ")\\s*=\\s*(?!=)");
     Matcher matcher;
     
     @Override

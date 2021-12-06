@@ -438,11 +438,11 @@ public class CompilationTest {
             class mx/kenzie/Default {
                 
                 export <>
-                static void test() {
+                static String test() {
                     String var1 = null;
                     String var2 = "hello";
                     String result = (var1 ? var2);
-                    System.out.println(result);
+                    return result;
                 }
                 
             }
@@ -450,7 +450,7 @@ public class CompilationTest {
             """;
         final Class<?> basic = new ReKrow().compileAndLoad(source);
         assert basic != null;
-        basic.getMethod("test").invoke(null);
+        assert basic.getMethod("test").invoke(null).equals("hello");
     }
     
     @Test
@@ -632,13 +632,14 @@ public class CompilationTest {
                     
                     System.out.println(var);
                     CompilationTest#testField = "there";
+                    assert CompilationTest#testField == "there";
                     
                     System.out.println(CompilationTest#testField);
                 }
                 
             }
             
-            """;
+            """; // todo
         final Class<?> basic = new ReKrow().compileAndLoad(source);
         assert basic != null;
         basic.getMethod("test").invoke(null);
@@ -801,10 +802,32 @@ public class CompilationTest {
             }
             
             """;
-        debug(source);
         final Class<?> basic = new ReKrow().compileAndLoad(source);
         assert basic != null;
         basic.getMethod("test").invoke(null);
+    }
+    
+    @Test
+    public void throwables() throws Throwable {
+        final String source = """
+            import <java/io/PrintStream>
+            export <>
+            class mx/kenzie/example/Throwing {
+                
+                export <>
+                throws <java/lang/Throwable>
+                static boolean test() {
+                    if (true) System.out.println("exception skipped");
+                    else throw new Throwable(":(");
+                    return true;
+                }
+                
+            }
+            
+            """;
+        final Class<?> basic = new ReKrow().compileAndLoad(source);
+        assert basic != null;
+        assert (Boolean) basic.getMethod("test").invoke(null) == true;
     }
     
     private void debug(final String source) throws Throwable {

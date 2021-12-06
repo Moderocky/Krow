@@ -1,5 +1,6 @@
 package krow.compiler;
 
+import krow.compiler.api.ChildContext;
 import krow.compiler.api.CompileExpectation;
 import krow.compiler.api.CompileState;
 import krow.compiler.lang.inmethod.IfHandler;
@@ -7,13 +8,10 @@ import krow.compiler.pre.*;
 import mx.kenzie.foundation.Type;
 import mx.kenzie.foundation.WriteInstruction;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
-public abstract class WorkContext {
+public abstract class WorkContext implements ChildContext {
     public final List<PreVariable> variables = new ArrayList<>();
     public final List<WriteInstruction> statement = new ArrayList<>();
     public final List<WriteInstruction> advance = new ArrayList<>();
@@ -143,4 +141,18 @@ public abstract class WorkContext {
         else if (this.conditionPhase > 0) this.conditionPhase--;
     }
     
+    @Override
+    public Collection<WriteInstruction> getSkippedInstructions() {
+        return new ArrayList<>(skip());
+    }
+    
+    @Override
+    public Collection<WriteInstruction> getStatement() {
+        return new ArrayList<>(statement());
+    }
+    
+    @Override
+    public void addInstruction(WriteInstruction instruction) {
+        statement(instruction);
+    }
 }

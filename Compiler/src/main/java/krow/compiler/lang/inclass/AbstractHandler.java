@@ -5,6 +5,7 @@ import krow.compiler.DefaultHandler;
 import krow.compiler.api.CompileState;
 import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
+import org.objectweb.asm.Opcodes;
 
 import java.lang.reflect.Modifier;
 

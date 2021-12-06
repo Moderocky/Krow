@@ -10,25 +10,24 @@ import mx.kenzie.foundation.Type;
 import mx.kenzie.foundation.WriteInstruction;
 
 @SuppressWarnings("ALL")
-public class AssertHandler implements DefaultHandler {
+public class ThrowHandler implements DefaultHandler {
     
     @Override
     public boolean accepts(String statement, CompileContext context) {
-        return statement.startsWith("assert");
+        return statement.startsWith("throw");
     }
     
     @Override
     public HandleResult handle(String statement, PreClass data, CompileContext context) {
         assert context.method != null;
-        context.lookingFor = new Type(boolean.class);
-        context.expectation = CompileExpectation.PRIMITIVE;
-        context.child.skip(WriteInstruction.assertTrue());
+        context.expectation = CompileExpectation.OBJECT;
+        context.child.skip(WriteInstruction.throwException());
         context.duplicate = true;
-        return new HandleResult(null, statement.substring(6).trim(), CompileState.STATEMENT);
+        return new HandleResult(null, statement.substring(5).trim(), CompileState.STATEMENT);
     }
     
     @Override
     public String debugName() {
-        return "ASSERT";
+        return "THROW";
     }
 }

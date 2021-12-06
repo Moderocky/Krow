@@ -6,6 +6,7 @@ import krow.compiler.api.CompileExpectation;
 import krow.compiler.api.CompileState;
 import krow.compiler.api.HandleResult;
 import krow.compiler.pre.PreClass;
+import mx.kenzie.foundation.Type;
 import mx.kenzie.foundation.WriteInstruction;
 
 @SuppressWarnings("ALL")
@@ -25,6 +26,7 @@ public class UpLevelHandler implements DefaultHandler {
         context.createChild();
         context.variables.clear();
         context.preparing.clear();
+        context.throwables.clear();
         context.currentField = null;
         context.currentMethod = null;
         context.method = null;

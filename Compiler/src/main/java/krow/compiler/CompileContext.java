@@ -1,7 +1,9 @@
 package krow.compiler;
 
+import krow.compiler.api.ChildContext;
 import krow.compiler.api.CompileState;
 import krow.compiler.api.Library;
+import krow.compiler.api.ParentContext;
 import krow.compiler.pre.*;
 import mx.kenzie.foundation.*;
 import mx.kenzie.foundation.language.PostCompileClass;
@@ -11,15 +13,15 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 @SuppressWarnings("ALL")
-public class CompileContext extends WorkContext {
+public class CompileContext extends WorkContext implements ParentContext, ChildContext {
     
     public final List<Type> availableTypes = new ArrayList<>();
     public final List<PreMethod> availableMethods = new ArrayList<>();
     public final List<PreField> availableFields = new ArrayList<>();
     public final List<PostCompileClass> attachments = new ArrayList<>();
     private final List<BlockSectionContext> blocks = new ArrayList<>();
+    public final List<Type> throwables = new ArrayList<>();
     public CompileContext child;
-    public CompileState superState;
     public HandlerSet handlers;
     public boolean isInterface;
     public boolean isClass;
@@ -125,9 +127,45 @@ public class CompileContext extends WorkContext {
         return child != null ? child.brackets() : brackets;
     }
     
+    public PreBracket createBracket() {
+        final PreBracket bracket = new PreBracket();
+        brackets().add(0, bracket);
+        return bracket;
+    }
+    
     @Override
-    public WorkContext child() {
+    public boolean isInterface() {
+        return isInterface;
+    }
+    
+    @Override
+    public boolean isClass() {
+        return isClass;
+    }
+    
+    @Override
+    public ClassBuilder getClassBuilder() {
+        return null;
+    }
+    
+    @Override
+    public CompileContext child() {
         return child;
+    }
+    
+    @Override
+    public Collection<Type> getAvailableTypes() {
+        return availableTypes();
+    }
+    
+    @Override
+    public Collection<PreMethod> getAvailableMethods() {
+        return availableMethods();
+    }
+    
+    @Override
+    public Collection<PreField> getAvailableFields() {
+        return availableFields();
     }
     
     @Override

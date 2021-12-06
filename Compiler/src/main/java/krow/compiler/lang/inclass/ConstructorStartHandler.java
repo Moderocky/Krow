@@ -29,7 +29,7 @@ public class ConstructorStartHandler implements DefaultHandler {
         method.name = "<init>";
         method.returnType = new Type(void.class);
         method.modifiers |= context.upcoming();
-//        if (context.isInterface) throw new RuntimeException("Cannot place constructor in interface.");
+        if (context.isInterface) throw new RuntimeException("Cannot place constructor in interface.");
         context.method = method;
         context.availableMethods.add(method);
         if (context.upcoming(Modifier.STATIC)) throw new RuntimeException("Class <init> declared static.");

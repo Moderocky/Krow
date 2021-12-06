@@ -19,6 +19,7 @@ public class DeadEndHandler implements DefaultHandler {
     public HandleResult handle(String statement, PreClass data, CompileContext context) {
         context.createChild();
         context.variables.clear();
+        context.throwables.clear();
         context.currentField = null;
         context.currentMethod = null;
         context.method = null;

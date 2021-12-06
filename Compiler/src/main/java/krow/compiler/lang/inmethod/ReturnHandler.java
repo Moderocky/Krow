@@ -23,6 +23,7 @@ public class ReturnHandler implements DefaultHandler {
         assert context.method != null;
         final Type type = context.method.returnType;
         assert type != null;
+        context.duplicate = true;
         context.lookingFor = type;
         if (type.getSimpleName().equals("Structure"))
             context.child.awaitAdjustedType = true;
@@ -51,6 +52,6 @@ public class ReturnHandler implements DefaultHandler {
     
     @Override
     public String debugName() {
-        return "BEGIN_RETURN";
+        return "RETURN";
     }
 }
